@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Grupo Berger · Control Comercial</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #f1f5f9; min-height: 100vh; padding: 28px 16px; color: #0f172a; }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  .eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 2.5px; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-size: 26px; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
+  .sub { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+
+  /* SELECTOR DE VISTA */
+  .vista-selector { display: flex; gap: 0; margin-bottom: 24px; background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; overflow: hidden; width: fit-content; }
+  .vista-btn { padding: 10px 22px; font-size: 13px; font-weight: 700; color: #64748b; background: none; border: none; cursor: pointer; transition: all .15s; border-right: 1px solid #e2e8f0; }
+  .vista-btn:last-child { border-right: none; }
+  .vista-btn.activo { background: #0f172a; color: #fff; }
+  .vista-btn:hover:not(.activo) { background: #f8fafc; }
+
+  /* VISTAS */
+  .vista { display: none; }
+  .vista.visible { display: block; }
+
+  /* =================== VISTA TABLERO =================== */
+  .top-section { display: grid; grid-template-columns: 1fr 260px; gap: 14px; margin-bottom: 14px; align-items: start; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .destacados-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 14px 16px; margin-top: 10px; }
+  .destacados-titulo { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+  .destacado-item { display: flex; align-items: start; gap: 8px; padding: 6px 0; font-size: 12.5px; color: #475569; line-height: 1.5; border-bottom: 1px solid #f8fafc; }
+  .destacado-item:last-child { border-bottom: none; }
+  .destacado-icon { font-size: 14px; flex-shrink: 0; }
+  .destacado-item strong { color: #0f172a; }
+  .kpi { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 14px 10px; text-align: center; }
+  .kpi-val { font-size: 26px; font-weight: 900; line-height: 1; }
+  .kpi-label { font-size: 10px; color: #94a3b8; font-weight: 600; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .funnel-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px 14px; }
+  .funnel-title { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+  .funnel-step { margin-bottom: 8px; }
+  .funnel-label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .funnel-label { font-size: 11px; font-weight: 700; color: #475569; }
+  .funnel-count { font-size: 13px; font-weight: 900; color: #0f172a; }
+  .funnel-bar-bg { background: #f1f5f9; border-radius: 4px; height: 8px; overflow: hidden; }
+  .funnel-bar { height: 8px; border-radius: 4px; }
+  .funnel-pct { font-size: 10px; color: #94a3b8; margin-top: 2px; text-align: right; }
+  .funnel-divider { border: none; border-top: 1px dashed #e2e8f0; margin: 10px 0; }
+  .filtros-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; align-items: center; }
+  .filtros-grupo { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filtros-sep { width: 1px; height: 28px; background: #e2e8f0; margin: 0 4px; }
+  .filtro { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #e2e8f0; background: #fff; color: #64748b; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .15s; }
+  .filtro.activo { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .filtro.asesor-btn.activo { background: #2563eb; border-color: #2563eb; }
+  .tabla { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 24px; }
+  .thead { display: grid; grid-template-columns: 2fr 1.3fr 50px 50px 65px 55px 88px 68px 78px; padding: 10px 16px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+  .thead div { text-align: center; }
+  .thead div:first-child, .thead div:nth-child(2) { text-align: left; }
+  .fila { border-bottom: 1px solid #f1f5f9; }
+  .fila:last-child { border-bottom: none; }
+  .fila-header { display: grid; grid-template-columns: 2fr 1.3fr 50px 50px 65px 55px 88px 68px 78px; padding: 13px 16px; align-items: center; cursor: pointer; transition: background .1s; }
+  .fila-header:hover { background: #f8fafc; }
+  .fila.abierta .fila-header { background: #f8fafc; }
+  .nombre { font-weight: 800; font-size: 14px; color: #0f172a; }
+  .arrow { font-size: 10px; color: #cbd5e1; margin-left: 5px; }
+  .zona { font-size: 13px; color: #475569; }
+  .num { text-align: center; font-size: 14px; font-weight: 800; color: #0f172a; }
+  .fecha { text-align: center; font-size: 12px; color: #475569; }
+  .cal-alta { color: #16a34a; font-size: 11px; font-weight: 800; text-align: center; }
+  .cal-buena { color: #2563eb; font-size: 11px; font-weight: 800; text-align: center; }
+  .cal-media { color: #ca8a04; font-size: 11px; font-weight: 800; text-align: center; }
+  .cal-baja { color: #ea580c; font-size: 11px; font-weight: 800; text-align: center; }
+  .cal-muybaja { color: #dc2626; font-size: 11px; font-weight: 800; text-align: center; }
+  .cal-nula { color: #7f1d1d; font-size: 11px; font-weight: 800; text-align: center; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 800; }
+  .badge .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .badge-verde { background: #dcfce7; color: #166534; } .badge-verde .dot { background: #16a34a; }
+  .badge-amarillo { background: #fef9c3; color: #854d0e; } .badge-amarillo .dot { background: #ca8a04; }
+  .badge-rojo { background: #fee2e2; color: #991b1b; } .badge-rojo .dot { background: #dc2626; }
+  .fresca-alta { text-align: center; font-size: 12px; font-weight: 800; color: #16a34a; }
+  .fresca-media { text-align: center; font-size: 12px; font-weight: 800; color: #ca8a04; }
+  .fresca-baja { text-align: center; font-size: 12px; font-weight: 800; color: #dc2626; }
+  .badge-estado { text-align: center; }
+  .tag-nuevo { display: inline-block; background: #dcfce7; color: #166534; font-size: 10px; font-weight: 800; border-radius: 4px; padding: 1px 6px; margin-left: 4px; }
+  .tag-igual { display: inline-block; background: #f1f5f9; color: #64748b; font-size: 10px; font-weight: 800; border-radius: 4px; padding: 1px 6px; margin-left: 4px; }
+  .detalle { display: none; padding: 14px 16px 16px; background: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 13px; color: #475569; line-height: 1.65; }
+  .fila.abierta .detalle { display: block; }
+  .detalle strong { color: #0f172a; }
+  .pipeline-panel { display: none; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 20px; }
+  .pipeline-panel.visible { display: block; }
+  .pipeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .pipeline-titulo { font-size: 16px; font-weight: 900; color: #0f172a; }
+  .pipeline-zona { font-size: 12px; color: #64748b; font-weight: 600; }
+  .pipeline-close { cursor: pointer; font-size: 18px; color: #94a3b8; background: none; border: none; font-weight: 700; }
+  .pipeline-close:hover { color: #0f172a; }
+  .pipeline-seccion-titulo { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #f1f5f9; }
+  .pipeline-item { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 10px 12px; border-radius: 8px; background: #f8fafc; margin-bottom: 6px; align-items: start; }
+  .pipeline-cliente { font-weight: 700; font-size: 13px; color: #0f172a; }
+  .pipeline-desc { font-size: 12px; color: #64748b; margin-top: 2px; line-height: 1.4; }
+  .pipeline-precio { font-size: 12px; font-weight: 800; color: #0f172a; white-space: nowrap; }
+  .pipeline-sin-precio { font-size: 11px; color: #94a3b8; font-style: italic; }
+  .pipeline-badge { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 800; margin-right: 4px; }
+  .pb-sol { background: #ede9fe; color: #5b21b6; }
+  .pipeline-empty { font-size: 13px; color: #94a3b8; font-style: italic; padding: 8px 0; }
+  .oculta { display: none; }
+
+  /* =================== VISTA ADOPCIÓN =================== */
+  .seccion-titulo { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+  .score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .score-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px 14px; text-align: center; }
+  .score-nombre { font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .score-circulo { width: 62px; height: 62px; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #fff; }
+  .score-zona { font-size: 11px; color: #94a3b8; }
+  .sc-a { background: linear-gradient(135deg,#16a34a,#22c55e); }
+  .sc-b { background: linear-gradient(135deg,#2563eb,#60a5fa); }
+  .sc-c { background: linear-gradient(135deg,#ca8a04,#fbbf24); }
+  .sc-d { background: linear-gradient(135deg,#dc2626,#f87171); }
+  .tabla-adopcion { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 28px; }
+  .thead-adop { display: grid; grid-template-columns: 1.8fr 1.2fr 65px 65px 65px 75px 90px 90px 75px; padding: 10px 16px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; }
+  .thead-adop div { text-align: center; }
+  .thead-adop div:first-child, .thead-adop div:nth-child(2) { text-align: left; }
+  .fila-adop-wrap { border-bottom: 1px solid #f1f5f9; }
+  .fila-adop-wrap:last-child { border-bottom: none; }
+  .fila-adop { display: grid; grid-template-columns: 1.8fr 1.2fr 65px 65px 65px 75px 90px 90px 75px; padding: 13px 16px; align-items: center; cursor: pointer; transition: background .1s; }
+  .fila-adop:hover { background: #f8fafc; }
+  .col-nombre { font-weight: 800; font-size: 13px; color: #0f172a; }
+  .col-zona { font-size: 12px; color: #64748b; }
+  .col-num { text-align: center; font-size: 13px; font-weight: 700; color: #0f172a; }
+  .col-fecha { text-align: center; }
+  .ind { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 800; }
+  .ind-alto { background: #dcfce7; color: #166534; }
+  .ind-medio { background: #fef9c3; color: #854d0e; }
+  .ind-bajo { background: #fee2e2; color: #991b1b; }
+  .ind-nulo { background: #f1f5f9; color: #94a3b8; }
+  .barra-wrap { display: flex; align-items: center; gap: 6px; justify-content: center; }
+  .barra-bg { background: #f1f5f9; border-radius: 3px; height: 6px; width: 55px; overflow: hidden; }
+  .barra-fill { height: 6px; border-radius: 3px; }
+  .barra-pct { font-size: 10px; font-weight: 700; color: #64748b; min-width: 26px; }
+  .score-badge { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; font-size: 13px; font-weight: 900; color: #fff; margin: auto; }
+  .checks-panel { display: none; padding: 14px 16px 18px; background: #f8fafc; border-top: 1px solid #f1f5f9; }
+  .checks-panel.abierto { display: block; }
+  .checks-titulo { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .checks-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .check-item { display: flex; align-items: center; gap: 5px; }
+  .check-ok { color: #16a34a; font-size: 13px; }
+  .check-no { color: #dc2626; font-size: 13px; }
+  .check-label { font-size: 11px; color: #475569; }
+  .tag { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 800; }
+  .tag-hoy { background: #dcfce7; color: #166534; }
+  .tag-semana { background: #fef9c3; color: #854d0e; }
+  .tag-viejo { background: #fee2e2; color: #991b1b; }
+  .rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .rec-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 16px; }
+  .rec-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .rec-icon { font-size: 18px; }
+  .rec-titulo { font-size: 13px; font-weight: 800; color: #0f172a; }
+  .rec-list { list-style: none; }
+  .rec-list li { font-size: 12px; color: #475569; padding: 4px 0; border-bottom: 1px solid #f8fafc; line-height: 1.5; }
+  .rec-list li:last-child { border-bottom: none; }
+  .rec-list li::before { content: "→ "; color: #94a3b8; font-weight: 700; }
+
+  .footer { font-size: 11px; color: #cbd5e1; text-align: center; margin-top: 20px; }
+
+  @media (max-width: 700px) {
+    .top-section { grid-template-columns: 1fr; }
+    .score-grid { grid-template-columns: repeat(2, 1fr); }
+    .rec-grid { grid-template-columns: 1fr; }
+    .checks-grid { grid-template-columns: repeat(2, 1fr); }
+    .filtros-sep { display: none; }
+    .semaforo-visual-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Grupo Berger · CRM</div>
+  <h1>Control de Gestión Comercial</h1>
+  <p class="sub">Actualizado al 9 de julio de 2026 · 8 asesores</p>
+
+  <div class="vista-selector">
+    <button class="vista-btn activo" onclick="cambiarVista('tablero', this)">📊 Tablero</button>
+    <button class="vista-btn" onclick="cambiarVista('adopcion', this)">📋 Adopción CRM</button>
+  </div>
+
+  <div class="vista visible" id="vista-tablero">
+
+    <div class="top-section">
+      <div class="kpis">
+        <div class="kpi"><div class="kpi-val" style="color:#0f172a">119</div><div class="kpi-label">Total Leads</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:#0f172a">75</div><div class="kpi-label">En Negociación</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:#7c3aed">12</div><div class="kpi-label">Solicitudes</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:#16a34a">2</div><div class="kpi-label">Activos ✅✅✅</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:#ca8a04">4</div><div class="kpi-label">Parciales ❌1</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:#dc2626">2</div><div class="kpi-label">Por mejorar ❌2+</div></div>
+        <div class="destacados-card" style="grid-column: 1 / -1;">
+          <div class="destacados-titulo">⚡ Destacados de hoy · 09/07</div>
+          <div class="destacado-item"><span class="destacado-icon">⚠️</span><span><strong>García</strong> — el export de hoy llegó incompleto (solo 6 registros vs 30+ habituales). Se procesó igual a pedido de Charlie, pero conviene re-exportar el archivo completo</span></div>
+          <div class="destacado-item"><span class="destacado-icon">📈</span><span><strong>Enríquez</strong> tiene el mejor score de la semana (80) — pipeline activo y bien cargado</span></div>
+          <div class="destacado-item"><span class="destacado-icon">🔄</span><span><strong>Choppi</strong> cargó una solicitud nueva, primer movimiento desde que perdió las de Clovis SA</span></div>
+          <div class="destacado-item"><span class="destacado-icon">📊</span><span><strong>Corte de hoy:</strong> 119 leads · 75 neg · 12 solicitudes · 2 verde · 4 en desarrollo · 2 por mejorar</span></div>
+        </div>
+      </div>
+      <div class="funnel-card">
+        <div class="funnel-title">Embudo de ventas</div>
+        <div class="funnel-step">
+          <div class="funnel-label-row"><span class="funnel-label">🔵 Leads</span><span class="funnel-count">108</span></div>
+          <div class="funnel-bar-bg"><div class="funnel-bar" style="width:100%;background:#3b82f6"></div></div>
+          <div class="funnel-pct">100% del total</div>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-label-row"><span class="funnel-label">🟡 En Negociación</span><span class="funnel-count">94</span></div>
+          <div class="funnel-bar-bg"><div class="funnel-bar" style="width:100%;background:#f59e0b"></div></div>
+          <div class="funnel-pct">Pipeline activo acumulado</div>
+        </div>
+        <hr class="funnel-divider">
+        <div class="funnel-step">
+          <div class="funnel-label-row"><span class="funnel-label">🟣 Solicitudes pres.</span><span class="funnel-count">6</span></div>
+          <div class="funnel-bar-bg"><div class="funnel-bar" style="width:2%;background:#7c3aed"></div></div>
+          <div class="funnel-pct">~2% del pipeline</div>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-label-row"><span class="funnel-label">✅ Aut. Comercial</span><span class="funnel-count">4</span></div>
+          <div class="funnel-bar-bg"><div class="funnel-bar" style="width:1%;background:#16a34a"></div></div>
+          <div class="funnel-pct">~1% del pipeline</div>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-label-row"><span class="funnel-label">🏆 Aceptadas / Cerradas</span><span class="funnel-count">7</span></div>
+          <div class="funnel-bar-bg"><div class="funnel-bar" style="width:2%;background:#0f172a"></div></div>
+          <div class="funnel-pct">~2% — Reimer lidera con 7 ventas</div>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-label-row"><span class="funnel-label">❌ Rechazadas / Perdidas</span><span class="funnel-count">107</span></div>
+          <div class="funnel-bar-bg"><div class="funnel-bar" style="width:33%;background:#ef4444"></div></div>
+          <div class="funnel-pct">mayoría de García y Goedelmann</div>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-label-row"><span class="funnel-label">🏁 Vendidas (sin datos)</span><span class="funnel-count">—</span></div>
+          <div class="funnel-bar-bg"><div class="funnel-bar" style="width:0%"></div></div>
+          <div class="funnel-pct" style="color:#94a3b8">Cerradas fuera del export</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEMÁFORO VISUAL -->
+    <div style="margin-bottom:24px;">
+      <div class="seccion-titulo" style="margin-bottom:10px;">🚦 Semáforo visual del equipo</div>
+      <div class="semaforo-visual-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);border:2px solid #16a34a;border-radius:16px;padding:18px 14px;text-align:center;position:relative;">
+        <div style="width:54px;height:54px;border-radius:50%;background:#16a34a;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">✓</div>
+        <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:2px;">Vía Tomás</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Trenque Lauquen</div>
+        <div style="font-size:10px;font-weight:800;color:#166534;letter-spacing:0.5px;margin-bottom:10px;">VERDE</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:11px;color:#475569;">
+          <span><strong style="color:#0f172a">14</strong> leads</span>
+          <span><strong style="color:#0f172a">4</strong> neg</span>
+        </div>
+        <div style="margin-top:6px;font-size:18px;font-weight:900;color:#166534;">71</div>
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">score</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);border:2px solid #16a34a;border-radius:16px;padding:18px 14px;text-align:center;position:relative;">
+        <div style="width:54px;height:54px;border-radius:50%;background:#16a34a;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">✓</div>
+        <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:2px;">Goedelmann Marcelo</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Gral. Villegas</div>
+        <div style="font-size:10px;font-weight:800;color:#166534;letter-spacing:0.5px;margin-bottom:10px;">VERDE</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:11px;color:#475569;">
+          <span><strong style="color:#0f172a">14</strong> leads</span>
+          <span><strong style="color:#0f172a">17</strong> neg</span>
+        </div>
+        <div style="margin-top:6px;font-size:18px;font-weight:900;color:#166534;">59</div>
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">score</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fef9c3,#fde68a);border:2px solid #ca8a04;border-radius:16px;padding:18px 14px;text-align:center;position:relative;">
+        <div style="width:54px;height:54px;border-radius:50%;background:#ca8a04;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">!</div>
+        <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:2px;">Enríquez Ramiro</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Gral. Pico</div>
+        <div style="font-size:10px;font-weight:800;color:#854d0e;letter-spacing:0.5px;margin-bottom:10px;">EN DESARROLLO</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:11px;color:#475569;">
+          <span><strong style="color:#0f172a">15</strong> leads</span>
+          <span><strong style="color:#0f172a">12</strong> neg</span>
+        </div>
+        <div style="margin-top:6px;font-size:18px;font-weight:900;color:#854d0e;">80</div>
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">score</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fef9c3,#fde68a);border:2px solid #ca8a04;border-radius:16px;padding:18px 14px;text-align:center;position:relative;">
+        <div style="width:54px;height:54px;border-radius:50%;background:#ca8a04;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">!</div>
+        <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:2px;">Campasso Martín</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Castex / Gral. Pico</div>
+        <div style="font-size:10px;font-weight:800;color:#854d0e;letter-spacing:0.5px;margin-bottom:10px;">EN DESARROLLO</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:11px;color:#475569;">
+          <span><strong style="color:#0f172a">15</strong> leads</span>
+          <span><strong style="color:#0f172a">7</strong> neg</span>
+        </div>
+        <div style="margin-top:6px;font-size:18px;font-weight:900;color:#854d0e;">75</div>
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">score</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fef9c3,#fde68a);border:2px solid #ca8a04;border-radius:16px;padding:18px 14px;text-align:center;position:relative;">
+        <div style="width:54px;height:54px;border-radius:50%;background:#ca8a04;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">!</div>
+        <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:2px;">García Demian</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Trenque Lauquen</div>
+        <div style="font-size:10px;font-weight:800;color:#854d0e;letter-spacing:0.5px;margin-bottom:10px;">EN DESARROLLO</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:11px;color:#475569;">
+          <span><strong style="color:#0f172a">1</strong> leads</span>
+          <span><strong style="color:#0f172a">5</strong> neg</span>
+        </div>
+        <div style="margin-top:6px;font-size:18px;font-weight:900;color:#854d0e;">64</div>
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">score</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fef9c3,#fde68a);border:2px solid #ca8a04;border-radius:16px;padding:18px 14px;text-align:center;position:relative;">
+        <div style="width:54px;height:54px;border-radius:50%;background:#ca8a04;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">!</div>
+        <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:2px;">Reimer Agustín</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Castex / La Pampa</div>
+        <div style="font-size:10px;font-weight:800;color:#854d0e;letter-spacing:0.5px;margin-bottom:10px;">EN DESARROLLO</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:11px;color:#475569;">
+          <span><strong style="color:#0f172a">52</strong> leads</span>
+          <span><strong style="color:#0f172a">25</strong> neg</span>
+        </div>
+        <div style="margin-top:6px;font-size:18px;font-weight:900;color:#854d0e;">55</div>
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">score</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fee2e2,#fecaca);border:2px solid #dc2626;border-radius:16px;padding:18px 14px;text-align:center;position:relative;">
+        <div style="width:54px;height:54px;border-radius:50%;background:#dc2626;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">✕</div>
+        <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:2px;">Sierra Juan</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Salliqueló</div>
+        <div style="font-size:10px;font-weight:800;color:#991b1b;letter-spacing:0.5px;margin-bottom:10px;">POR MEJORAR</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:11px;color:#475569;">
+          <span><strong style="color:#0f172a">8</strong> leads</span>
+          <span><strong style="color:#0f172a">4</strong> neg</span>
+        </div>
+        <div style="margin-top:6px;font-size:18px;font-weight:900;color:#991b1b;">62</div>
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">score</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fee2e2,#fecaca);border:2px solid #dc2626;border-radius:16px;padding:18px 14px;text-align:center;position:relative;">
+        <div style="width:54px;height:54px;border-radius:50%;background:#dc2626;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.15);">✕</div>
+        <div style="font-weight:800;font-size:14px;color:#0f172a;margin-bottom:2px;">Choppi Diego</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Cnel. Pringles</div>
+        <div style="font-size:10px;font-weight:800;color:#991b1b;letter-spacing:0.5px;margin-bottom:10px;">POR MEJORAR</div>
+        <div style="display:flex;justify-content:center;gap:10px;font-size:11px;color:#475569;">
+          <span><strong style="color:#0f172a">0</strong> leads</span>
+          <span><strong style="color:#0f172a">1</strong> neg</span>
+        </div>
+        <div style="margin-top:6px;font-size:18px;font-weight:900;color:#991b1b;">40</div>
+        <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">score</div>
+      </div>
+      </div>
+    </div>
+
+
+    <div style="margin-bottom:12px;">
+      <button onclick="toggleCriterios()" style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;width:100%;text-align:left;" id="btn-criterios">
+        <span>📖 Criterios de carga</span>
+        <span style="margin-left:auto;font-size:10px;color:#94a3b8" id="arrow-criterios">▼ ver</span>
+      </button>
+      <div id="panel-criterios" style="display:none;background:#fff;border:1.5px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;padding:14px 16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#3b82f6;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🔵 Lead</div>
+            <div style="font-size:12.5px;color:#475569;line-height:1.7;">
+              El cliente mostró interés pero <strong style="color:#0f172a">todavía no hay precio sobre la mesa</strong>.<br>
+              · Me llamó / consultó por una máquina<br>
+              · Lo visité y relevé qué necesita<br>
+              · Mandé catálogo o ficha técnica<br>
+              · Está en evaluación, sin número concreto
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#ca8a04;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🟡 Negociación</div>
+            <div style="font-size:12.5px;color:#475569;line-height:1.7;">
+              Ya hay un <strong style="color:#0f172a">precio definido y el cliente lo conoce</strong>.<br>
+              · Le pasé un precio formal (cotización, proforma, WhatsApp con número)<br>
+              · Estamos discutiendo condiciones (forma de pago, toma de usado, plazo)<br>
+              · El cliente compara con otras opciones con precio en mano
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9;font-size:11px;color:#94a3b8;">
+          💡 <strong>Regla clave:</strong> el momento exacto del pase de Lead a Negociación es cuando enviás el precio.
+        </div>
+      </div>
+    </div>
+
+    <!-- METODOLOGÍA -->
+    <div style="margin-bottom:12px;">
+      <button onclick="toggleMetodologia()" style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:700;color:#475569;width:100%;text-align:left;" id="btn-metodologia">
+        <span>📐 Metodología del tablero</span>
+        <span style="margin-left:auto;font-size:10px;color:#94a3b8" id="arrow-metodologia">▼ ver</span>
+      </button>
+      <div id="panel-metodologia" style="display:none;background:#fff;border:1.5px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;padding:16px;">
+
+        <div style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🚦 Semáforo — 3 criterios</div>
+        <div style="font-size:12.5px;color:#475569;line-height:1.8;margin-bottom:14px;">
+          <strong>① Actividad ≤7 días</strong> · <strong>② Al menos 3 negociaciones con precio cargado</strong> (criterio generoso) · <strong>③ Campos ≥60% completos</strong><br>
+          🟢 <strong>Verde</strong> = cumple los 3 &nbsp;·&nbsp; 🟡 <strong>En desarrollo</strong> = falla solo 1 &nbsp;·&nbsp; 🔴 <strong>Por mejorar</strong> = falla 2 o más
+        </div>
+
+        <div style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📋 Criterio ③ — cómo se mide "campos completos"</div>
+        <div style="font-size:12.5px;color:#475569;line-height:1.8;margin-bottom:14px;">
+          Se mide <strong>por registro individual</strong> (cada negociación o solicitud), no agregado por campo.<br>
+          Si la operación no tiene entrega de usado, los 3 campos de usado <strong>no cuentan</strong> — ni suman ni restan del cálculo.<br>
+          El % del asesor es el <strong>promedio</strong> de ese % entre todas sus negociaciones + solicitudes activas (no incluye leads ni perdidas).<br>
+          <span style="color:#94a3b8">18 campos base (sin usado): CUIT, Ubicación, Teléfono, Correo electrónico, Interes Nuevo/Usado, Entrega usado, Clase/Clasificación, Marca, Detalle técnico, Descripción adicional, Precio de lista, Precio negociado, Precio Final, Moneda pactada, Forma de pago, Tipo Financiación, Observación, Inicio de negociación. + 3 condicionales de usado (Fotos usado, Descripción de usado, Valor de toma Usado) solo si Entrega usado = SI → 21 campos en ese caso.</span>
+        </div>
+
+        <div style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🎯 Campos excluidos del conteo</div>
+        <div style="font-size:12.5px;color:#475569;line-height:1.8;margin-bottom:14px;">
+          <span style="color:#94a3b8">De las 44 columnas del export de monday.com, quedan afuera 23: identidad/sistema (Name, Vendedor, Estado), auto-calculadas (Precio Sin IVA, IVA, Diferencia a abonar, Última actualización, Tipo de cambio), flujo de aprobación condicional (Aut. Comercial, Comercial Motivo rechazo, Aut. Financiera, Financiación Motivo rechazo), fechas de etapa (Fecha de aceptación, Fecha del lead), selector interno (Entorno), descuentos (% Dto 1-4), Boleto, Agendado, Interes de Marca e Interes Tipo Maquinaria.</span>
+        </div>
+
+        <div style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📊 Score de Adopción</div>
+        <div style="font-size:12.5px;color:#475569;line-height:1.8;margin-bottom:14px;">
+          <strong>Score = Actividad (30%) + Campos (40%) + Frescura de pipeline (30%)</strong><br>
+          Actividad = 50% Recencia (según días desde la última carga) + 50% Volumen sostenido (operaciones tocadas en los últimos 7 días, 8 operaciones = 100 puntos).<br>
+          Frescura = % de negociaciones actualizadas hace menos de 30 días.
+        </div>
+
+        <div style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🔵🟡 Lead vs. Negociación</div>
+        <div style="font-size:12.5px;color:#475569;line-height:1.8;margin-bottom:14px;">
+          <strong>Lead</strong> = el cliente mostró interés pero todavía no hay precio sobre la mesa.<br>
+          <strong>Negociación</strong> = ya se envió un precio formal al cliente.
+        </div>
+
+        <div style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">↕️ Orden de las vistas</div>
+        <div style="font-size:12.5px;color:#475569;line-height:1.8;">
+          <strong>Tablero:</strong> verdes primero (por frescura de pipeline descendente), después en desarrollo, después por mejorar.<br>
+          <strong>Adopción:</strong> por score puro de mayor a menor, sin importar el color del semáforo.
+        </div>
+
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9;font-size:11px;color:#94a3b8;">
+          🔒 Metodología fijada junto con Charlie el 03/07/2026. No se reinterpreta en actualizaciones futuras sin su validación explícita.
+        </div>
+      </div>
+    </div>
+
+
+  <div style="margin-bottom:16px;">
+    <div style="position:relative;">
+      <input type="text" id="buscador-global" oninput="buscarGlobal(this.value)" placeholder="Buscar en todo el tablero: sembradora usada, tractor NH, Trenque Lauquen, cliente..." style="width:100%;padding:12px 16px 12px 40px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:14px;color:#0f172a;background:#fff url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2218%22 height=%2218%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2394a3b8%22 stroke-width=%222%22%3E%3Ccircle cx=%2211%22 cy=%2211%22 r=%228%22/%3E%3Cline x1=%2221%22 y1=%2221%22 x2=%2216.65%22 y2=%2216.65%22/%3E%3C/svg%3E') no-repeat 14px center;" />
+    </div>
+    <div id="resultados-busqueda" style="display:none;margin-top:10px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;max-height:480px;overflow-y:auto;"></div>
+  </div>
+
+  <div class="filtros-wrap">
+      <div class="filtros-grupo" id="filtros-estado">
+        <button class="filtro activo" onclick="filtrarEstado('todos',this)">Todos</button>
+        <button class="filtro" onclick="filtrarEstado('verde',this)">Verde</button>
+        <button class="filtro" onclick="filtrarEstado('amarillo',this)">En desarrollo</button>
+        <button class="filtro" onclick="filtrarEstado('rojo',this)">Por mejorar</button>
+      </div>
+      <div class="filtros-sep"></div>
+      <div class="filtros-grupo" id="filtros-asesor">
+        <button class="filtro asesor-btn" onclick="filtrarAsesor('garcia',this)">García</button>
+        <button class="filtro asesor-btn" onclick="filtrarAsesor('goedelmann',this)">Goedelmann</button>
+        <button class="filtro asesor-btn" onclick="filtrarAsesor('sierra',this)">Sierra</button>
+        <button class="filtro asesor-btn" onclick="filtrarAsesor('enriquez',this)">Enríquez</button>
+        <button class="filtro asesor-btn" onclick="filtrarAsesor('via',this)">Vía</button>
+        <button class="filtro asesor-btn" onclick="filtrarAsesor('reimer',this)">Reimer</button>
+        <button class="filtro asesor-btn" onclick="filtrarAsesor('campasso',this)">Campasso</button>
+        <button class="filtro asesor-btn" onclick="filtrarAsesor('choppi',this)">Choppi</button>
+      </div>
+    </div>
+
+    <div class="tabla" id="tabla-resumen">
+      <div class="thead">
+        <div>Asesor</div><div>Zona</div><div>Leads</div><div>Neg.</div><div>Frescas</div><div>Solic.</div><div>Última act.</div><div>Calidad</div><div>Estado</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#475569;line-height:1.7;">
+        <strong style="color:#0f172a;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Criterios semáforo</strong> &nbsp;·&nbsp;
+        🟢 <strong>Verde</strong>: cumple los 3 &nbsp;·&nbsp;
+        🔴 <strong>Por mejorar</strong>: falla 2 o más &nbsp;·&nbsp;
+        🟡 <strong>En desarrollo</strong>: falla solo 1 &nbsp;&nbsp;
+        <span style="color:#94a3b8">|</span>&nbsp;&nbsp;
+        <strong>① Actividad ≤7 días</strong> &nbsp;
+        <strong>② ≥3 neg. con precio</strong> &nbsp;
+        <strong>③ Campos ≥60% completos</strong>
+      </div>
+
+<!-- 🟢 VERDE — cumple los 3 criterios -->
+      <div class="fila" data-estado="verde" data-asesor="via">
+        <div class="fila-header" onclick="toggle(this)">
+          <div class="nombre">Vía Tomás <span class="arrow">▼</span></div><div class="zona">Trenque Lauquen</div>
+          <div class="num">14</div><div class="num">4</div><div class="fresca-alta">100%</div><div class="num" style="color:#94a3b8">0</div>
+          <div class="fecha">06/07</div><div class="cal-buena">Buena</div>
+          <div class="badge-estado"><span class="badge badge-verde"><span class="dot"></span>Verde</span></div>
+        </div>
+        <div class="detalle"><strong>Progreso:</strong> <span class="tag-igual">Sigue verde, pipeline depurado</span> &nbsp;<button onclick="abrirPipeline('via')" style="font-size:11px;font-weight:700;color:#2563eb;background:none;border:none;cursor:pointer;text-decoration:underline">Ver pipeline →</button><br><br>Se mantiene verde, pipeline chico pero prolijo (4 negociaciones, 3 con precio). <span style="color:#16a34a;font-weight:700">✅ ① ✅ ② ✅ ③</span></div>
+      </div>
+      <div class="fila" data-estado="verde" data-asesor="goedelmann">
+        <div class="fila-header" onclick="toggle(this)">
+          <div class="nombre">Goedelmann Marcelo <span class="arrow">▼</span></div><div class="zona">Gral. Villegas</div>
+          <div class="num">14</div><div class="num">17</div><div class="fresca-alta">88%</div><div class="num" style="color:#94a3b8">0</div>
+          <div class="fecha">02/07</div><div class="cal-alta">Alta</div>
+          <div class="badge-estado"><span class="badge badge-verde"><span class="dot"></span>Verde</span></div>
+        </div>
+        <div class="detalle"><strong>Progreso:</strong> <span class="tag-igual">Sin movimientos nuevos desde 02/07</span> &nbsp;<button onclick="abrirPipeline('goedelmann')" style="font-size:11px;font-weight:700;color:#2563eb;background:none;border:none;cursor:pointer;text-decoration:underline">Ver pipeline →</button><br><br>Sin movimientos nuevos en negociación desde el 02/07 — ya lleva 7 días, empieza a acercarse al límite del criterio ①. Campos siguen al 71%, el mejor del equipo. <span style="color:#16a34a;font-weight:700">✅ ① ✅ ② ✅ ③</span></div>
+      </div>
+<!-- 🟡 EN DESARROLLO — falla 1 criterio -->
+      <div class="fila" data-estado="amarillo" data-asesor="garcia">
+        <div class="fila-header" onclick="toggle(this)">
+          <div class="nombre">García Demian <span class="arrow">▼</span></div><div class="zona">Trenque Lauquen</div>
+          <div class="num">1</div><div class="num">5</div><div class="fresca-alta">100%</div><div class="num" style="color:#94a3b8">0</div>
+          <div class="fecha">04/07</div><div class="cal-buena">Buena</div>
+          <div class="badge-estado"><span class="badge badge-amarillo"><span class="dot"></span>En desarrollo</span></div>
+        </div>
+        <div class="detalle"><strong>Progreso:</strong> <span class="tag-nuevo">⚠️ Export incompleto: solo 6 registros (antes 30+)</span> &nbsp;<button onclick="abrirPipeline('garcia')" style="font-size:11px;font-weight:700;color:#2563eb;background:none;border:none;cursor:pointer;text-decoration:underline">Ver pipeline →</button><br><br>El archivo de hoy vino con solo 6 registros (1 lead + 5 negociaciones), muy por debajo de los 30+ habituales — probablemente un export parcial o filtrado, no que haya perdido pipeline real. Se procesó tal cual llegó, a pedido de Charlie. Solo queda 1 de los 3 negocios Comofra que tenía (Cuadrado); Sucesores Jorge Costa y Marcos Salicio no aparecen en este archivo. <span style="color:#ca8a04;font-weight:700">✅ ① ❌ ② ✅ ③</span></div>
+      </div>
+      <div class="fila" data-estado="amarillo" data-asesor="reimer">
+        <div class="fila-header" onclick="toggle(this)">
+          <div class="nombre">Reimer Agustín <span class="arrow">▼</span></div><div class="zona">Castex / La Pampa</div>
+          <div class="num">52</div><div class="num">25</div><div class="fresca-alta">100%</div><div class="num" style="color:#7c3aed">7</div>
+          <div class="fecha">29/06</div><div class="cal-buena">Buena</div>
+          <div class="badge-estado"><span class="badge badge-amarillo"><span class="dot"></span>En desarrollo</span></div>
+        </div>
+        <div class="detalle"><strong>Progreso:</strong> <span class="tag-igual">10 días sin tocar ninguna negociación</span> &nbsp;<button onclick="abrirPipeline('reimer')" style="font-size:11px;font-weight:700;color:#2563eb;background:none;border:none;cursor:pointer;text-decoration:underline">Ver pipeline →</button><br><br>El pipeline más grande del equipo (25 neg, 52 leads) lleva 10 días sin tocar ninguna negociación. Sigue en amarillo por el criterio ①. <span style="color:#ca8a04;font-weight:700">❌ ① ✅ ② ✅ ③</span></div>
+      </div>
+      <div class="fila" data-estado="amarillo" data-asesor="campasso">
+        <div class="fila-header" onclick="toggle(this)">
+          <div class="nombre">Campasso Martín <span class="arrow">▼</span></div><div class="zona">Castex / Gral. Pico</div>
+          <div class="num">15</div><div class="num">7</div><div class="fresca-alta">100%</div><div class="num" style="color:#7c3aed">3</div>
+          <div class="fecha">07/07</div><div class="cal-media">Media</div>
+          <div class="badge-estado"><span class="badge badge-amarillo"><span class="dot"></span>En desarrollo</span></div>
+        </div>
+        <div class="detalle"><strong>Progreso:</strong> <span class="tag-nuevo">Buen volumen de carga (10 op. en 7 días)</span> &nbsp;<button onclick="abrirPipeline('campasso')" style="font-size:11px;font-weight:700;color:#2563eb;background:none;border:none;cursor:pointer;text-decoration:underline">Ver pipeline →</button><br><br>Buen ritmo de carga (10 operaciones tocadas en 7 días), campos al 47%. El lead Comofra de Poli Jose ya no aparece en este export. <span style="color:#ca8a04;font-weight:700">✅ ① ✅ ② ❌ ③</span></div>
+      </div>
+      <div class="fila" data-estado="amarillo" data-asesor="enriquez">
+        <div class="fila-header" onclick="toggle(this)">
+          <div class="nombre">Enríquez Ramiro <span class="arrow">▼</span></div><div class="zona">Gral. Pico</div>
+          <div class="num">15</div><div class="num">12</div><div class="fresca-alta">100%</div><div class="num" style="color:#94a3b8">0</div>
+          <div class="fecha">07/07</div><div class="cal-buena">Buena</div>
+          <div class="badge-estado"><span class="badge badge-amarillo"><span class="dot"></span>En desarrollo</span></div>
+        </div>
+        <div class="detalle"><strong>Progreso:</strong> <span class="tag-igual">Pipeline estable, el mejor score de la semana</span> &nbsp;<button onclick="abrirPipeline('enriquez')" style="font-size:11px;font-weight:700;color:#2563eb;background:none;border:none;cursor:pointer;text-decoration:underline">Ver pipeline →</button><br><br>El mejor score de la semana (80) — pipeline activo, 9 de 12 negociaciones con precio, campos al 58%. <span style="color:#ca8a04;font-weight:700">✅ ① ✅ ② ❌ ③</span></div>
+      </div>
+<!-- 🔴 POR MEJORAR — falla 2 o más -->
+      <div class="fila" data-estado="rojo" data-asesor="sierra">
+        <div class="fila-header" onclick="toggle(this)">
+          <div class="nombre">Sierra Juan <span class="arrow">▼</span></div><div class="zona">Salliqueló</div>
+          <div class="num">8</div><div class="num">4</div><div class="fresca-alta">100%</div><div class="num" style="color:#7c3aed">1</div>
+          <div class="fecha">08/07</div><div class="cal-media">Media</div>
+          <div class="badge-estado"><span class="badge badge-rojo"><span class="dot"></span>Por mejorar</span></div>
+        </div>
+        <div class="detalle"><strong>Progreso:</strong> <span class="tag-nuevo">Actualizó ayer, pero sigue con pocos precios cargados</span> &nbsp;<button onclick="abrirPipeline('sierra')" style="font-size:11px;font-weight:700;color:#2563eb;background:none;border:none;cursor:pointer;text-decoration:underline">Ver pipeline →</button><br><br>Actualizó una operación ayer (primera novedad en semanas), pero campos y precio siguen bajos (42%, 0 de 4 con precio). <span style="color:#dc2626;font-weight:700">✅ ① ❌ ② ❌ ③</span></div>
+      </div>
+      <div class="fila" data-estado="rojo" data-asesor="choppi">
+        <div class="fila-header" onclick="toggle(this)">
+          <div class="nombre">Choppi Diego <span class="arrow">▼</span></div><div class="zona">Cnel. Pringles</div>
+          <div class="num">0</div><div class="num">1</div><div class="fresca-media">50%</div><div class="num" style="color:#7c3aed">1</div>
+          <div class="fecha">06/07</div><div class="cal-baja">Baja</div>
+          <div class="badge-estado"><span class="badge badge-rojo"><span class="dot"></span>Por mejorar</span></div>
+        </div>
+        <div class="detalle"><strong>Progreso:</strong> <span class="tag-nuevo">Cargó 1 solicitud nueva, primer movimiento en semanas</span> &nbsp;<button onclick="abrirPipeline('choppi')" style="font-size:11px;font-weight:700;color:#2563eb;background:none;border:none;cursor:pointer;text-decoration:underline">Ver pipeline →</button><br><br>Cargó una solicitud nueva hoy, el primer movimiento desde que perdió las 4 solicitudes de Clovis SA. A confirmar si se mantiene. <span style="color:#dc2626;font-weight:700">✅ ① ❌ ② ❌ ③</span></div>
+      </div>
+    </div>
+
+    <div class="pipeline-panel" id="pipeline-panel">
+      <div class="pipeline-header">
+        <div><div class="pipeline-titulo" id="pp-titulo"></div><div class="pipeline-zona" id="pp-zona"></div></div>
+        <button class="pipeline-close" onclick="cerrarPipeline()">✕</button>
+      </div>
+      <div id="pp-contenido"></div>
+    </div>
+
+  </div>
+
+  <div class="vista" id="vista-adopcion">
+
+    <div class="seccion-titulo">Ranking de adopción · semana 09/07/2026 · Score = actividad (30%) + calidad campos (40%) + frescura pipeline (30%) · Actividad = 50% recencia + 50% volumen sostenido</div>
+    <div class="score-grid">
+      <div class="score-card"><div class="score-nombre">Enríquez Ramiro</div><div class="score-circulo sc-a">80</div><div class="score-zona">Gral. Pico 🟡</div></div>
+      <div class="score-card"><div class="score-nombre">Campasso Martín</div><div class="score-circulo sc-b">75</div><div class="score-zona">Castex / Gral. Pico 🟡</div></div>
+      <div class="score-card"><div class="score-nombre">Vía Tomás</div><div class="score-circulo sc-b">71</div><div class="score-zona">Trenque Lauquen 🟢</div></div>
+      <div class="score-card"><div class="score-nombre">García Demian</div><div class="score-circulo sc-c">64</div><div class="score-zona">Trenque Lauquen 🟡</div></div>
+      <div class="score-card"><div class="score-nombre">Sierra Juan</div><div class="score-circulo sc-c">62</div><div class="score-zona">Salliqueló 🔴</div></div>
+      <div class="score-card"><div class="score-nombre">Goedelmann Marcelo</div><div class="score-circulo sc-c">59</div><div class="score-zona">Gral. Villegas 🟢</div></div>
+      <div class="score-card"><div class="score-nombre">Reimer Agustín</div><div class="score-circulo sc-c">55</div><div class="score-zona">Castex / La Pampa 🟡</div></div>
+      <div class="score-card"><div class="score-nombre">Choppi Diego</div><div class="score-circulo sc-d">40</div><div class="score-zona">Cnel. Pringles 🔴</div></div>
+    </div>
+
+    <div class="seccion-titulo">Detalle por asesor · tocá una fila para ver campos</div>
+    <div class="tabla-adopcion">
+      <div class="thead-adop">
+        <div>Asesor</div><div>Zona</div><div>Leads</div><div>Neg.</div><div>Solic.</div><div>Últ. carga</div><div>Campos llenos</div><div>Frecuencia</div><div>Score</div>
+      </div>
+
+      <div class="fila-adop-wrap">
+        <div class="fila-adop" onclick="toggleChecks('enriquez')">
+          <div class="col-nombre">Enríquez Ramiro</div><div class="col-zona">Gral. Pico 🟡</div>
+          <div class="col-num">15</div><div class="col-num">12</div><div class="col-num">0</div>
+          <div class="col-fecha"><span class="tag tag-semana">07/07</span></div>
+          <div class="barra-wrap"><div class="barra-bg"><div class="barra-fill" style="width:58%;background:#16a34a"></div></div><span class="barra-pct">58%</span></div>
+          <div style="text-align:center"><span class="ind ind-alto">Frecuente</span></div>
+          <div style="text-align:center"><span class="score-badge" style="background:#16a34a">80</span></div>
+        </div>
+        <div class="checks-panel" id="checks-enriquez">
+          <div class="checks-titulo">Campos: 18 sin usado / 21 con usado · datos 09/07</div>
+          <div class="checks-grid">
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">① Actividad ≤7 días (2d)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">② ≥3 neg con precio (9/12)</span></div>
+            <div class="check-item"><span class="check-no">✗</span><span class="check-label">③ Campos ≥60% (58%)</span></div>
+            <div class="check-item"><span class="check-label" style="color:#94a3b8">Volumen 7d: 12 op. · Frescura 100%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="fila-adop-wrap">
+        <div class="fila-adop" onclick="toggleChecks('campasso')">
+          <div class="col-nombre">Campasso Martín</div><div class="col-zona">Castex / Gral. Pico 🟡</div>
+          <div class="col-num">15</div><div class="col-num">7</div><div class="col-num">3</div>
+          <div class="col-fecha"><span class="tag tag-semana">07/07</span></div>
+          <div class="barra-wrap"><div class="barra-bg"><div class="barra-fill" style="width:47%;background:#16a34a"></div></div><span class="barra-pct">47%</span></div>
+          <div style="text-align:center"><span class="ind ind-alto">Frecuente</span></div>
+          <div style="text-align:center"><span class="score-badge" style="background:#16a34a">75</span></div>
+        </div>
+        <div class="checks-panel" id="checks-campasso">
+          <div class="checks-titulo">Campos: 18 sin usado / 21 con usado · datos 09/07</div>
+          <div class="checks-grid">
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">① Actividad ≤7 días (2d)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">② ≥3 neg con precio (3/7)</span></div>
+            <div class="check-item"><span class="check-no">✗</span><span class="check-label">③ Campos ≥60% (47%)</span></div>
+            <div class="check-item"><span class="check-label" style="color:#94a3b8">Volumen 7d: 10 op. · Frescura 100%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="fila-adop-wrap">
+        <div class="fila-adop" onclick="toggleChecks('via')">
+          <div class="col-nombre">Vía Tomás</div><div class="col-zona">Trenque Lauquen 🟢</div>
+          <div class="col-num">14</div><div class="col-num">4</div><div class="col-num">0</div>
+          <div class="col-fecha"><span class="tag tag-semana">06/07</span></div>
+          <div class="barra-wrap"><div class="barra-bg"><div class="barra-fill" style="width:60%;background:#16a34a"></div></div><span class="barra-pct">60%</span></div>
+          <div style="text-align:center"><span class="ind ind-alto">Frecuente</span></div>
+          <div style="text-align:center"><span class="score-badge" style="background:#16a34a">71</span></div>
+        </div>
+        <div class="checks-panel" id="checks-via">
+          <div class="checks-titulo">Campos: 18 sin usado / 21 con usado · datos 09/07</div>
+          <div class="checks-grid">
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">① Actividad ≤7 días (3d)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">② ≥3 neg con precio (3/4)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">③ Campos ≥60% (60%)</span></div>
+            <div class="check-item"><span class="check-label" style="color:#94a3b8">Volumen 7d: 4 op. · Frescura 100%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="fila-adop-wrap">
+        <div class="fila-adop" onclick="toggleChecks('garcia')">
+          <div class="col-nombre">García Demian</div><div class="col-zona">Trenque Lauquen 🟡</div>
+          <div class="col-num">1</div><div class="col-num">5</div><div class="col-num">0</div>
+          <div class="col-fecha"><span class="tag tag-semana">04/07</span></div>
+          <div class="barra-wrap"><div class="barra-bg"><div class="barra-fill" style="width:62%;background:#ca8a04"></div></div><span class="barra-pct">62%</span></div>
+          <div style="text-align:center"><span class="ind ind-medio">Ocasional</span></div>
+          <div style="text-align:center"><span class="score-badge" style="background:#ca8a04">64</span></div>
+        </div>
+        <div class="checks-panel" id="checks-garcia">
+          <div class="checks-titulo">Campos: 18 sin usado / 21 con usado · datos 09/07</div>
+          <div class="checks-grid">
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">① Actividad ≤7 días (5d)</span></div>
+            <div class="check-item"><span class="check-no">✗</span><span class="check-label">② ≥3 neg con precio (2/5)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">③ Campos ≥60% (62%)</span></div>
+            <div class="check-item"><span class="check-label" style="color:#94a3b8">Volumen 7d: 2 op. · Frescura 100%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="fila-adop-wrap">
+        <div class="fila-adop" onclick="toggleChecks('sierra')">
+          <div class="col-nombre">Sierra Juan</div><div class="col-zona">Salliqueló 🔴</div>
+          <div class="col-num">8</div><div class="col-num">4</div><div class="col-num">1</div>
+          <div class="col-fecha"><span class="tag tag-semana">08/07</span></div>
+          <div class="barra-wrap"><div class="barra-bg"><div class="barra-fill" style="width:42%;background:#ca8a04"></div></div><span class="barra-pct">42%</span></div>
+          <div style="text-align:center"><span class="ind ind-alto">Diaria</span></div>
+          <div style="text-align:center"><span class="score-badge" style="background:#ca8a04">62</span></div>
+        </div>
+        <div class="checks-panel" id="checks-sierra">
+          <div class="checks-titulo">Campos: 18 sin usado / 21 con usado · datos 09/07</div>
+          <div class="checks-grid">
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">① Actividad ≤7 días (1d)</span></div>
+            <div class="check-item"><span class="check-no">✗</span><span class="check-label">② ≥3 neg con precio (0/4)</span></div>
+            <div class="check-item"><span class="check-no">✗</span><span class="check-label">③ Campos ≥60% (42%)</span></div>
+            <div class="check-item"><span class="check-label" style="color:#94a3b8">Volumen 7d: 1 op. · Frescura 100%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="fila-adop-wrap">
+        <div class="fila-adop" onclick="toggleChecks('goedelmann')">
+          <div class="col-nombre">Goedelmann Marcelo</div><div class="col-zona">Gral. Villegas 🟢</div>
+          <div class="col-num">14</div><div class="col-num">17</div><div class="col-num">0</div>
+          <div class="col-fecha"><span class="tag tag-semana">02/07</span></div>
+          <div class="barra-wrap"><div class="barra-bg"><div class="barra-fill" style="width:71%;background:#ca8a04"></div></div><span class="barra-pct">71%</span></div>
+          <div style="text-align:center"><span class="ind ind-medio">Ocasional</span></div>
+          <div style="text-align:center"><span class="score-badge" style="background:#ca8a04">59</span></div>
+        </div>
+        <div class="checks-panel" id="checks-goedelmann">
+          <div class="checks-titulo">Campos: 18 sin usado / 21 con usado · datos 09/07</div>
+          <div class="checks-grid">
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">① Actividad ≤7 días (7d)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">② ≥3 neg con precio (4/17)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">③ Campos ≥60% (71%)</span></div>
+            <div class="check-item"><span class="check-label" style="color:#94a3b8">Volumen 7d: 1 op. · Frescura 88%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="fila-adop-wrap">
+        <div class="fila-adop" onclick="toggleChecks('reimer')">
+          <div class="col-nombre">Reimer Agustín</div><div class="col-zona">Castex / La Pampa 🟡</div>
+          <div class="col-num">52</div><div class="col-num">25</div><div class="col-num">7</div>
+          <div class="col-fecha"><span class="tag tag-viejo">29/06</span></div>
+          <div class="barra-wrap"><div class="barra-bg"><div class="barra-fill" style="width:62%;background:#ca8a04"></div></div><span class="barra-pct">62%</span></div>
+          <div style="text-align:center"><span class="ind ind-medio">Ocasional</span></div>
+          <div style="text-align:center"><span class="score-badge" style="background:#ca8a04">55</span></div>
+        </div>
+        <div class="checks-panel" id="checks-reimer">
+          <div class="checks-titulo">Campos: 18 sin usado / 21 con usado · datos 09/07</div>
+          <div class="checks-grid">
+            <div class="check-item"><span class="check-no">✗</span><span class="check-label">① Actividad ≤7 días (10d)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">② ≥3 neg con precio (5/25)</span></div>
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">③ Campos ≥60% (62%)</span></div>
+            <div class="check-item"><span class="check-label" style="color:#94a3b8">Volumen 7d: 0 op. · Frescura 100%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="fila-adop-wrap">
+        <div class="fila-adop" onclick="toggleChecks('choppi')">
+          <div class="col-nombre">Choppi Diego</div><div class="col-zona">Cnel. Pringles 🔴</div>
+          <div class="col-num">0</div><div class="col-num">1</div><div class="col-num">1</div>
+          <div class="col-fecha"><span class="tag tag-semana">06/07</span></div>
+          <div class="barra-wrap"><div class="barra-bg"><div class="barra-fill" style="width:33%;background:#dc2626"></div></div><span class="barra-pct">33%</span></div>
+          <div style="text-align:center"><span class="ind ind-alto">Frecuente</span></div>
+          <div style="text-align:center"><span class="score-badge" style="background:#dc2626">40</span></div>
+        </div>
+        <div class="checks-panel" id="checks-choppi">
+          <div class="checks-titulo">Campos: 18 sin usado / 21 con usado · datos 09/07</div>
+          <div class="checks-grid">
+            <div class="check-item"><span class="check-ok">✓</span><span class="check-label">① Actividad ≤7 días (3d)</span></div>
+            <div class="check-item"><span class="check-no">✗</span><span class="check-label">② ≥3 neg con precio (0/1)</span></div>
+            <div class="check-item"><span class="check-no">✗</span><span class="check-label">③ Campos ≥60% (33%)</span></div>
+            <div class="check-item"><span class="check-label" style="color:#94a3b8">Volumen 7d: 1 op. · Frescura 50%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">Grupo Berger · Control de Gestión Comercial · Datos monday.com actualizados al 09/07/2026</div>
+
+</div>
+
+<script>
+// ---- SELECTOR DE VISTA ----
+function cambiarVista(id, btn) {
+  document.querySelectorAll('.vista').forEach(v => v.classList.remove('visible'));
+  document.querySelectorAll('.vista-btn').forEach(b => b.classList.remove('activo'));
+  document.getElementById('vista-' + id).classList.add('visible');
+  btn.classList.add('activo');
+}
+
+// ---- TABLERO ----
+
+const pipelines = {
+  garcia: { nombre:"García Demian", zona:"Trenque Lauquen",
+    solicitudes:[],
+    negociaciones:[
+      {cliente:"cristian busman",desc:"cosechadora cr 5.85 con draper de 30 pies maizco credito cnh 5 años",precio:"USD 548.301"},
+      {cliente:"miguel uria",desc:"compra tractor usado TM 135 en usd 54000 mas iva.",precio:"USD 54.000"},
+      {cliente:"gonzalo cuadrado",desc:"batea de 8tn comofra batea volcadora de 8Tn balancin sin gomas",precio:"ARS 30.700.956"},
+      {cliente:"hernan orsi",desc:"t7 dual sin tres puntos",precio:"USD 204.000"},
+      {cliente:"guillermo bigliani",desc:"segadora vemos que necesitan para encararlo",precio:"USD 35.000"}
+    ],
+    leads:[
+      {cliente:"lucas lara",desc:"Sin detalle",precio:"—"}
+    ]
+  },
+  goedelmann: { nombre:"Goedelmann Marcelo", zona:"Gral. Villegas",
+    solicitudes:[],
+    negociaciones:[
+      {cliente:"celso",desc:"girasolero maizco girasolero hidraulico 21 a 52 girasolero hidraulico 21 a 52,5",precio:"USD 43.300"},
+      {cliente:"celso",desc:"maicero maizco maicero SGT 16 a70 maicero SGT 16 a 70",precio:"USD 70.790"},
+      {cliente:"Rovassio Paulo Cesar",desc:"comofra comofra batea volcadora 7.5 tn batea volcadora sin cubiertas",precio:"USD 18.335"},
+      {cliente:"Guazu sociedad en.por acc.",desc:"Omar Martin",precio:"—"},
+      {cliente:"Furhr Pablo",desc:"maizco cabezal maicero SGT 16 a 52",precio:"ARS 100.527.000"},
+      {cliente:"DOMINGO HERCK",desc:"maizco CABEZAL MAICERO SGT ROW FREE 18 A 52",precio:"ARS 155.047.000"},
+      {cliente:"Saino Dario",desc:"maizco cabezal Draper 35 pies para cosechadora case 6130",precio:"USD 130.242"},
+      {cliente:"Sorba Hermanos",desc:"maizco cabezal girasolero 16 a 70 cabezal girasolero 18 a 70",precio:"ARS 116.025.000"},
+      {cliente:"Yurk Edgardo",desc:"maizco Draper 40 pies Maquina Case 7088",precio:"USD 160.000"},
+      {cliente:"Yurk Edgardo (copy)",desc:"maizco Girasolero Maquina Case 7088",precio:"USD 160.000"},
+      {cliente:"Guazu sociedad en.por acc.",desc:"Omar Martin pala con kit de accesorios porta rollo /bolsones unidad pedida a espera de entrega y colocacion",precio:"USD 17.890"},
+      {cliente:"Isadelca S.A.",desc:"New Holland retroexcabadora B95C 4x4",precio:"USD 135.000"},
+      {cliente:"isadelca S:A",desc:"yineng retroexcabadora",precio:"ARS 72.000"},
+      {cliente:"Alberto Matias Lopez",desc:"yineng retropala",precio:"USD 72.000"},
+      {cliente:"Ricardi Javier",desc:"New Holland tractor potencia 100hp /130hp con pala cargadora omar martin",precio:"—"},
+      {cliente:"Orrego Renato Oscar",desc:"unidad usada New Holland t7 205 T 7 240/245/260 usados",precio:"—"},
+      {cliente:"Orrego Renato Oscar",desc:"agrometal sembradoradora agrometal TX mega gen3 -DVA TIM 16 lineas a 52,5",precio:"—"}
+    ],
+    leads:[
+      {cliente:"Rovassio",desc:"New Holland tractor t7 215/205",precio:"—"},
+      {cliente:"Bedino Guillermo Marcelo",desc:"maizco maicero usado mainero modelo 2008 16a52.5 busca usado 14/16a 52,5",precio:"—"},
+      {cliente:"falco Pablo David",desc:"New Holland",precio:"—"},
+      {cliente:"Rescorza Raul",desc:"Sin detalle",precio:"—"},
+      {cliente:"Ordinas marcos Yanquetruz",desc:"batea volcadora comofra",precio:"—"},
+      {cliente:"Ordinas Marcos Yanquetruz",desc:"palon para corrales el pato NCH 350 PARA CORRALES",precio:"—"},
+      {cliente:"ingeniero Quiroga",desc:"rastra disco 60 platos",precio:"—"},
+      {cliente:"tomaselli guillermo",desc:"yineng pala cargadora 2 mt2",precio:"—"},
+      {cliente:"polverini",desc:"maicero mainero pedido de maicero mainero mdd200 multilinea 16 a 52",precio:"—"},
+      {cliente:"Carlos Cipriani",desc:"Sin detalle",precio:"—"},
+      {cliente:"Daniel ferela",desc:"Sin detalle",precio:"—"},
+      {cliente:"Daniel Ferela",desc:"Sin detalle",precio:"—"},
+      {cliente:"jorge rosales",desc:"Sin detalle",precio:"—"},
+      {cliente:"kunn Gimena / lavin",desc:"pulverizadora automotriz usada valor usd 80.000/90.000",precio:"$ 80.000 (en texto libre)"}
+    ]
+  },
+  sierra: { nombre:"Sierra Juan", zona:"Salliqueló",
+    solicitudes:[
+      {cliente:"La dominga (copy)",desc:"maizco maicero sgts 14 a 52",precio:"USD 69.157",estado:"Aut. por Comercial"}
+    ],
+    negociaciones:[
+      {cliente:"Mariano Banegas",desc:"Sin detalle",precio:"—"},
+      {cliente:"Lacteos San Francisco",desc:"Sin detalle",precio:"—"},
+      {cliente:"Gerardo Druille",desc:"Sin detalle",precio:"—"},
+      {cliente:"Ezequiel Montes",desc:"comofra tanque 5000 lts combinado",precio:"—"}
+    ],
+    leads:[
+      {cliente:"La dominga",desc:"maizco 19 a 52 para JD S500",precio:"USD 58.751"},
+      {cliente:"diego zuchinni",desc:"pampero",precio:"USD 40.001"},
+      {cliente:"Gerardo Druille",desc:"NEW HOLLAND t7 195 paton con piloto",precio:"USD 189.905"},
+      {cliente:"Martin Paez",desc:"gherardi",precio:"USD 24.310"},
+      {cliente:"Vasco arabaloza",desc:"comofra",precio:"ARS 36.215.089"},
+      {cliente:"Mauricio malabolta",desc:"Sin detalle",precio:"USD 24.310"},
+      {cliente:"Luis tronconi",desc:"Sin detalle",precio:"—"},
+      {cliente:"Ruben Stein",desc:"Sin detalle",precio:"—"}
+    ]
+  },
+  via: { nombre:"Vía Tomás", zona:"Trenque Lauquen",
+    solicitudes:[],
+    negociaciones:[
+      {cliente:"LA NENE",desc:"Sin detalle",precio:"—"},
+      {cliente:"JAMES TOMAS",desc:"MOTONIVELADORA OJA DE 3 METROS",precio:"USD 30.000"},
+      {cliente:"GEOVANANGELO GUILLERMO",desc:"FERCAM Sembradora Fercam",precio:"USD 287.310"},
+      {cliente:"BIAIN GASTON",desc:"MIXER MIXER CON BALANZA",precio:"USD 22.000"}
+    ],
+    leads:[
+      {cliente:"Agregar cliente",desc:"Sin detalle",precio:"—"},
+      {cliente:"ARIEL FALCO",desc:"RANDON BATEA RANDON 55 TN BATEA RANDON CON CUBIERTAS Y LONA",precio:"USD 81.400.000"},
+      {cliente:"ALVAREZ ADRIAN",desc:"SUPER WALTER SEMBRADORA SUPER WALTER 20 A 52",precio:"USD 207.200.000"},
+      {cliente:"Agregar cliente",desc:"Sin detalle",precio:"—"},
+      {cliente:"ADRIAN ALVAREZ",desc:"ERCA",precio:"USD 297.245"},
+      {cliente:"AMADEO HERMANOS",desc:"HUSQVARNA TRACTOR CORTA CESPED TS 217",precio:"ARS 8.729.720"},
+      {cliente:"SERGIO GONZALEZ",desc:"YINENG PALA 938 2 METROS CUBICOS",precio:"ARS 94.000.000"},
+      {cliente:"SEBASTIAN CHAVEZ",desc:"AGROMETAL 16 A 52 PIVOT CON PP KIT 3 18 A 52",precio:"USD 303.781"},
+      {cliente:"NANNINI ALBEL",desc:"AGROMETAL 23 A 35 LINEAS CON P.P",precio:"—"},
+      {cliente:"AGROIDEAL DE HENDERSON S.R.L",desc:"COMOFRA TOLVA DE SEMILLA Y FERTLIZANTE 17MIL LITROS",precio:"ARS 36.225.000"},
+      {cliente:"AMADEO GUILLERMO PEDRO",desc:"COMOFRA TOLVA DE SEMILLA Y FERTLIZANTE 17 MIL LITROS",precio:"ARS 36.225.000"},
+      {cliente:"DANIEL BARADAD",desc:"COMOFRA TOLVA DE SEMILLA Y FERTILIZANTE 17 MIL LITROS",precio:"ARS 36.225.000"},
+      {cliente:"NICOLAS Y FRANCISCO AMADEO",desc:"COMOFRA TOLVA DE SEMILLA Y FERTILIZANTE 17 MIL LITROS",precio:"ARS 36.225.000"},
+      {cliente:"AGS AGRO",desc:"COMOFRA TOLVA DE SEMILLA Y FERTILIZANTE 17 MIL LITROS",precio:"ARS 3.622.500"}
+    ]
+  },
+  reimer: { nombre:"Reimer Agustín", zona:"Castex / La Pampa",
+    solicitudes:[
+      {cliente:"Andrea ughetti",desc:"cosechadora nh cosechadora nh cr 7.90 ex la riojana pagaron con el seguro de la maquina anterior que se les quemo 340.000usd y se les financiaron los ",precio:"USD 380.000",estado:"Aceptada"},
+      {cliente:"Andrea ughetti (copy)",desc:"tractor nh tractor tm 7030 ex martini hnos 40.000usd de diferencia se les financio con los otros 40.000 de la cosechadora",precio:"USD 80.000",estado:"Aceptada"},
+      {cliente:"Hector Davit",desc:"cosechadora dr dr150 castex 60000usd entrego 20.000 y el resto plazo a 3 años con 8% anual pagares semestrales negocio cerrado y maquina ya entregada",precio:"USD 57.000",estado:"Aceptada"},
+      {cliente:"Nancy Vigliocco",desc:"pulverizadora kuhn kuhn stronger 200.000usd mas el iva que se facture financiada 4 años con el 8.5% anual el negocio esta hecho, la maquina esta en la",precio:"USD 200.000",estado:"Aceptada"},
+      {cliente:"Maier hermanos ss",desc:"tractor pauny 540 ex alzogaray 60.000.000 de diferencia mas el iva a facturar a parte, pagado con tarjeta agronacion",precio:"USD 1",estado:"Aceptada"},
+      {cliente:"Olabba de Sauze SA",desc:"tractor nh nh t5s 110 nuevo pago con crredito bco provincia de bsas",precio:"USD 110.000",estado:"Aceptada"},
+      {cliente:"nicolas marcantonio",desc:"tractor nh t7 215 dual con piloto y telemetria credito bco nacion expoagro, negocio ya cerrado realizado, y unidades entregadas",precio:"USD 190.000",estado:"Aceptada"}
+    ],
+    negociaciones:[
+      {cliente:"Eduardo Sanchez",desc:"tractor Nh t7 semipower comenzando negociacion esta semana hijo de carlitos sanchez ex intendente productor e ing agr de metileo",precio:"USD 180.000"},
+      {cliente:"Mauricio Pelosso",desc:"cosechadora NH cr 7+ el año que viene estara cambiando una unidad y hablaremos al respecto",precio:"ARS 7.000.000"},
+      {cliente:"Mario domingo Dellacqua (copy)",desc:"paratil dolbi paratil dolbi de 11 puas se cotizo via credito banco nacion no llegamos a nada aun no compro",precio:"USD 33.000"},
+      {cliente:"Julio Vicario",desc:"maicero maizco maizco premium de 12 a 70, le cotizamos en expoagro pero las fechas de entrega que teniamos no le servian porque nos pasabamos de su fe",precio:"USD 30.000"},
+      {cliente:"Martin capozzi Franco Schieda y cia",desc:"cargadora richiger les cotize en expoagro una cargadora richiger nueva iba sin usado, oooootra vez conflictos de \"zona\"con otro asesor. al final no ve",precio:"—"},
+      {cliente:"El relleno Sa",desc:"carro conese Hablandolo con el encargado (QUE ES DE CASTEX) y ya les vendi hace dos años una agrometal FX nueva, compraron un dron DJI y quieren ver d",precio:"USD 25.000"},
+      {cliente:"Atilio Volpini",desc:"sembradora crucianelli quiere comprar la de 40 17.5 ex arrollo, lo tengo que hacer venir a verla. pero bueno a no ilusionarse es bastante ratatuil est",precio:"USD 70.000"},
+      {cliente:"Miguel Suarez",desc:"pulverizadora metalfor le estamos cotizando la pulverizadora metalfor 3025 ex colombatto contratistas de pulverizacion de la zona, no les sobra nada, ",precio:"USD 120.000"},
+      {cliente:"Rodrigo Fernandez",desc:"pulverizadora nh pulverizadora nh defensor 3000 de stock, lo hablamos ayer por mensajes quedo en la semana venir a verla y ver que negocio podemos hac",precio:"USD 400.000"},
+      {cliente:"Luciano Alles",desc:"maicero 13 52 maizco 13 52 30.000usd y le tomabamos en 6.000 el mainero de 11 24.000usd de diferencia, le pasamos un menu financiero con cotizador",precio:"USD 30.000"},
+      {cliente:"Wirkaleufu srl",desc:"cosechadora nh cr 5.85 nueva hay que pasar diferencia",precio:"USD 600.000"},
+      {cliente:"Francisco moronta",desc:"embolsadora cargadora richiger ex nescol que esta en castex le pasamos un numero con financiacion como para hacerlo, se lo financiabamos 2 años, y bue",precio:"USD 15.000"},
+      {cliente:"javier barovero",desc:"mixer COMOFRA Mixer verticar 14m hay que pasarle negocio financiacion",precio:"—"},
+      {cliente:"Pablo Castelli y Adrian Botta",desc:"cosechadora nh cr7+ nueva 2wd con draper de 45 pies les pase diferencia esta semana 390.000usd final con nacion o cnh",precio:"USD 7.500.000"},
+      {cliente:"Brian Faisandas",desc:"Autodescargable COMOFRA le cotice una de 30000 quedamos en seguir hablando unos dias, 83.740.000$ menu financiero comofra videgnte lo debo contactar e",precio:"USD 60.000"},
+      {cliente:"ceferino migliore",desc:"Sembradora crucianelli le pase 70000 por la crucianelli de 40 17.5 ex arrollo, en la epoca de expoagro quedo en pasasr por castex a verla y no ha veni",precio:"USD 70.000"},
+      {cliente:"Fabian falkenstein",desc:"minicargadora nh le pase por la l218 qaue hay en trenque 45.000mas iva y bueno hay que negociarlo, lo tengo que llamar este es comprador",precio:"USD 45.000"},
+      {cliente:"Adriano cabodevilla",desc:"tractor nh t7 usado, le ofreci los usados que tenemos esta semana quedamos en juntarnos a almorzar y ver que se puede hacer comprador nato, hay que co",precio:"USD 140.000"},
+      {cliente:"Diego bonetto",desc:"tractor john deere 7800 ex marcantonio quedo en pasar a verlo. es de aca del pueblo lo conocemos de toda la vida, excelente gente, mañana lo insisto p",precio:"USD 75.000"},
+      {cliente:"Cooperativa Agricola Embajador martini",desc:"tractor nh o un t6 130 o un t7 190, esta semana tengo que pasar por la coope a hablar con el, me llamo el viernes rodolfo rovere me llamo el viernes q",precio:"USD 150.000"},
+      {cliente:"Dario cabrera (copy)",desc:"cosechadora nh se le quemo a fin de mayo la cosechadora, una jd 9770, esta proximo a cobrar el seguro, hay que activarlo con todo., hable con el la se",precio:"USD 400.000"},
+      {cliente:"Remigio scherger",desc:"Sembradora agrometal quiere la adx usada que aparecio en el grupo esta semana intercambiamos fotos el otro dia queda pendiente pasarle un negocio exce",precio:"USD 10"},
+      {cliente:"Walter wiggenausser",desc:"tractor nh quiere comprar uno nuevo o un usado semi nuevo, en la semana me junto a charlar con el compañero mio de la facultad, trabaja en aca y produ",precio:"USD 10"},
+      {cliente:"La caledoña de lariguet",desc:"tractor nh t8 350 quieren presupuesto sin usado contado les pase lista mas iva menos 30%",precio:"USD 285.000"},
+      {cliente:"federico lonne",desc:"drone nh xag le pase precio de lista con el menu financiero plan cheque 180 360 probablemente esta semana lo cerremos",precio:"ARS 71.000.000"}
+    ],
+    leads:[
+      {cliente:"Agregar cliente",desc:"Sin detalle",precio:"—"},
+      {cliente:"Santiago Cordoba",desc:"Autodescargable busca uno chico de un eje",precio:"—"},
+      {cliente:"Terry Pereyra",desc:"buscaba una inoculadora que no esta mas, supuestamente ubicada ahora en la primavera",precio:"—"},
+      {cliente:"Roberto Sagrado",desc:"paratil En realidad busca una rastra chica de 40 44 y no tenemos nada atento a los ingresos",precio:"—"},
+      {cliente:"Delfino Nestor",desc:"girasolero girasolero de 19 para la proxima campaña seguir de cerca",precio:"—"},
+      {cliente:"Fabian Brum",desc:"alguna de las usadas de castex richiger no nos pudimos poner de acuerdo le ofreci 5 millones de pesos financiado en 8 cheques y decia que asi y todo e",precio:"—"},
+      {cliente:"Santiago Tandil",desc:"pulverizadora metalfor conoce a emiliano, hablamos por una pulverizadora para el empleado, lo asesore tecnicamente respecto a las unidades que tenemos",precio:"—"},
+      {cliente:"Aceral (pechin)",desc:"juntarollos sode junta rollos sode de 6 rollos, me consulto emiliano pechin, le presupueste lista y menu financiero, luego siguen con emiliano berger",precio:"—"},
+      {cliente:"mauro insua",desc:"girasolero gira de 21 o 24 para la proxima campaña, esta campaña seguir de cerca",precio:"—"},
+      {cliente:"alejandro hollmann",desc:"girasolero girasolero de 14 o 16 a 52 seguir atento lo busca para la campaña entrante, pendiente a los ingresos que se den",precio:"—"},
+      {cliente:"Hernan Mining",desc:"ferti altina quiere entregar una sembradora crucianelli de fina toda reparada (fotos pasadas por whatsapp) negocio que no avanzo, pero el altina no se",precio:"—"},
+      {cliente:"Hector y Luciano veliz",desc:"maicero maizco maicero 18 usado para case 7150",precio:"—"},
+      {cliente:"Capaldi hermanos Luiggi",desc:"tractor NH T7 215 full power dual es un lead activo estamos trabajandolo hace un año en algun momento lo van a encarar, son muy temerosos",precio:"—"},
+      {cliente:"Gonzalo Sauze",desc:"cosechadora NH BUSCA COSECHADORA USADA nh AXIAL DE 30 lo cual en este momento no tenemos, seguir de cerca",precio:"—"},
+      {cliente:"Miguel Alesandri (copy)",desc:"tractor NH t7 full power shift va a necesitar, de la charla en la que me cuenta que consiguio el magnum me comenta esto le pase todos los t7 usado que",precio:"—"},
+      {cliente:"Fernando Minetti",desc:"tractor pauny Busca algun pauny o Deutz usado SIN PLATAAAAA HAY QUE VERLO, ES HERMANO DE SERGIO MINETTI E IGNACIO MINETTI, SI ESTAMOS DISPUESTOS A FIN",precio:"—"},
+      {cliente:"Mateo Ferrarez",desc:"tractor Agco busca un ago 150 170 en lo posible, le ofreci el ex medero, y el ex vazquez 220, quedo en venir a la oficina la proxima semana necesita f",precio:"—"},
+      {cliente:"Polorio Oscar",desc:"tractor Agco Agco 6.150 lo venimos hablando hace rato, le cotice el ex medero",precio:"USD 70.000"},
+      {cliente:"Christian quiroga",desc:"tractor pauny buscaba alguno de los paunys articulados pero nunca se acerco a verlos, era un contacto salido de agro ads consultando hasta en la NASA ",precio:"—"},
+      {cliente:"Adrian Alberti",desc:"pulverizadora NH NH defensor 4000 Es uno de los contratistas de pulverizacion mas grande del pais, usa solo maquinas grandes, siempre esta esperando l",precio:"USD 500.000"},
+      {cliente:"Jose gavazza",desc:"pulverizadora metalfor metalfor 3025 ex colombatto es un lead medio en el aire pregunto de curioso esta frio",precio:"USD 120.000"},
+      {cliente:"Alberto Flores",desc:"orugas zuidberg orugas para cosechadora nh cs 660 pregunto de curioso todavia esta temblando del susto",precio:"USD 140.000"},
+      {cliente:"Alberto galetto",desc:"cargadora palou cotice palou ex el ñandu en 15.000 usd la cotice varias veces muy dura de vender en ese valor",precio:"USD 15.000"},
+      {cliente:"Gaston salvaro",desc:"Autodescargable COMOFRA la autodescargable verde con calcos de john deere linda que hubo que se vendio en seguida, la cotice y se vendio ese mismo dia",precio:"USD 30.000"},
+      {cliente:"Enrique villa",desc:"orugas zuidberg consulto muy curioseando pero bueno en algun momento por ahi va, tiene una case grande, pero bueno, a presar de los problemas de piso ",precio:"USD 140.000"},
+      {cliente:"Leo barreña",desc:"tractor nh estan considerando un semipower 190 para la proxima campaña estmos hablandolo. ahora lo arranco a apurar fuerte, estamos en permanente cont",precio:"USD 140.000"},
+      {cliente:"Maximiliano Jubete",desc:"tractor nh t7 estuvimos en la expodinamica de santa rosa, es un lead muy frio pero para seguir en algun momento van a querer comprar segun lo expresad",precio:"—"},
+      {cliente:"Roman Descalzi",desc:"tractor nh pregunto en expodinamica en santa rosa por un t7 semi power pero no esta para hacer nada su tractor esta literalmetne nuevo es ganadero y d",precio:"USD 120.000"},
+      {cliente:"Elian Gauna",desc:"tractor nh consulta de expodinamica santa rosa la pampa hacen de todo, son buena gente, pero medio secones, siempre andan en las expos dando vueltas, ",precio:"—"},
+      {cliente:"Roberto Marenghi",desc:"tractor nh hay que cotizarle un t7 260 esta para hacer algo cuando le salga el negocio, no tiene apuro, espera el numero,",precio:"—"},
+      {cliente:"Juan Pablo Gonzales Bellini",desc:"tractor nh quiere cambiar un 250 por un t7 depende del hermano y el padre la desicion no es solo de el, estamos en contacto continuamente, el problema",precio:"USD 120.000"},
+      {cliente:"Juan pablo servetti",desc:"Autodescargable COMOFRA le cotice la fabimag o la santa rosa el negocio no prospero por no poderle tomar la tolva usada de el",precio:"USD 15.000"},
+      {cliente:"Omar alejandro Perez (copy)",desc:"orugas zuidberg cotice precio lista curiosidad pura, todavia esta asustado pobre omar",precio:"USD 140.000"},
+      {cliente:"Santiago maier",desc:"cosechadora nh vinieron a ver la cs 660 ex gherhi esta toda desarmada, y no podriamos tenerla a tiempo para el momento de la cosecha y el negocio no p",precio:"USD 80.000"},
+      {cliente:"Gonzalo bassi",desc:"cargadora palou 15000usd le cotice y no quieren saber nada, cuando lo multiplican y ven los pesos que son no lo quieren pagar, realmente la he cotizad",precio:"USD 15.000"},
+      {cliente:"waldino correa",desc:"Sembradora agrometal sembradora de fina que tomo tomas en guatrache, le pase los 75 que pedimos le di todas las opciones de financiacion que necesite,",precio:"USD 75.000"},
+      {cliente:"flor fritz",desc:"Sembradora agrometal sembradora de fina que tomo tomas en guatrache le cotice 75000 no les parecio les parecio cara, el cliente que anda atras de esta",precio:"USD 75.000"},
+      {cliente:"Roman cisterna",desc:"tanque cisterna de agua apollo hay que cotizarle una tolva de 2500/3000lts habria que pasarle por una conese o algun otro proveedor",precio:"USD 10"},
+      {cliente:"brian belcher",desc:"Sembradora agrometal hay que pasarle por una de 16 a 52, le voy a ofrecer la que pasaste el otro dia al grupo que estaria tomando juan sierra ex alzog",precio:"USD 10"},
+      {cliente:"brian belcher (copy)",desc:"carro dron conese le pase cotizacion por un consese para un solo dron afinar bien precio y financiacion, lo que le pase no es lo que plasme aca en mon",precio:"USD 20.000"},
+      {cliente:"gustavo herrero (los retonos srl)",desc:"tractor nh quiere un t7 260 para ampliar a un eqipo de siembra mas, sin entregar usado, hay que encontrarle financiacion, si se lo financiamos nosotro",precio:"USD 220.000"},
+      {cliente:"Agustin Picardi",desc:"me llamo mientras estaba con los vazquez el viernes y no le devolvi mas la llamada, devolver llamada urgente",precio:"—"},
+      {cliente:"Juan pablo andrada",desc:"pulverizadora nh sp defensor 3000 32m acero de stock lo tengo que convencer de venderle esa, lucas me dice que como es buen cliente y la pla la pago s",precio:"USD 400.000"},
+      {cliente:"Malena Barbero",desc:"tractor agco agco allis 150 ex medero espero respuesta y que necesitan para negociarlo",precio:"USD 70.000"},
+      {cliente:"jose picco",desc:"Sembradora usada estuvo en el local viene referido por el dealer pioneer de maiz amigo mio, le ofreci todo lo qu etenemos grueso por ahora frio le ofr",precio:"USD 10"},
+      {cliente:"martin toay",desc:"pulverizadora alguna de las usadas de castex por ahora muy frio le ofreci lo que hay lo ire siguiendo",precio:"USD 10"},
+      {cliente:"pelusa bonivardo",desc:"tractor nh vamos por un t7 190, estan re frios hay que seguirlos porque en algun momento compran, ya les cotice el año pasado y ahora les retome la ch",precio:"USD 10"},
+      {cliente:"sonia gracia",desc:"tractor zanello le tengo que pasar todos los zanelones articulados naranjas que hay, hablamos ayer domingo por whatsapp productores de castex que tien",precio:"—"},
+      {cliente:"pedro conchez",desc:"cosechadora nh super frio pregunto la otra ez por una 6.80 desde ahi que lo vengo siguiendo esta semana lo voy a tratar de visitar",precio:"USD 600.000"},
+      {cliente:"Lucas y Luciano Resler",desc:"tractor NH t7 215 dual retomando conversacion estan en busca juntando coraje hace un año",precio:"USD 200.000"},
+      {cliente:"Marcelo besso",desc:"tractor NH hicimos un negocio por un t7 195 para expo agro por banco nacion, la financiacion no salio, la diferencia que le podiamos hacer por cnh no ",precio:"USD 130.000"},
+      {cliente:"Gonzalo waimann",desc:"Autodescargable COMOFRA Tolvas usadas santa rosa, o fabimag lo debo contactar esta semana nuevamente",precio:"USD 20.000"}
+    ]
+  },
+  campasso: { nombre:"Campasso Martín", zona:"Castex / Gral. Pico",
+    solicitudes:[
+      {cliente:"Pablo acosta",desc:"Sin detalle",precio:"USD 45.000",estado:"Rechazada"},
+      {cliente:"Bruno Walter",desc:"Massey Ferguson tractor 7415",precio:"USD 93.925",estado:"Aut. por Comercial"},
+      {cliente:"Picco Claudia Maria",desc:"mainero cabezal maicero MD200 de 20 a 52.5",precio:"USD 80.665",estado:"Aut. por Comercial"}
+    ],
+    negociaciones:[
+      {cliente:"Ignacio gumineti",desc:"Sin detalle",precio:"USD 17.030.000"},
+      {cliente:"Javier szeliga22",desc:"Sin detalle",precio:"—"},
+      {cliente:"Armando fernandez",desc:"Sin detalle",precio:"USD 87.000"},
+      {cliente:"Civalero mauro",desc:"Sin detalle",precio:"USD 112.000"},
+      {cliente:"Billar carlos",desc:"Sin detalle",precio:"—"},
+      {cliente:"Bruno Walter",desc:"John Deere 8300",precio:"USD 110.500"},
+      {cliente:"Poli jose",desc:"CR 5.85 NEW HOLLAND",precio:"USD 60.775"}
+    ],
+    leads:[
+      {cliente:"Omar marquez",desc:"tractor NEW HOLLAND",precio:"—"},
+      {cliente:"Morales Francisco",desc:"Sin detalle",precio:"USD 25.000"},
+      {cliente:"Knudsen carlos",desc:"Sin detalle",precio:"—"},
+      {cliente:"Burgardt Gabriel dario",desc:"Sin detalle",precio:"USD 87.000"},
+      {cliente:"Mile Diego",desc:"inoculador tedeschi",precio:"USD 45.000"},
+      {cliente:"Gonzalo pico",desc:"embolsadora quebradora richiger",precio:"USD 16.575"},
+      {cliente:"Martin Emanuel",desc:"cosechadora don Roque 150",precio:"USD 85.000"},
+      {cliente:"Cámpora Jorge ramayo",desc:"tractor NH T8",precio:"USD 200.000"},
+      {cliente:"Caponi hernan",desc:"Sin detalle",precio:"—"},
+      {cliente:"Santiago conti",desc:"JD tractor 7800",precio:"USD 77.350"},
+      {cliente:"Tonelli juan",desc:"palou extractora",precio:"USD 16.575"},
+      {cliente:"Néstor Garrone",desc:"sembradora 16 a 52",precio:"—"},
+      {cliente:"Wilson Gauna",desc:"Mercedes Benz Axor 2544 con batea",precio:"USD 193.375"},
+      {cliente:"Sebastian ramirez",desc:"fiat 900 tractor",precio:"USD 10.000"},
+      {cliente:"Horacio Paniagua",desc:"mixer mainero 2910",precio:"USD 15.000"}
+    ]
+  },
+  enriquez: { nombre:"Enríquez Ramiro", zona:"Gral. Pico",
+    solicitudes:[],
+    negociaciones:[
+      {cliente:"jorge melo",desc:"implemento richiger ea 910",precio:"ARS 40.000.000"},
+      {cliente:"alejandro greco",desc:"implemento extractora tecnocar",precio:"—"},
+      {cliente:"gonzalo bassi",desc:"pala cargadora yineng 938",precio:"USD 95.000"},
+      {cliente:"eduardo martiez",desc:"pala cargadora yineng 938",precio:"USD 94.930"},
+      {cliente:"sergio miguel",desc:"sembradora fina Gherardi 6100",precio:"USD 15.000"},
+      {cliente:"marcelo villaº",desc:"implemento procor chimango 8 mts motor explosion",precio:"ARS 4.250.000"},
+      {cliente:"gino ghione",desc:"implemento mainero maicero 22 a 52",precio:"USD 83.000"},
+      {cliente:"gaston guitart",desc:"implemento maizco 13 a 52",precio:"USD 25.000"},
+      {cliente:"Luis Silva",desc:"Sembradora fina Gherardi G100",precio:"USD 15.000"},
+      {cliente:"Gonzalo Chacón",desc:"Implementó COMOFRA Batea 8 tn",precio:"ARS 24.000.000"},
+      {cliente:"Fabio capdevilla",desc:"Pala Yineng Balde 1,5",precio:"—"},
+      {cliente:"juan carlos pascual",desc:"maicero maizco 14 a 52",precio:"USD 30.000"}
+    ],
+    leads:[
+      {cliente:"eduardo martinez",desc:"sembradora fina agrometal 33 a 21",precio:"—"},
+      {cliente:"jonathan bravo",desc:"implemento richiger 910 extractora",precio:"—"},
+      {cliente:"gonzalo chacon",desc:"sembradora fina 37 a 17",precio:"—"},
+      {cliente:"armando repetto",desc:"pala cargadora yineng pala cargadora 3 mts",precio:"—"},
+      {cliente:"armando repetto",desc:"retropala retropala escavadora",precio:"—"},
+      {cliente:"juan villamonte",desc:"implementos rastra de 40 / 44 platos y rolos hidraulicos",precio:"—"},
+      {cliente:"joaquin cosso",desc:"implemento rastra",precio:"—"},
+      {cliente:"joaquin cosso",desc:"casilla casilla",precio:"—"},
+      {cliente:"jorge delgado",desc:"implemento extractora palou",precio:"—"},
+      {cliente:"Ema peinado",desc:"Sembradora fina Gherardi G100",precio:"USD 15.000"},
+      {cliente:"Jorge Pacioni",desc:"Implementó COMOFRA Batea 8 tn",precio:"—"},
+      {cliente:"Lucas arrieta",desc:"Implementó COMOFRA Tolva 22 tn",precio:"—"},
+      {cliente:"Juan Hutchinson",desc:"Implementó Maizco Maicero 10 a 70",precio:"ARS 66.000.000"},
+      {cliente:"juan villamonte",desc:"motoniveladora motoniveladora ex clovis",precio:"USD 50.000"},
+      {cliente:"julian corral",desc:"implemento maizco 14 a 52",precio:"USD 28.000"}
+    ]
+  },
+  choppi: { nombre:"Choppi Diego", zona:"Cnel. Pringles",
+    solicitudes:[
+      {cliente:"Clovis sa",desc:"9 de julio 2000 litros eje balancin",precio:"USD 4.200",estado:"Aut. por Comercial"}
+    ],
+    negociaciones:[
+      {cliente:"Leoz ezequiel",desc:"Sin detalle",precio:"—"}
+    ],
+    leads:[]
+  },
+};
+function toggleMetodologia() {
+  const panel = document.getElementById('panel-metodologia');
+  const arrow = document.getElementById('arrow-metodologia');
+  const visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  arrow.textContent = visible ? '▼ ver' : '▲ ocultar';
+}
+
+function toggleCriterios() {
+  const panel = document.getElementById('panel-criterios');
+  const arrow = document.getElementById('arrow-criterios');
+  const visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  arrow.textContent = visible ? '▼ ver' : '▲ ocultar';
+}
+
+function buscarGlobal(query) {
+  const cont = document.getElementById('resultados-busqueda');
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) { cont.style.display = 'none'; cont.innerHTML = ''; return; }
+
+  const tipoLabel = { solicitudes: '🟣 Solicitud', negociaciones: '🟡 Negociación', leads: '🔵 Lead' };
+  const tipoColor = { solicitudes: '#7c3aed', negociaciones: '#ca8a04', leads: '#3b82f6' };
+  let resultados = [];
+
+  Object.keys(pipelines).forEach(key => {
+    const asesor = pipelines[key];
+    ['solicitudes', 'negociaciones', 'leads'].forEach(tipo => {
+      (asesor[tipo] || []).forEach(item => {
+        const texto = (item.cliente + ' ' + item.desc + ' ' + (item.precio||'') + ' ' + asesor.zona).toLowerCase();
+        if (texto.includes(q)) {
+          resultados.push({ asesorNombre: asesor.nombre, zona: asesor.zona, tipo, item, asesorKey: key });
+        }
+      });
+    });
+  });
+
+  if (resultados.length === 0) {
+    cont.style.display = 'block';
+    cont.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:13px;">Sin resultados para "' + query + '"</div>';
+    return;
+  }
+
+  let html = '<div style="padding:10px 16px;background:#f8fafc;border-bottom:1px solid #f1f5f9;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">' + resultados.length + ' resultado' + (resultados.length>1?'s':'') + ' en todo el tablero</div>';
+  resultados.forEach(r => {
+    html += '<div style="padding:12px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer;" onclick="abrirPipeline(\'' + r.asesorKey + '\')">' +
+      '<div style="display:flex;justify-content:space-between;align-items:start;gap:10px;">' +
+        '<div style="flex:1;">' +
+          '<span style="display:inline-block;font-size:10px;font-weight:800;color:' + tipoColor[r.tipo] + ';background:' + tipoColor[r.tipo] + '15;border-radius:4px;padding:2px 7px;margin-right:6px;">' + tipoLabel[r.tipo] + '</span>' +
+          '<span style="font-weight:700;font-size:13px;color:#0f172a;">' + r.item.cliente + '</span>' +
+          '<div style="font-size:12px;color:#64748b;margin-top:3px;line-height:1.4;">' + r.item.desc + '</div>' +
+          '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">📍 ' + r.zona + ' · Asesor: <strong style="color:#475569">' + r.asesorNombre + '</strong></div>' +
+        '</div>' +
+        '<div style="text-align:right;white-space:nowrap;">' + (r.item.precio && r.item.precio !== '—' ? '<span style="font-size:12px;font-weight:800;color:#0f172a;">' + r.item.precio + '</span>' : '<span style="font-size:11px;color:#cbd5e1;font-style:italic;">sin precio</span>') + '</div>' +
+      '</div>' +
+    '</div>';
+  });
+  cont.innerHTML = html;
+  cont.style.display = 'block';
+}
+
+function toggle(header) {
+  const fila = header.parentElement;
+  const arrow = header.querySelector('.arrow');
+  fila.classList.toggle('abierta');
+  arrow.textContent = fila.classList.contains('abierta') ? '▲' : '▼';
+}
+
+let estadoActivo = 'todos', asesorActivo = null;
+
+function filtrarEstado(estado, btn) {
+  estadoActivo = estado; asesorActivo = null;
+  document.querySelectorAll('#filtros-estado .filtro').forEach(b => b.classList.remove('activo'));
+  document.querySelectorAll('#filtros-asesor .filtro').forEach(b => b.classList.remove('activo'));
+  btn.classList.add('activo');
+  aplicarFiltros(); cerrarPipeline();
+}
+
+function filtrarAsesor(asesor, btn) {
+  if (asesorActivo === asesor) { asesorActivo = null; btn.classList.remove('activo'); }
+  else { asesorActivo = asesor; document.querySelectorAll('#filtros-asesor .filtro').forEach(b => b.classList.remove('activo')); btn.classList.add('activo'); }
+  estadoActivo = 'todos';
+  document.querySelectorAll('#filtros-estado .filtro').forEach(b => b.classList.remove('activo'));
+  document.querySelector('#filtros-estado .filtro').classList.add('activo');
+  aplicarFiltros();
+  if (asesorActivo) abrirPipeline(asesor); else cerrarPipeline();
+}
+
+function aplicarFiltros() {
+  document.querySelectorAll('.fila').forEach(f => {
+    const ok = (estadoActivo==='todos'||f.dataset.estado===estadoActivo) && (!asesorActivo||f.dataset.asesor===asesorActivo);
+    if (ok) f.classList.remove('oculta');
+    else { f.classList.add('oculta'); f.classList.remove('abierta'); const a=f.querySelector('.arrow'); if(a) a.textContent='▼'; }
+  });
+}
+
+function abrirPipeline(key) {
+  const d = pipelines[key]; if (!d) return;
+  document.getElementById('pp-titulo').textContent = d.nombre;
+  document.getElementById('pp-zona').textContent = d.zona;
+  let html = '';
+  if (d.solicitudes&&d.solicitudes.length) {
+    html += '<div class="pipeline-seccion-titulo">🟣 Solicitudes Presentadas ('+d.solicitudes.length+')</div>';
+    d.solicitudes.forEach(i => { html += '<div class="pipeline-item"><div><div class="pipeline-cliente"><span class="pipeline-badge pb-sol">'+(i.estado||'Solicitud')+'</span>'+i.cliente+'</div><div class="pipeline-desc">'+i.desc+'</div></div><div class="pipeline-precio">'+i.precio+'</div></div>'; });
+  }
+  if (d.negociaciones&&d.negociaciones.length) {
+    html += '<div class="pipeline-seccion-titulo">🟡 En Negociación ('+d.negociaciones.length+')</div>';
+    d.negociaciones.forEach(i => { html += '<div class="pipeline-item"><div><div class="pipeline-cliente">'+i.cliente+'</div><div class="pipeline-desc">'+i.desc+'</div></div><div>'+(i.precio!=='—'?'<span class="pipeline-precio">'+i.precio+'</span>':'<span class="pipeline-sin-precio">Sin precio</span>')+'</div></div>'; });
+  } else if (!d.solicitudes||!d.solicitudes.length) { html += '<div class="pipeline-seccion-titulo">En Negociación</div><div class="pipeline-empty">Sin negociaciones activas</div>'; }
+  if (d.leads&&d.leads.length) {
+    html += '<div class="pipeline-seccion-titulo">🔵 Leads ('+d.leads.length+')</div>';
+    d.leads.forEach(i => { html += '<div class="pipeline-item"><div><div class="pipeline-cliente">'+i.cliente+'</div><div class="pipeline-desc">'+i.desc+'</div></div><div>'+(i.precio!=='—'?'<span class="pipeline-precio">'+i.precio+'</span>':'<span class="pipeline-sin-precio">Sin precio</span>')+'</div></div>'; });
+  }
+  document.getElementById('pp-contenido').innerHTML = html;
+  document.getElementById('pipeline-panel').classList.add('visible');
+  document.getElementById('pipeline-panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function cerrarPipeline() {
+  document.getElementById('pipeline-panel').classList.remove('visible');
+  asesorActivo = null;
+  document.querySelectorAll('#filtros-asesor .filtro').forEach(b => b.classList.remove('activo'));
+  aplicarFiltros();
+}
+
+// ---- ADOPCIÓN ----
+function toggleChecks(id) {
+  document.getElementById('checks-'+id).classList.toggle('abierto');
+}
+</script>
+</body>
+</html>
+
