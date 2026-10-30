@@ -1311,3 +1311,343 @@ const NEU_CHALERO_VERTEBRADA = {
   "11L15": { precio:140, iva:0.21 },
   "12.5L15": { precio:168, iva:0.21 }
 };
+
+// ═══════════ Tablas complementarias (movidas desde index.html, 30/10/2026) ═══════════
+const LLANTAS_CONESE = {
+  "TA-2.0 Tanque 2.000 lts": "Simples 15 o 16",
+  "TA-3.0 Tanque 3.000 lts": "Simples 15 o 16",
+  "TCA3-2 Tanque 3.000 lts + Taller": "Duales 15-16 o simples 17 (+$2.950.000 duales 17)",
+  "TCA4-2 Tanque 4.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.540.000 duales 17/18)",
+  "TCA5-2 Tanque 5.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.540.000 duales 17/18)",
+  "TCA6-2 Tanque 6.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.540.000 duales 17/18)",
+  "TT-1 Tanque 5.000 lts + Taller Rodante": "Duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.540.000 duales 17/18)",
+  "TRD-2 Taller Dron": "Simples 15 o 16 - sin cubiertas",
+  "TT-2 Tanque 3.000 lts + Taller Rodante": "Duales 16 ctro gde (+$1.540.000 duales 17/18)"
+};
+
+const CUBIERTAS_COMOFRA = {
+  autodesc_1eje:[
+    {desc:"23:1x30 BKT 16T TA-17,5/21,5",precio:2285073,cant:2},
+    {desc:"23:1x30 BKT 18T TA-17,5/21,5 consultar",precio:2590577,cant:2}
+  ],
+  autodesc_2ejes:[
+    {desc:"23:1x30 BKT 16T TA-26/30",precio:2285073,cant:4},
+    {desc:"23:1x30 BKT 18T TA-26/30 consultar",precio:2590577,cant:4},
+    {desc:"24:5x32 BKT 16T TA-35/38",precio:2934086,cant:4},
+    {desc:"24:5Rx32 Alliance Radial TA-35/38",precio:3021916,cant:4},
+    {desc:"28:Lx26 BKT 20T delantera TA-35/38",precio:2839034,cant:4},
+    {desc:"28:LRx26 BKT Radial delantera TA-35/38",precio:3887879,cant:4}
+  ],
+  autodesc_45:[
+    {desc:"28:Lx26 BKT 20T TA-45 delantera",precio:2839034,cant:2},
+    {desc:"23:1x26 BKT 18T TA-45 trasera",precio:2324530,cant:4},
+    {desc:"30,5-LRx32 BKT Radial TA-38/45",precio:4917418,cant:2}
+  ],
+  mixer_h_balancin:[{desc:"11-Lx16 BKT 12T Mix.H 6/10m3 Balancin",precio:378921,cant:4}],
+  mixer_h10_1eje:[{desc:"16:9x24 Mix.H 10m3 1 eje",precio:1058766,cant:2}],
+  mixer_h14_1eje:[
+    {desc:"23:1x26 BKT 18T Mix.H 14m3 1 eje",precio:2324530,cant:2},
+    {desc:"295/80Rx22,5 Sure Track Radial Mix.H 14m3",precio:731172,cant:2}
+  ],
+  mixer_h14_balancin:[{desc:"400/55x22,5 BKT 20T Mix.H 14m3 Balancin",precio:944165,cant:4}],
+  mixer_h16_1eje:[{desc:"600/50x22,5 Alliance 18T Mix.H 16m3 1 eje",precio:1279847,cant:2}],
+  mixer_h16_2ejes:[{desc:"16,0/70x20 BKT 16T Mix.H 16m3 2 ejes",precio:1030979,cant:4}],
+  mixer_v_1eje:[
+    {desc:"12,5-Lx16 BKT 12T Mix.V 6m3",precio:349395,cant:2},
+    {desc:"400/60x15,5 BKT 18T Mix.V 10m3",precio:655010,cant:2},
+    {desc:"550/45x22,5 Alliance 20T Mix.V 14m3",precio:1179526,cant:2}
+  ],
+  mixer_v25:[{desc:"600/40x22,5 BKT 18T Mix.V 25m3",precio:1852219,cant:2}],
+  batea_pequena:[
+    {desc:"11-Lx16 BKT 12T BV-04/BV-05",precio:378921,cant:4}
+  ],
+  batea_75:[
+    {desc:"275/80Rx22,5 Sure Track Radial BV-7,5",precio:731172,cant:4},
+    {desc:"400/55x22,5 BKT 20T BV-7,5",precio:944165,cant:4}
+  ],
+  batea_95:[
+    {desc:"275/80Rx22,5 Sure Track Radial BV-9,5",precio:731172,cant:4},
+    {desc:"400/55x22,5 BKT 20T BV-9,5 opcional",precio:944165,cant:4}
+  ],
+  batea_15:[
+    {desc:"500/60x22,5 BKT 18T BV-15",precio:1289126,cant:4}
+  ],
+  atf_4cub:[
+    {desc:"275/80x22,5 ATF 12000/17500 x4",precio:540540,cant:4},
+    {desc:"275/80x22,5 ATF 17500 doble eje x8",precio:540540,cant:8}
+  ],
+  atf_8cub:[
+    {desc:"275/80x22,5 ATF 26000 x8",precio:540540,cant:8}
+  ]
+};
+
+const BALANZAS_COMOFRA = {
+  autodesc_1eje:[
+    {desc:"Magris MTV-206 17.500/21.500L 1eje",precio:5394000},
+    {desc:"Magris MTV-207A 17.500/21.500L 1eje",precio:5684000},
+    {desc:"Magris MTV-306 17.500/21.500L 1eje",precio:6581000},
+    {desc:"Hook ST-108 17.500/21.500L 1eje",precio:5637000},
+    {desc:"Hook AT-455 17.500/21.500L 1eje",precio:5845500},
+    {desc:"Vesta 3520 Basico 17.500/21.500L 1eje",precio:5235000},
+    {desc:"Vesta 3525 17.500/21.500L 1eje",precio:5610000}
+  ],
+  autodesc_2ejes:[
+    {desc:"Magris MTV-206 26/30/35/38.000L 2ejes",precio:6638000},
+    {desc:"Magris MTV-207A 26/30/35/38.000L 2ejes",precio:6928000},
+    {desc:"Magris MTV-306 26/30/35/38.000L 2ejes",precio:7478000},
+    {desc:"Hook ST-108 26/30/35/38.000L 2ejes",precio:6777000},
+    {desc:"Hook AT-455 26/30/35/38.000L 2ejes",precio:6985500},
+    {desc:"Vesta 3520 26/30/35/38.000L 2ejes",precio:7113000},
+    {desc:"Vesta 3525 26/30/35/38.000L 2ejes",precio:7428000}
+  ],
+  autodesc_45:[
+    {desc:"Magris MTV-206 45.000L 2ejes",precio:8186000},
+    {desc:"Magris MTV-207A 45.000L 2ejes",precio:8476000},
+    {desc:"Magris MTV-306 45.000L 2ejes",precio:9026000},
+    {desc:"Hook ST-108 45.000L 2ejes",precio:7276500},
+    {desc:"Hook AT-455 45.000L 2ejes",precio:7471500}
+  ],
+  mixer_h_balancin:[
+    {desc:"Magris MX-8M Mix.H 6/10m3 balancin",precio:5176000},
+    {desc:"Magris Mass-68 Mix.H 6/10m3 balancin",precio:6326000},
+    {desc:"Hook AT-150 Mix.H H6/H10m3 balancin",precio:5192000},
+    {desc:"Hook AT-456 Mix.H H6/H10m3 balancin",precio:5400500}
+  ],
+  mixer_h10_1eje:[
+    {desc:"Magris MX-8M Mix.H 10m3 1eje",precio:5176000},
+    {desc:"Magris Mass-68 Mix.H 10m3 1eje",precio:6326000},
+    {desc:"Hook AT-150 Mix.H H10m3 1eje",precio:5192000},
+    {desc:"Hook AT-456 Mix.H H10m3 1eje",precio:5400500}
+  ],
+  mixer_h14_1eje:[
+    {desc:"Magris MX-8M Mix.H 14/16m3 1eje",precio:6239000},
+    {desc:"Magris Mass-68 Mix.H 14/16m3 1eje",precio:8584000},
+    {desc:"Hook ST-456 Mix.H 14/16m3 1eje",precio:5342000}
+  ],
+  mixer_h14_balancin:[
+    {desc:"Magris MX-8M Mix.H 14m3 balancin",precio:6239000},
+    {desc:"Magris Mass-68 Mix.H 14m3 balancin",precio:8200000},
+    {desc:"Hook ST-456 Mix.H 14m3 balancin",precio:5342000}
+  ],
+  mixer_h16_1eje:[
+    {desc:"Magris MX-8M Mix.H 16m3 1eje",precio:6239000},
+    {desc:"Magris Mass-68 Mix.H 16m3 1eje",precio:8584000},
+    {desc:"Hook ST-456 Mix.H 16m3 1eje",precio:5342000}
+  ],
+  mixer_h16_2ejes:[
+    {desc:"Magris MX-8M Mix.H 2ejes",precio:7434000},
+    {desc:"Magris Mass-68 Mix.H 2ejes",precio:8200000}
+  ],
+  mixer_v_1eje:[
+    {desc:"Magris MX-8M Mix.V 6m3",precio:5176000},
+    {desc:"Magris MX-8M Mix.V 10/14m3",precio:5617000},
+    {desc:"Magris Mass-68 Mix.V 6m3",precio:6326000},
+    {desc:"Magris Mass-68 Mix.V 10/14m3",precio:6767000},
+    {desc:"Hook AT-150 Mix.V MV10/MV14",precio:6646000},
+    {desc:"Hook AT-456 Mix.V MV10/MV14",precio:6354500},
+    {desc:"Vesta 3530 Mix.V MV10/MV14",precio:5872000},
+    {desc:"Vesta 3535 Mix.V MV10/MV14",precio:6397000}
+  ],
+  mixer_v25:[
+    {desc:"Magris MX-8M Mix.V 21/25m3",precio:6267000},
+    {desc:"Magris Mass-68 Mix.V 21/25m3",precio:7417000}
+  ]
+};
+
+// HOD1 y HOD2 por línea de pago y tipo de producto
+// Formato: { hod1, hod2 } - descuentos encadenados al cliente
+const NH_DESCUENTOS = {
+  // Forma de pago → tipo producto → {hod1, hod2}
+  "contado":        { tractores_t7t8: {hod1:11, hod2:7}, tractores_chicos: {hod1:11, hod2:7}, cosechadoras: {hod1:11, hod2:7}, cabezales: {hod1:11, hod2:7}, pulverizadores: {hod1:11, hod2:7}, heno_forraje: {hod1:11, hod2:7}, picadoras: {hod1:11, hod2:7} },
+  "trade_90":       { tractores_t7t8: {hod1:11, hod2:5}, tractores_chicos: {hod1:11, hod2:5}, cosechadoras: {hod1:11, hod2:5}, cabezales: {hod1:11, hod2:5}, pulverizadores: {hod1:11, hod2:5}, heno_forraje: {hod1:11, hod2:5}, picadoras: {hod1:11, hod2:5} },
+  "wholesale_90":   { tractores_t7t8: {hod1:11, hod2:4}, tractores_chicos: {hod1:11, hod2:4}, cosechadoras: {hod1:11, hod2:4}, cabezales: {hod1:11, hod2:4}, pulverizadores: {hod1:11, hod2:4}, heno_forraje: {hod1:11, hod2:4}, picadoras: {hod1:11, hod2:4} },
+  "wholesale_180":  { tractores_t7t8: {hod1:11, hod2:1}, tractores_chicos: {hod1:11, hod2:1}, cosechadoras: {hod1:11, hod2:1}, cabezales: {hod1:11, hod2:1}, pulverizadores: {hod1:11, hod2:1}, heno_forraje: {hod1:11, hod2:1}, picadoras: {hod1:11, hod2:1} },
+};
+
+// ── AGROACTIVA 2026 ──────────────────────────────────────────
+// Descuentos directos (un solo hod) por tipo de producto
+// tractores/pulv = descTP, cosechadoras/cabezales = descCC
+const NH_AGROACTIVA_LINEAS = [
+  // Contado
+  { id:"aa_cto_tract",     label:"Contado – Tractores/Pulv. (24%)",         banco:"Contado",     plazo:"contado", tna:0,     moneda:"USD", descTP:24.0, descCC:28.0 },
+  { id:"aa_cto_cose",      label:"Contado – Cosechadoras/Cab. (28%)",        banco:"Contado",     plazo:"contado", tna:0,     moneda:"USD", descTP:24.0, descCC:28.0 },
+  { id:"aa_cto_heno",      label:"Contado – Heno & Forraje (15%)",           banco:"Contado",     plazo:"contado", tna:0,     moneda:"USD", descTP:15.0, descCC:15.0 },
+  // AGROCANJE
+  { id:"aa_agrocanje",     label:"AGROCANJE",                                banco:"AGROCANJE",   plazo:"contado", tna:0,     moneda:"USD", descTP:24.0, descCC:28.0 },
+  // BBVA
+  { id:"aa_bbva_ars_4",    label:"BBVA – ARS 4 años TNA 21,5%",              banco:"BBVA",        plazo:"4",       tna:21.5,  moneda:"ARS", descTP:15.6, descCC:19.9 },
+  { id:"aa_bbva_usd_3",    label:"BBVA – USD 3 años TNA 1%",                 banco:"BBVA",        plazo:"3",       tna:1.0,   moneda:"USD", descTP:16.5, descCC:20.8 },
+  { id:"aa_bbva_usd_4",    label:"BBVA – USD 4 años TNA 3%",                 banco:"BBVA",        plazo:"4",       tna:3.0,   moneda:"USD", descTP:16.5, descCC:20.8 },
+  { id:"aa_bbva_usd_5",    label:"BBVA – USD 5 años TNA 5%",                 banco:"BBVA",        plazo:"5",       tna:5.0,   moneda:"USD", descTP:16.5, descCC:20.8 },
+  // BANCOR
+  { id:"aa_bancor_ars_4",  label:"BANCOR – ARS 4 años TNA 14%",              banco:"BANCOR",      plazo:"4",       tna:14.0,  moneda:"ARS", descTP:14.7, descCC:19.0 },
+  // BERSA
+  { id:"aa_bersa_usd_3",   label:"BERSA/NBSF – USD 3 años TNA 4%",           banco:"BERSA",       plazo:"3",       tna:4.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_bersa_usd_4",   label:"BERSA/NBSF – USD 4 años TNA 5,5%",         banco:"BERSA",       plazo:"4",       tna:5.5,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  // CREDICOOP
+  { id:"aa_coop_usd_3",    label:"CREDICOOP – USD 3 años TNA 2%",             banco:"CREDICOOP",   plazo:"3",       tna:2.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_coop_usd_4",    label:"CREDICOOP – USD 4 años TNA 4%",             banco:"CREDICOOP",   plazo:"4",       tna:4.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_coop_ars_3",    label:"CREDICOOP – ARS 3 años TNA 22%",            banco:"CREDICOOP",   plazo:"3",       tna:22.0,  moneda:"ARS", descTP:18.0, descCC:22.5 },
+  // GALICIA
+  { id:"aa_galicia_usd_3", label:"GALICIA – USD 3 años TNA 4,5%",             banco:"GALICIA",     plazo:"3",       tna:4.5,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_galicia_usd_4", label:"GALICIA – USD 4 años TNA 5,25%",            banco:"GALICIA",     plazo:"4",       tna:5.25,  moneda:"USD", descTP:18.0, descCC:22.5 },
+  // BAPRO
+  { id:"aa_bapro_ars_3",   label:"BAPRO – ARS 3 años TNA 28,5%",              banco:"BAPRO",       plazo:"3",       tna:28.5,  moneda:"ARS", descTP:13.7, descCC:18.0 },
+  { id:"aa_bapro_ars_4",   label:"BAPRO – ARS 4 años TNA 29,5%",              banco:"BAPRO",       plazo:"4",       tna:29.5,  moneda:"ARS", descTP:13.7, descCC:18.0 },
+  { id:"aa_bapro_usd_3",   label:"BAPRO – USD 3 años TNA 1%",                 banco:"BAPRO",       plazo:"3",       tna:1.0,   moneda:"USD", descTP:13.7, descCC:18.0 },
+  { id:"aa_bapro_usd_4",   label:"BAPRO – USD 4 años TNA 2,5%",               banco:"BAPRO",       plazo:"4",       tna:2.5,   moneda:"USD", descTP:13.7, descCC:18.0 },
+  // LA PAMPA
+  { id:"aa_lapampa_ars_3", label:"LA PAMPA – ARS 3 años TNA 35%",             banco:"LA PAMPA",    plazo:"3",       tna:35.0,  moneda:"ARS", descTP:15.6, descCC:19.9 },
+  // MACRO
+  { id:"aa_macro_usd_3",   label:"MACRO – USD 3 años TNA 4,5%",               banco:"MACRO",       plazo:"3",       tna:4.5,   moneda:"USD", descTP:17.4, descCC:21.6 },
+  { id:"aa_macro_usd_4",   label:"MACRO – USD 4 años TNA 9,5%",               banco:"MACRO",       plazo:"4",       tna:9.5,   moneda:"USD", descTP:17.4, descCC:21.6 },
+  // PATAGONIA
+  { id:"aa_patagonia_3",   label:"PATAGONIA – USD 3 años TNA 3,75%",           banco:"PATAGONIA",   plazo:"3",       tna:3.75,  moneda:"USD", descTP:17.4, descCC:21.6 },
+  // CNHI Capital
+  { id:"aa_cnhi_st_1",     label:"CNHI Capital – ST USD 1 año TNA 0%",         banco:"CNHI Capital",plazo:"1",       tna:0.0,   moneda:"USD", descTP:19.0, descCC:23.0 },
+  { id:"aa_cnhi_st_2",     label:"CNHI Capital – ST USD 2 años TNA 0%",        banco:"CNHI Capital",plazo:"2",       tna:0.0,   moneda:"USD", descTP:14.7, descCC:19.0 },
+  { id:"aa_cnhi_lt_3",     label:"CNHI Capital – LT USD 3 años TNA 3%",        banco:"CNHI Capital",plazo:"3",       tna:3.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_cnhi_lt_4",     label:"CNHI Capital – LT USD 4 años TNA 4%",        banco:"CNHI Capital",plazo:"4",       tna:4.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_cnhi_lt_5a",    label:"CNHI Capital – LT USD 5 años TNA 5%",        banco:"CNHI Capital",plazo:"5",       tna:5.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_cnhi_lt_5b",    label:"CNHI Capital – LT USD 5 años TNA 6,9%",      banco:"CNHI Capital",plazo:"5",       tna:6.9,   moneda:"USD", descTP:23.0, descCC:25.6 },
+  { id:"aa_cnhi_pch6",     label:"CNHI PCH – 6 cheques mensuales",             banco:"CNHI PCH",    plazo:"contado", tna:0,     moneda:"ARS", descTP:15.6, descCC:19.9 },
+  { id:"aa_cnhi_pch9",     label:"CNHI PCH – 9 cheques mensuales",             banco:"CNHI PCH",    plazo:"contado", tna:0,     moneda:"ARS", descTP:14.7, descCC:19.0 },
+  // SANTANDER
+  { id:"aa_sant_a_3",      label:"SANTANDER Opcion A – USD 3 años TNA 3%",     banco:"SANTANDER",   plazo:"3",       tna:3.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_sant_a_4",      label:"SANTANDER Opcion A – USD 4 años TNA 4%",     banco:"SANTANDER",   plazo:"4",       tna:4.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_sant_a_5",      label:"SANTANDER Opcion A – USD 5 años TNA 5%",     banco:"SANTANDER",   plazo:"5",       tna:5.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_sant_a_6",      label:"SANTANDER Opcion A – USD 6 años TNA 6%",     banco:"SANTANDER",   plazo:"6",       tna:6.0,   moneda:"USD", descTP:18.0, descCC:22.5 },
+  { id:"aa_sant_b_3",      label:"SANTANDER Opcion B – USD 3 años TNA 5,25%",  banco:"SANTANDER",   plazo:"3",       tna:5.25,  moneda:"USD", descTP:23.0, descCC:25.6 },
+  { id:"aa_sant_b_4",      label:"SANTANDER Opcion B – USD 4 años TNA 6,5%",   banco:"SANTANDER",   plazo:"4",       tna:6.5,   moneda:"USD", descTP:23.0, descCC:25.6 },
+  { id:"aa_sant_b_5",      label:"SANTANDER Opcion B – USD 5 años TNA 7%",     banco:"SANTANDER",   plazo:"5",       tna:7.0,   moneda:"USD", descTP:23.0, descCC:25.6 },
+  { id:"aa_sant_b_6",      label:"SANTANDER Opcion B – USD 6 años TNA 8%",     banco:"SANTANDER",   plazo:"6",       tna:8.0,   moneda:"USD", descTP:23.0, descCC:25.6 },
+  // BNA
+  { id:"aa_bna_r827",      label:"BNA – ARS 5 años TNA 18% (R827)",            banco:"BNA",         plazo:"5",       tna:18.0,  moneda:"ARS", descTP:14.7, descCC:19.0 },
+  { id:"aa_bna_r810",      label:"BNA – Extra Convenio USD 5 años TNA 6,5% (R810)", banco:"BNA",    plazo:"5",       tna:6.5,   moneda:"USD", descTP:24.0, descCC:28.0 },
+];
+
+// Líneas de financiamiento por plazo
+const NH_LINEAS = [
+  // ── Boletín Comercial CNH N°01 — Condiciones Comerciales JUNIO 2026 ──
+  { id:"agrocanje", label:"Agrocanje", banco:"Agrocanje", plazo:"-", tna:0, moneda:"USD", hod1:11, hod2:7 },
+  // ── Condición de Pago (por línea de producto, no por banco) ──
+  { id:"cnh_contado",  label:"Contado - Extra Convenio - Banco sin subsidio", banco:"CNH - Condición de Pago", plazo:"contado", tna:0, moneda:"USD", hod1:11, hod2:7 },
+  { id:"cnh_whole90",  label:"Wholesale - 90D (LTV 100%)",  banco:"CNH - Condición de Pago", plazo:"90dias", tna:0, moneda:"USD", hod1:11, hod2:4 },
+  { id:"cnh_whole180", label:"Wholesale - 180D (LTV 100%)", banco:"CNH - Condición de Pago", plazo:"180dias", tna:0, moneda:"USD", hod1:11, hod2:1,
+    naLineas:["tractores_chicos","tractores_t7t8","pulverizadores","cosechadoras_cana"] },
+  // ── CNHI Capital (Boletín N°03 - Julio 2026) ───────────────────
+  { id:"cnhi_st_1",     label:"CNHI Capital – ST USD S/Gastos-S/Seguro (Mutuo) 1 año TNA 0%",     banco:"CNHI Capital", plazo:1, tna:0,    moneda:"USD", hod1:8,  hod2:0 },
+  { id:"cnhi_st_2",     label:"CNHI Capital – ST USD S/Gastos-S/Seguro (Mutuo) 2 años TNA 0%",    banco:"CNHI Capital", plazo:2, tna:0,    moneda:"USD", hod1:12, hod2:0 },
+  { id:"cnhi_lt_3",     label:"CNHI Capital – LT USD 3 años TNA 3,9%",  banco:"CNHI Capital", plazo:3, tna:3.9,  moneda:"USD", hod1:7,  hod2:0 },
+  { id:"cnhi_lt_4",     label:"CNHI Capital – LT USD 4 años TNA 4,9%",  banco:"CNHI Capital", plazo:4, tna:4.9,  moneda:"USD", hod1:7,  hod2:0 },
+  { id:"cnhi_lt_5",     label:"CNHI Capital – LT USD 5 años TNA 6,9%",  banco:"CNHI Capital", plazo:5, tna:6.9,  moneda:"USD", hod1:5,  hod2:0 },
+  { id:"cnhi_pch6_0",   label:"CNHI Capital – PCH 6 Cheques Mensuales TNA 0%",   banco:"CNHI Capital", plazo:"cheques", tna:0,  moneda:"USD", hod1:9,  hod2:0 },
+  { id:"cnhi_pch6_15",  label:"CNHI Capital – PCH 6 Cheques Mensuales TNA 15%",  banco:"CNHI Capital", plazo:"cheques", tna:15, moneda:"USD", hod1:6,  hod2:0 },
+  { id:"cnhi_pch9_0",   label:"CNHI Capital – PCH 9 Cheques Mensuales TNA 0%",   banco:"CNHI Capital", plazo:"cheques", tna:0,  moneda:"USD", hod1:12, hod2:0 },
+  { id:"cnhi_pch9_15",  label:"CNHI Capital – PCH 9 Cheques Mensuales TNA 15%",  banco:"CNHI Capital", plazo:"cheques", tna:15, moneda:"USD", hod1:8,  hod2:0 },
+  { id:"cnhi_pch11_0",  label:"CNHI Capital – PCH 11 Cheques Mensuales TNA 0%",  banco:"CNHI Capital", plazo:"cheques", tna:0,  moneda:"USD", hod1:14, hod2:0 },
+  { id:"cnhi_pch11_15", label:"CNHI Capital – PCH 11 Cheques Mensuales TNA 15%", banco:"CNHI Capital", plazo:"cheques", tna:15, moneda:"USD", hod1:9,  hod2:0 },
+  { id:"cnhi_pch180_0", label:"CNHI Capital – PCH 180/360 TNA 0%",  banco:"CNHI Capital", plazo:"cheques", tna:0,  moneda:"USD", hod1:18, hod2:0 },
+  { id:"cnhi_pch180_15",label:"CNHI Capital – PCH 180/360 TNA 15%", banco:"CNHI Capital", plazo:"cheques", tna:15, moneda:"USD", hod1:13, hod2:0 },
+  // ── Santander ────────────────────────────────────────────────
+  { id:"sant_a_3", label:"Santander – Opción A (1er cuota anualizada) 3 años TNA 3%", banco:"Santander", plazo:3, tna:3, moneda:"USD", hod1:11, hod2:0 },
+  { id:"sant_a_4", label:"Santander – Opción A (1er cuota anualizada) 4 años TNA 4%", banco:"Santander", plazo:4, tna:4, moneda:"USD", hod1:11, hod2:0 },
+  { id:"sant_a_5", label:"Santander – Opción A (1er cuota anualizada) 5 años TNA 5%", banco:"Santander", plazo:5, tna:5, moneda:"USD", hod1:11, hod2:0 },
+  { id:"sant_a_6", label:"Santander – Opción A (1er cuota anualizada) 6 años TNA 6%", banco:"Santander", plazo:6, tna:6, moneda:"USD", hod1:11, hod2:4 },
+  { id:"sant_b_3", label:"Santander – Opción B (1er cuota anualizada) 3 años TNA 5,25%", banco:"Santander", plazo:3, tna:5.25, moneda:"USD", hod1:11, hod2:4 },
+  { id:"sant_b_4", label:"Santander – Opción B (1er cuota anualizada) 4 años TNA 6,5%",  banco:"Santander", plazo:4, tna:6.5,  moneda:"USD", hod1:11, hod2:4 },
+  { id:"sant_b_5", label:"Santander – Opción B (1er cuota anualizada) 5 años TNA 7%",    banco:"Santander", plazo:5, tna:7,    moneda:"USD", hod1:11, hod2:4 },
+  { id:"sant_b_6", label:"Santander – Opción B (1er cuota anualizada) 6 años TNA 8%",    banco:"Santander", plazo:6, tna:8,    moneda:"USD", hod1:11, hod2:4 },
+  // ── BNA ──────────────────────────────────────────────────────
+  { id:"bna_r827", label:"BNA – Prendario ARS Con Subsidio R827 5 años TNA 18%", banco:"BNA", plazo:5, tna:18,  moneda:"ARS", hod1:7,  hod2:0 },
+  { id:"bna_r810", label:"BNA – Extra Convenio R810 5 años TNA 6,5%",            banco:"BNA", plazo:5, tna:6.5, moneda:"ARS", hod1:11, hod2:7 },
+  // ── BBVA ─────────────────────────────────────────────────────
+  { id:"bbva_ars_4",  label:"BBVA – Prendario ARS Con Subsidio (L30/6) 4 años TNA 21,5%", banco:"BBVA", plazo:4, tna:21.5, moneda:"ARS", hod1:8, hod2:0 },
+  { id:"bbva_usd_3",  label:"BBVA – Prendario USD Con Subsidio (L30/6) 3 años TNA 1%",    banco:"BBVA", plazo:3, tna:1,    moneda:"USD", hod1:9, hod2:0 },
+  { id:"bbva_usd_4",  label:"BBVA – Prendario USD Con Subsidio (L30/6) 4 años TNA 3%",    banco:"BBVA", plazo:4, tna:3,    moneda:"USD", hod1:9, hod2:0 },
+  { id:"bbva_usd_5",  label:"BBVA – Prendario USD Con Subsidio (L30/6) 5 años TNA 5%",    banco:"BBVA", plazo:5, tna:5,    moneda:"USD", hod1:9, hod2:0 },
+  // ── Bancor ───────────────────────────────────────────────────
+  { id:"bancor_ars_4", label:"Bancor – Prendario ARS Con Subsidio 4 años TNA 14%", banco:"Bancor", plazo:4, tna:14, moneda:"ARS", hod1:7, hod2:0 },
+  // ── Bersa/NBSF ───────────────────────────────────────────────
+  { id:"bersa_usd_3", label:"Bersa/NBSF – Prendario USD Con Subsidio 3 años TNA 4%",   banco:"Bersa/NBSF", plazo:3, tna:4,   moneda:"USD", hod1:11, hod2:0 },
+  { id:"bersa_usd_4", label:"Bersa/NBSF – Prendario USD Con Subsidio 4 años TNA 5,5%", banco:"Bersa/NBSF", plazo:4, tna:5.5, moneda:"USD", hod1:11, hod2:0 },
+  // ── Credicoop ────────────────────────────────────────────────
+  { id:"credi_usd_3",  label:"Credicoop – Prendario USD Con Subsidio 3 años TNA 2%",  banco:"Credicoop", plazo:3, tna:2,  moneda:"USD", hod1:11, hod2:0 },
+  { id:"credi_usd_4",  label:"Credicoop – Prendario USD Con Subsidio 4 años TNA 4%",  banco:"Credicoop", plazo:4, tna:4,  moneda:"USD", hod1:11, hod2:0 },
+  { id:"credi_ars_3",  label:"Credicoop – Prendario ARS Con Subsidio 3 años TNA 22%", banco:"Credicoop", plazo:3, tna:22, moneda:"ARS", hod1:11, hod2:0 },
+  // ── Galicia ──────────────────────────────────────────────────
+  { id:"gal_usd_3", label:"Galicia – Prendario USD Con Subsidio 3 años TNA 4,5%",  banco:"Galicia", plazo:3, tna:4.5,  moneda:"USD", hod1:11, hod2:0 },
+  { id:"gal_usd_4", label:"Galicia – Prendario USD Con Subsidio 4 años TNA 5,25%", banco:"Galicia", plazo:4, tna:5.25, moneda:"USD", hod1:11, hod2:0 },
+  // ── Bapro ────────────────────────────────────────────────────
+  { id:"bapro_ars_3", label:"Bapro – Prendario ARS Con Subsidio 3 años TNA 28,5%", banco:"Bapro", plazo:3, tna:28.5, moneda:"ARS", hod1:6, hod2:0 },
+  { id:"bapro_ars_4", label:"Bapro – Prendario ARS Con Subsidio 4 años TNA 29,5%", banco:"Bapro", plazo:4, tna:29.5, moneda:"ARS", hod1:6, hod2:0 },
+  { id:"bapro_usd_3", label:"Bapro – Prendario USD Con Subsidio 3 años TNA 1%",    banco:"Bapro", plazo:3, tna:1,    moneda:"USD", hod1:6, hod2:0 },
+  { id:"bapro_usd_4", label:"Bapro – Prendario USD Con Subsidio 4 años TNA 2,5%",  banco:"Bapro", plazo:4, tna:2.5,  moneda:"USD", hod1:6, hod2:0 },
+  // ── La Pampa ─────────────────────────────────────────────────
+  { id:"lapampa_ars_3", label:"La Pampa – Prendario ARS Con Subsidio 3 años TNA 35%", banco:"La Pampa", plazo:3, tna:35, moneda:"ARS", hod1:8, hod2:0 },
+  // ── Macro ────────────────────────────────────────────────────
+  { id:"macro_usd_3", label:"Macro – Prendario USD Con Subsidio 3 años TNA 4,5%", banco:"Macro", plazo:3, tna:4.5, moneda:"USD", hod1:10, hod2:0 },
+  { id:"macro_usd_4", label:"Macro – Prendario USD Con Subsidio 4 años TNA 9,5%", banco:"Macro", plazo:4, tna:9.5, moneda:"USD", hod1:10, hod2:0 },
+  // ── Patagonia ────────────────────────────────────────────────
+  { id:"pat_usd_3", label:"Patagonia – Prendario USD Con Subsidio 3 años TNA 3,75%", banco:"Patagonia", plazo:3, tna:3.75, moneda:"USD", hod1:10, hod2:0 },
+];
+
+// Descuento Base por línea de producto (Boletín CNH Junio 2026) — usado solo para
+// calcular el techo del "Desc. extra" (nunca puede perforar 15 puntos de Desc. Base)
+const NH_DESC_BASE_LINEA = {
+  tractores_chicos:   22,
+  tractores_t7t8:     22,
+  cosechadoras:       26,
+  cabezales:          26,
+  pulverizadores:     22,
+  heno_forraje:       20,
+  picadoras:          20,
+  sembradoras:        20,
+  cosechadoras_cana:  18,
+  braud:              10,
+};
+
+const NH_DESC_EXTRA_PISO = 15;
+// ─── DATOS DRON P150 ──────────────────────────────────────────
+const DRON_DATA = {
+  basic_revocast: {
+    nombre: "Kit Básico + Revocast",
+    contado:  { precioSIVA: 28600, precioFinal: 31600 },
+    cheque:   { cuota: 21448, cuotas: 2, plazo: "180 y 360 días", moneda: "USD" },
+    mutuo1:   { cuota: 16900, cuotas: 2, plazo: "180 y 360 días", moneda: "USD" },
+    mutuo2:   { entrega: 10400, cuota: 6070, cuotas: 4, plazo: "c/6 meses", moneda: "USD" }
+  },
+  basic: {
+    nombre: "Kit Básico",
+    contado:  { precioSIVA: 26600, precioFinal: 29390 },
+    cheque:   { cuota: 20047, cuotas: 2, plazo: "180 y 360 días", moneda: "USD" },
+    mutuo1:   { cuota: 15800, cuotas: 2, plazo: "180 y 360 días", moneda: "USD" },
+    mutuo2:   { entrega: 9728, cuota: 5674, cuotas: 4, plazo: "c/6 meses", moneda: "USD" }
+  },
+  full: {
+    nombre: "Kit Full",
+    contado:  { precioSIVA: 30500, precioFinal: 33700 },
+    cheque:   { cuota: 23105, cuotas: 2, plazo: "180 y 360 días", moneda: "USD" },
+    mutuo1:   { cuota: 18230, cuotas: 2, plazo: "180 y 360 días", moneda: "USD" },
+    mutuo2:   { entrega: 11220, cuota: 6550, cuotas: 4, plazo: "c/6 meses", moneda: "USD" }
+  }
+};
+
+// Precios ATF por tipo de tubo de descarga (s/IVA) — Lista N°181 (vig. 01/09/2026)
+const ATF_OPCIONES_DESCARGA = {
+  "ATF 12000": { sinfin: 28773345, noria: 33146894, sintubo: 26586571 },
+  "ATF 17500": { sinfin: 35878724, noria: 41332290, sintubo: 33152000 },
+  "ATF 26000": { sinfin: 45610169, noria: 51858000, sintubo: 43110000 }
+};
+
+const CONESE_CUBIERTA_USD = 130;
+
+const CONESE_ALTA_FLOTACION_USD = 345;
+
+const CONESE_SEL_OPC = {
+  bomba:        { label:"Bomba Rossi p/gas-oil 50 lts/min (pico común, surtidor, filtro, 5 m manguera)", usd:1401 },
+  cuentalitros: { label:"Cuentalitros 3 dígitos (Piusi)", usd:554 },
+  luces_com:    { label:"Luces comunes", usd:137, grupo:"luces" },
+  luces_led:    { label:"Luces LED", usd:261, grupo:"luces" }
+};
+
