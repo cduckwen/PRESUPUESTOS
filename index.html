@@ -182,8 +182,10 @@
 <div class="tabs-bar">
   <button class="tab-btn on" id="tabBtnPres" onclick="mostrarTab('pres')">📋 Presupuesto</button>
   <button class="tab-btn" id="tabBtnGer" onclick="mostrarTab('ger')">🔒 Gerencia</button>
+  <button class="tab-btn" id="tabBtnUsa" onclick="mostrarTab('usa')">🔒 Usados</button>
 </div>
 <div class="ger-view" id="gerView" style="display:none;"></div>
+<div class="ger-view" id="usaView" style="display:none;"></div>
 
 <div class="container" id="mainContainer">
 
@@ -584,6 +586,7 @@
 
 <script src="tc.js"></script>
 <script src="precios.js"></script>
+<script src="usados.js"></script>
 <script>
 // Retorna {medida, cant} segun discos del modelo
 function neuChaleraVert(modelo) {
@@ -3066,19 +3069,23 @@ function _sha256(str){
 }
 let _gerOK = false;
 try { _gerOK = sessionStorage.getItem('gerOK') === '1'; } catch(e) {}
+var _tabActual = 'pres';
 function mostrarTab(t){
-  const ger = t==='ger';
-  document.getElementById('mainContainer').style.display = ger ? 'none' : '';
-  document.getElementById('gerView').style.display = ger ? 'block' : 'none';
-  document.getElementById('tabBtnPres').classList.toggle('on', !ger);
-  document.getElementById('tabBtnGer').classList.toggle('on', ger);
-  if (ger) renderGerencia();
+  _tabActual = t;
+  document.getElementById('mainContainer').style.display = t==='pres' ? '' : 'none';
+  document.getElementById('gerView').style.display = t==='ger' ? 'block' : 'none';
+  document.getElementById('usaView').style.display = t==='usa' ? 'block' : 'none';
+  document.getElementById('tabBtnPres').classList.toggle('on', t==='pres');
+  document.getElementById('tabBtnGer').classList.toggle('on', t==='ger');
+  document.getElementById('tabBtnUsa').classList.toggle('on', t==='usa');
+  if (t==='ger') renderGerencia();
+  if (t==='usa') renderUsados();
 }
 function gerEntrar(){
   const v = (document.getElementById('gerClave')||{}).value || '';
   if (_sha256('berger|ger|'+v) === GER_HASH) {
     _gerOK = true; try { sessionStorage.setItem('gerOK','1'); } catch(e) {}
-    renderGerencia();
+    if (_tabActual==='usa') renderUsados(); else renderGerencia();
   } else {
     const m = document.getElementById('gerMsg'); if (m) m.textContent = 'Clave incorrecta.';
   }
@@ -4076,6 +4083,90 @@ function guardarAsesor(sel){
 }
 (function(){ try{ const v=localStorage.getItem("ft_asesor"); const s=document.getElementById("asesorNombre");
   if(v && s && Array.from(s.options).some(function(o){return o.value===v;})) s.value=v; }catch(e){} })();
+
+// ═══ Pestaña USADOS (con la clave de Gerencia): tasación de cabezales con la misma cuenta del cotizador de usados ═══
+var _usaQ = {tipo:'Maicero', marca:'Maizco', surcos:'', dist:'52', anio:'', estado:'bueno', hid:'0', mod:'conv', mas:false};
+function renderUsados(){
+  const box = document.getElementById('usaView'); if (!box) return;
+  if (!_gerOK) {
+    box.innerHTML = '<div class="ger-key"><strong>🔒 Usados</strong><div style="font-size:0.8rem;color:#666;margin-top:4px;">Tasador de cabezales usados — misma clave que Gerencia.</div><div style="margin-top:8px;"><input type="password" id="gerClave" placeholder="Clave" onkeydown="if(event.key===\'Enter\')gerEntrar()" style="padding:6px 8px;border:1.5px solid #bbb;border-radius:5px;"> <button class="btn-opcionales" onclick="gerEntrar()">Entrar</button></div><div id="gerMsg" style="color:#b00;font-size:0.82rem;margin-top:6px;"></div></div>';
+    return;
+  }
+  if (typeof USADOS === 'undefined') { box.innerHTML = '<div class="ger-card">No se pudo cargar usados.js.</div>'; return; }
+  const q=_usaQ, U=USADOS;
+  const op=function(v,t,sel){ return '<option value="'+v+'"'+(String(sel)===String(v)?' selected':'')+'>'+t+'</option>'; };
+  const dists = q.tipo==='Girasolero' ? ['52','70'] : (q.tipo==='Maicero' ? ['52','70','42'] : []);
+  let anios=''; for(let y=2026;y>=1995;y--) anios+=op(y,y,q.anio);
+  const st='padding:7px 8px;border:1.5px solid #bbb;border-radius:5px;font-size:0.9rem;width:100%;';
+  const campo=function(l,html){ return '<label style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-weight:700;color:#555;">'+l+html+'</label>'; };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><h2 style="font-size:1.05rem;">🔒 Usados — tasación de cabezales</h2><button class="btn-opcionales" onclick="gerSalir()">Salir</button></div>';
+  h+='<div class="ger-card"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">';
+  h+=campo('Tipo','<select style="'+st+'" onchange="usaSet(\'tipo\',this.value)">'+['Maicero','Girasolero','Draper'].map(function(t){return op(t,t,q.tipo);}).join('')+'</select>');
+  h+=campo('Marca','<select style="'+st+'" onchange="usaSet(\'marca\',this.value)">'+U.MARCAS.map(function(m){return op(m,m,q.marca);}).join('')+'</select>');
+  h+=campo(q.tipo==='Draper'?'Pies':'Surcos','<input type="number" min="4" max="45" style="'+st+'" value="'+q.surcos+'" oninput="usaSet(\'surcos\',this.value,true)">');
+  if (dists.length) h+=campo('Distancia','<select style="'+st+'" onchange="usaSet(\'dist\',this.value)">'+dists.map(function(d){return op(d,d+' cm',q.dist);}).join('')+'</select>');
+  h+=campo('Año','<select style="'+st+'" onchange="usaSet(\'anio\',this.value)"><option value="">—</option>'+anios+'</select>');
+  h+=campo('Estado','<select style="'+st+'" onchange="usaSet(\'estado\',this.value)">'+op('imp','Impecable (+5%)',q.estado)+op('bueno','Bueno',q.estado)+op('cast','Castigado (−5%)',q.estado)+op('rep','Para reparar (−10%, tope 30%)',q.estado)+'</select>');
+  if (q.tipo==='Girasolero') h+=campo('Accionamiento','<select style="'+st+'" onchange="usaSet(\'hid\',this.value)">'+op('0','Mecánico',q.hid)+op('1','Hidráulico',q.hid)+'</select>');
+  if (q.marca==='Mainero' && q.tipo==='Maicero') h+=campo('Modelo Mainero','<select style="'+st+'" onchange="usaSet(\'mod\',this.value)">'+op('conv','Convencional',q.mod)+op('mdd','MDD',q.mod)+'</select>');
+  h+='</div><label style="display:flex;gap:6px;align-items:center;font-size:0.82rem;margin-top:10px;"><input type="checkbox" '+(q.mas?'checked ':'')+'onchange="usaSet(\'mas\',this.checked)"> El cliente va por un nuevo de <b>más surcos</b></label></div>';
+  h+='<div id="usaRes">'+usaResultado()+'</div>';
+  box.innerHTML=h;
+}
+function usaSet(k,v,soloRes){ _usaQ[k]=v; if(k==='tipo'){ if(v==='Draper'){_usaQ.dist='';} else if(!_usaQ.dist){_usaQ.dist='52';} }
+  if(soloRes){ const r=document.getElementById('usaRes'); if(r) r.innerHTML=usaResultado(); } else renderUsados(); }
+function usaCalcular(q){
+  const U=USADOS, C=U.CONFIG, s=+q.surcos, a=+q.anio; if(!s||!a) return null;
+  const hid=q.hid==='1', linea=(q.tipo==='Maicero'&&q.marca==='Mainero'&&q.mod==='mdd')?'rowfree':'premium';
+  const distE=q.tipo==='Draper'?null:(linea==='rowfree'?'52':q.dist);
+  const N=U.nuevo(q.tipo,s,distE,hid,linea); if(!N) return {error:'No hay lista de nuevo para esa medida.'};
+  const T=U.tramo(a), pct=q.mas?T.mas:T.mix, F=U.factorMarca(q.tipo,q.marca,q.mod,a,s,distE);
+  let f=1; F.out.forEach(function(x){f*=x[0];});
+  const E=C.estado[q.estado]; let pctF=pct*f*E.f, tope=false; if(E.tope&&pctF>E.tope*100){pctF=E.tope*100;tope=true;}
+  const toma=N.v*pctF/100;
+  let conf=F.conf; if(T.n<3)conf=Math.max(conf,1); if(a>=2020)conf=Math.max(conf,1); if(q.tipo==='Draper')conf=Math.max(conf,2); if(q.estado==='rep')conf=Math.max(conf,1);
+  const av=[];
+  if(a>=2020) av.push(q.marca==='Maizco'?'Equipo 2020+: en los más nuevos se suele pagar algo menos que la fórmula. Mirar los comparables.':'Equipo 2020+ de marca no Maizco: se pagó 10-25% menos que la fórmula. Confirmar con el referente.');
+  if(T.n<3) av.push('Pocos casos reales para ese tramo de años ('+T.n+'): el % se apoya sobre todo en la guía.');
+  if(!N.exacto) av.push('La medida '+s+' no está en la '+C.lista+': precio del nuevo interpolado.');
+  if(q.tipo==='Draper') av.push('Drapers: muy pocos datos.');
+  return {N:N,T:T,F:F,E:E,pct:pct,pctF:pctF,tope:tope,toma:toma,piso:toma*(1+C.ventaPiso),pedir:toma*(1+C.ventaPedir),conf:['alta','media','baja'][conf],av:av,distE:distE};
+}
+function usaResultado(){
+  const q=_usaQ, r=usaCalcular(q);
+  if(!r) return '<div class="ger-card" style="color:#777;">Completá surcos y año para ver el valor.</div>';
+  if(r.error) return '<div class="ger-card">'+r.error+'</div>';
+  const U=USADOS, usd=r.N.mon==='USD';
+  const f1=function(v){ return usd ? 'USD '+Math.round(v).toLocaleString('es-AR') : '$ '+v.toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1})+' M'; };
+  const r05=function(v){ return usd?Math.round(v/500)*500:Math.round(v*2)/2; };
+  const pc=function(v){ return (Math.round(v*10)/10).toLocaleString('es-AR')+'%'; };
+  const col={alta:'#2e7d32',media:'#ef6c00',baja:'#c62828'}[r.conf];
+  let h='<div class="ger-card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;"><h3 style="margin:0;">'+q.tipo+' '+q.marca+' '+q.surcos+(q.tipo==='Draper'?' pies':' a '+r.distE)+' · '+q.anio+'</h3><span style="background:'+col+';color:#fff;border-radius:10px;padding:2px 10px;font-size:0.75rem;font-weight:700;">Confianza '+r.conf+'</span></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px;">';
+  const kpi=function(t,v,sub,bg){ return '<div style="background:'+bg+';border-radius:8px;padding:10px;"><div style="font-size:0.75rem;color:#555;font-weight:700;">'+t+'</div><div style="font-size:1.25rem;font-weight:800;">'+v+'</div><div style="font-size:0.75rem;color:#666;">'+sub+'</div></div>'; };
+  h+=kpi('TOMA',f1(r.toma),'Rango '+f1(r05(r.toma*0.95))+' – '+f1(r05(r.toma*1.05)),'#e3f2fd');
+  h+=kpi('VENTA MÍNIMA',f1(r.piso),'toma +'+Math.round(U.CONFIG.ventaPiso*100)+'%','#fff8e1');
+  h+=kpi('PARA PEDIR',f1(r.pedir),'toma +'+Math.round(U.CONFIG.ventaPedir*100)+'%','#e8f5e9');
+  h+='</div>';
+  r.av.forEach(function(w){ h+='<div style="background:#fff3cd;border:1px solid #ffe08a;border-radius:6px;padding:6px 10px;font-size:0.8rem;margin-top:8px;">⚠️ '+w+'</div>'; });
+  h+='<table class="ger-tbl" style="margin-top:10px;"><tr><td>Nuevo de referencia</td><td>'+r.N.desc+' ('+U.CONFIG.lista+', c/IVA): <b>'+f1(r.N.v)+'</b>'+(r.N.exacto?'':' · interpolado')+'</td></tr>';
+  h+='<tr><td>% por año</td><td>'+r.T.d+'-'+r.T.h+': guía '+pc(r.T.g)+' · casos reales '+(r.T.emp==null?'sin casos':pc(r.T.emp)+' ('+r.T.n+')')+' → <b>'+pc(r.T.mix)+'</b></td></tr>';
+  if(q.mas) h+='<tr><td>Más surcos</td><td><b>'+pc(r.T.mas)+'</b></td></tr>';
+  r.F.out.forEach(function(x){ h+='<tr><td>Marca / medida</td><td>'+x[1]+' · <b>×'+x[0].toLocaleString('es-AR')+'</b></td></tr>'; });
+  h+='<tr><td>Estado</td><td>'+r.E.txt+(r.tope?' (tope 30%)':'')+'</td></tr><tr><td>% final del nuevo</td><td><b>'+pc(r.pctF)+'</b> → toma '+f1(r.toma)+'</td></tr></table></div>';
+  // comparables
+  const fm=function(x){ const rg=function(v){ return !v?'–':(v[0]===v[1]?String(v[0]).replace('.',','):String(v[0]).replace('.',',')+'–'+String(v[1]).replace('.',','))+(x.mon==='USD'?' USD':''); };
+    return '<tr><td>'+x.f+'</td><td>'+(x.m||'s/d')+' '+(x.mo||'')+' '+(x.s||'?')+(x.t==='Draper'?' p':'-'+(x.d||'?'))+'</td><td>'+(x.a||'s/año')+'</td><td>'+rg(x.tm)+'</td><td>'+rg(x.vt)+'</td><td>'+(x.pt!=null?String(x.pt).replace('.',',')+'%':'–')+'</td><td style="color:#666;">'+(x.e||'')+'</td></tr>'; };
+  const a=+q.anio, s=+q.surcos;
+  const mm=U.DATA.hist.filter(function(x){return x.t===q.tipo && x.m===q.marca && (x.tm||x.vt||x.pt!=null);})
+    .sort(function(x,y){ return (x.a?Math.abs(x.a-a):50)-(y.a?Math.abs(y.a-a):50) || Math.abs((x.s||s)-s)-Math.abs((y.s||s)-s); }).slice(0,6);
+  const cp=U.comparables(q.tipo,q.marca,s,r.distE,a), otros=cp.lista.filter(function(x){return x.m!==q.marca;}).slice(0,6);
+  const thead='<tr style="font-weight:700;"><td>Fecha</td><td>Equipo</td><td>Año</td><td>Toma</td><td>Venta</td><td>% nuevo</td><td>Estado</td></tr>';
+  h+='<div class="ger-card"><h3>Comparables '+q.marca+'</h3>'+(mm.length?'<div style="overflow-x:auto;"><table class="ger-tbl">'+thead+mm.map(fm).join('')+'</table></div>':'<div style="color:#777;font-size:0.85rem;">Sin casos de esta marca.</div>');
+  if(otros.length) h+='<h3 style="margin-top:12px;">Otras marcas, años cercanos</h3><div style="overflow-x:auto;"><table class="ger-tbl">'+thead+otros.map(fm).join('')+'</table></div>';
+  h+='<div style="font-size:0.74rem;color:#777;margin-top:8px;">Valores en millones de $ con IVA salvo indicación USD. Historial reducido (sin clientes ni notas); el completo está en el Drive. Para afinar: estado de cadenas, engranajes, punteras, capots y kit; si es parte de pago, por qué equipo.</div></div>';
+  return h;
+}
 </script>
 </body>
 </html>
