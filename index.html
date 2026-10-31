@@ -4085,6 +4085,8 @@ function guardarAsesor(sel){
   if(v && s && Array.from(s.options).some(function(o){return o.value===v;})) s.value=v; }catch(e){} })();
 
 // ═══ Pestaña USADOS (con la clave de Gerencia): tasación de cabezales con la misma cuenta del cotizador de usados ═══
+var _usaModo = 'cab';
+var _usaS = {t:'Gruesa', m:'', l:'', d:'', a:'', pp:false, q:''};
 var _usaQ = {tipo:'Maicero', marca:'Maizco', surcos:'', dist:'52', anio:'', estado:'bueno', hid:'0', mod:'conv', mas:false};
 function renderUsados(){
   const box = document.getElementById('usaView'); if (!box) return;
@@ -4093,13 +4095,14 @@ function renderUsados(){
     return;
   }
   if (typeof USADOS === 'undefined') { box.innerHTML = '<div class="ger-card">No se pudo cargar usados.js.</div>'; return; }
+  if (_usaModo==='sem') { renderUsadosSem(box); return; }
   const q=_usaQ, U=USADOS;
   const op=function(v,t,sel){ return '<option value="'+v+'"'+(String(sel)===String(v)?' selected':'')+'>'+t+'</option>'; };
   const dists = q.tipo==='Girasolero' ? ['52','70'] : (q.tipo==='Maicero' ? ['52','70','42'] : []);
   let anios=''; for(let y=2026;y>=1995;y--) anios+=op(y,y,q.anio);
   const st='padding:7px 8px;border:1.5px solid #bbb;border-radius:5px;font-size:0.9rem;width:100%;';
   const campo=function(l,html){ return '<label style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-weight:700;color:#555;">'+l+html+'</label>'; };
-  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><h2 style="font-size:1.05rem;">🔒 Usados — tasación de cabezales</h2><button class="btn-opcionales" onclick="gerSalir()">Salir</button></div>';
+  let h=usaCabecera('cabezales');
   h+='<div class="ger-card"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">';
   h+=campo('Tipo','<select style="'+st+'" onchange="usaSet(\'tipo\',this.value)">'+['Maicero','Girasolero','Draper'].map(function(t){return op(t,t,q.tipo);}).join('')+'</select>');
   h+=campo('Marca','<select style="'+st+'" onchange="usaSet(\'marca\',this.value)">'+U.MARCAS.map(function(m){return op(m,m,q.marca);}).join('')+'</select>');
@@ -4165,6 +4168,76 @@ function usaResultado(){
   h+='<div class="ger-card"><h3>Comparables '+q.marca+'</h3>'+(mm.length?'<div style="overflow-x:auto;"><table class="ger-tbl">'+thead+mm.map(fm).join('')+'</table></div>':'<div style="color:#777;font-size:0.85rem;">Sin casos de esta marca.</div>');
   if(otros.length) h+='<h3 style="margin-top:12px;">Otras marcas, años cercanos</h3><div style="overflow-x:auto;"><table class="ger-tbl">'+thead+otros.map(fm).join('')+'</table></div>';
   h+='<div style="font-size:0.74rem;color:#777;margin-top:8px;">Valores en millones de $ con IVA salvo indicación USD. Historial reducido (sin clientes ni notas); el completo está en el Drive. Para afinar: estado de cadenas, engranajes, punteras, capots y kit; si es parte de pago, por qué equipo.</div></div>';
+  return h;
+}
+
+function usaCabecera(t){
+  const b=function(k,l){ return '<button class="tab-btn'+(_usaModo===k?' on':'')+'" style="border-radius:6px;border-bottom:1.5px solid #ccc;" onclick="_usaModo=\''+k+'\';renderUsados()">'+l+'</button>'; };
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;"><h2 style="font-size:1.05rem;">🔒 Usados — '+t+'</h2><span style="display:flex;gap:6px;">'+b('cab','Cabezales')+b('sem','Sembradoras')+'<button class="btn-opcionales" onclick="gerSalir()">Salir</button></span></div>';
+}
+function renderUsadosSem(box){
+  const U=USADOS, q=_usaS, S=U.DATA.sem;
+  const op=function(v,t,sel){ return '<option value="'+v+'"'+(String(sel)===String(v)?' selected':'')+'>'+t+'</option>'; };
+  const marcas=Array.from(new Set(S.map(function(r){return r.m;}).filter(Boolean))).sort();
+  let anios=''; for(let y=2026;y>=1990;y--) anios+=op(y,y,q.a);
+  const st='padding:7px 8px;border:1.5px solid #bbb;border-radius:5px;font-size:0.9rem;width:100%;';
+  const campo=function(l,html){ return '<label style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-weight:700;color:#555;">'+l+html+'</label>'; };
+  let h=usaCabecera('sembradoras');
+  h+='<div class="ger-card"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">';
+  h+=campo('Tipo','<select style="'+st+'" onchange="usaSemSet(\'t\',this.value)">'+op('','Cualquiera',q.t)+['Gruesa','Fina','Combinada'].map(function(t){return op(t,t,q.t);}).join('')+'</select>');
+  h+=campo('Marca','<select style="'+st+'" onchange="usaSemSet(\'m\',this.value)">'+op('','Cualquiera',q.m)+marcas.map(function(m){return op(m,m,q.m);}).join('')+'</select>');
+  h+=campo('Líneas','<input type="number" min="5" max="70" style="'+st+'" value="'+q.l+'" oninput="usaSemSet(\'l\',this.value,true)">');
+  h+=campo('Distancia (cm)','<input type="text" inputmode="decimal" placeholder="ej. 52,5" style="'+st+'" value="'+q.d+'" oninput="usaSemSet(\'d\',this.value,true)">');
+  h+=campo('Año','<select style="'+st+'" onchange="usaSemSet(\'a\',this.value)"><option value="">Cualquiera</option>'+anios+'</select>');
+  h+='</div><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:0.82rem;"><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" '+(q.pp?'checked ':'')+'onchange="usaSemSet(\'pp\',this.checked)"> Con Precision Planting (PP)</label>';
+  h+='<input type="text" placeholder="o buscá libre: ej. MXY alfalfero" value="'+String(q.q).replace(/"/g,'&quot;')+'" oninput="usaSemSet(\'q\',this.value,true)" style="flex:1;min-width:180px;padding:6px 8px;border:1.5px solid #bbb;border-radius:5px;"></div></div>';
+  h+='<div id="usaRes">'+usaSemResultado()+'</div>';
+  box.innerHTML=h;
+}
+function usaSemSet(k,v,soloRes){ _usaS[k]=v; if(soloRes){ const r=document.getElementById('usaRes'); if(r) r.innerHTML=usaSemResultado(); } else renderUsados(); }
+function usaSemResultado(){
+  const U=USADOS, q=_usaS, S=U.DATA.sem, T=U.TOMA_SEM;
+  const numD=function(d){ return parseFloat(String(d||'').replace(',','.')); };
+  const norm=function(x){ return String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); };
+  const fU=function(v){ return 'USD '+Math.round(v).toLocaleString('es-AR'); };
+  const rgU=function(a,b){ return a===b?fU(a):fU(a)+' – '+Math.round(b).toLocaleString('es-AR'); };
+  const tomaR=function(r){ return r.tm0!=null?[r.tm0,r.tm1]:(r.v0!=null?[r.v0*T,r.v1*T]:null); };
+  const a=+q.a, L=+q.l, D=numD(q.d);
+  let lista, sinA, titulo, aviso='';
+  if (String(q.q).trim()) {
+    const W=norm(q.q).split(/\s+/).filter(Boolean);
+    const txt=function(r){ return norm([r.m,r.mo,r.t,r.l&&(r.l+'-'+r.d),r.e,r.pp?'pp precision planting':''].join(' ')); };
+    const Lq=S.filter(function(r){ return W.every(function(w){return txt(r).indexOf(w)>=0;}) && (!q.pp||r.pp); });
+    lista=Lq.filter(function(r){return r.a;}).sort(function(x,y){ return (a?Math.abs(x.a-a)-Math.abs(y.a-a):0)||U.fechaN(y.f)-U.fechaN(x.f); });
+    sinA=Lq.filter(function(r){return !r.a;});
+    titulo='Búsqueda: "'+q.q+'"'; aviso=(lista.length+sinA.length)?'':'Sin resultados. Probá con menos palabras.';
+  } else {
+    const base=S.filter(function(r){ return (q.t?r.t===q.t:true) && !!r.pp===!!q.pp; });
+    const A=L&&D?L*D:null;
+    const sc=function(r){ let s=0; if(q.m && r.m!==q.m) s+=100; if(a) s+=Math.abs(r.a-a)*3;
+      const ra=r.l&&numD(r.d)?r.l*numD(r.d):null; if(A&&ra) s+=Math.abs(ra-A)/A*20; else if(L&&r.l) s+=Math.abs(r.l-L)/L*20; return s; };
+    lista=base.filter(function(r){ return r.a && (!a || Math.abs(r.a-a)<=2); });
+    if(a && lista.length<3){ lista=base.filter(function(r){ return r.a && Math.abs(r.a-a)<=3; }); aviso='Pocas referencias en '+(a-2)+'–'+(a+2)+': ampliado a '+(a-3)+'–'+(a+3)+'.'; }
+    if(q.pp && a && lista.length<3){ lista=S.filter(function(r){return r.pp && r.a;}); aviso='Hay pocas sembradoras con PP: se muestran todas las PP, de cualquier año y tipo.'; }
+    lista.sort(function(x,y){ return sc(x)-sc(y)||U.fechaN(y.f)-U.fechaN(x.f); });
+    sinA=base.filter(function(r){return !r.a;}).sort(function(x,y){return sc(x)-sc(y);});
+    titulo='Sembradora '+(q.t||'(cualquier tipo)').toLowerCase()+(q.pp?' con PP':'')+(q.m?' '+q.m:'')+(L?' '+L+' líneas':'')+(D?' a '+q.d:'')+(a?' · '+a:' · cualquier año');
+  }
+  const top=lista.slice(0,12);
+  const conV=top.filter(function(r){return r.v0!=null;}), mids=conV.map(function(r){return (r.v0+r.v1)/2;}), mv=mids.length?U.med(mids):null;
+  const tms=top.map(tomaR).filter(Boolean).map(function(t){return (t[0]+t[1])/2;}), mt=tms.length?U.med(tms):null, nReal=top.filter(function(r){return r.tm0!=null;}).length;
+  const kpi=function(t,v,sub,bg){ return '<div style="background:'+bg+';border-radius:8px;padding:10px;"><div style="font-size:0.75rem;color:#555;font-weight:700;">'+t+'</div><div style="font-size:1.25rem;font-weight:800;">'+v+'</div><div style="font-size:0.75rem;color:#666;">'+sub+'</div></div>'; };
+  let h='<div class="ger-card"><h3 style="margin:0 0 8px;">'+titulo+'</h3>';
+  if(aviso) h+='<div style="background:#fff3cd;border:1px solid #ffe08a;border-radius:6px;padding:6px 10px;font-size:0.8rem;margin-bottom:8px;">⚠️ '+aviso+'</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">';
+  h+=kpi('VENTA (mediana)',mv?fU(mv):'–',mv?'rango '+fU(Math.min.apply(null,conV.map(function(r){return r.v0;})))+' – '+Math.round(Math.max.apply(null,conV.map(function(r){return r.v1;}))).toLocaleString('es-AR'):'','#fff8e1');
+  h+=kpi('TOMA (mediana)',mt?fU(mt):'–',mt?'sobre '+tms.length+' ref.'+(nReal?' ('+nReal+' con toma real Berger, resto venta × 0,82)':' (venta × 0,82)'):'','#e3f2fd');
+  h+='</div><div style="font-size:0.74rem;color:#777;margin-top:6px;">Mediana de las '+top.length+' referencias más parecidas (abajo). Mirá cuáles se parecen de verdad antes de pasar un número.</div></div>';
+  const fila=function(r){ const t=tomaR(r); return '<tr><td>'+r.f+(r.b?' <span style="font-size:0.7rem;color:#1565c0;">Berger</span>':'')+'</td><td>'+(r.pp?'<b>PP</b> ':'')+(r.m||'s/d')+(r.mo?' '+r.mo:'')+' · '+r.t+(r.l?' '+r.l+'-'+r.d:'')+'<div style="color:#777;font-size:0.75rem;">'+r.e+'</div></td><td>'+(r.a||'–')+'</td><td>'+(r.v0!=null?rgU(r.v0,r.v1):'–')+'</td><td>'+(t?(r.tm0!=null?'<b>'+rgU(t[0],t[1])+'</b> real':rgU(t[0],t[1])):'–')+'</td></tr>'; };
+  const th='<tr style="font-weight:700;"><td>Fecha</td><td>Equipo</td><td>Año</td><td>Venta</td><td>Toma</td></tr>';
+  h+='<div class="ger-card"><h3>Referencias</h3>'+(top.length?'<div style="overflow-x:auto;"><table class="ger-tbl">'+th+top.map(fila).join('')+'</table></div>':'<div style="color:#777;font-size:0.85rem;">Sin referencias.</div>');
+  if(sinA.length) h+='<h3 style="margin-top:12px;">Sin año</h3><div style="overflow-x:auto;"><table class="ger-tbl">'+th+sinA.slice(0,8).map(fila).join('')+'</table></div>';
+  h+='<div style="font-size:0.74rem;color:#777;margin-top:8px;">Valores en USD. Criterios del referente de Agrometal: pierde ~50% al salir de fábrica y ~20% por año; a placa castiga fuerte; monitor +3-6 mil; reparaciones típicas 15-30 mil. Historial reducido; el completo está en el Drive.</div></div>';
   return h;
 }
 </script>
