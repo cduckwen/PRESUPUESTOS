@@ -49,6 +49,9 @@
   .asesor-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
   .asesor-row input { flex: 1; border: 2px solid var(--border); border-radius: 6px; padding: 9px 12px; font-size: 0.95rem; font-family: 'Barlow', sans-serif; transition: border-color .2s; }
   .asesor-row input:focus { outline: none; border-color: var(--red); }
+  .asesor-row select#asesorNombre { flex: 1; border: 2px solid var(--border); border-radius: 6px; padding: 9px 12px; font-size: 0.95rem; font-family: 'Barlow', sans-serif; background: #fff; }
+  .campo-falta { border-color: #d32f2f !important; background: #fff5f5 !important; }
+  .falta-msg { color: #d32f2f; font-size: 0.8rem; margin: -8px 0 10px 0; display: none; }
   .asesor-row label { font-size: 0.8rem; font-weight: 600; color: var(--mid); text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
 
   /* SELECTOR */
@@ -192,12 +195,13 @@
       <div class="panel-body">
         <div class="asesor-row">
           <label>Asesor:</label>
-          <input type="text" id="asesorNombre" placeholder="Tu nombre completo" />
+          <select id="asesorNombre" onchange="guardarAsesor(this)"><option value="">— Elegí tu nombre —</option><optgroup label="Castex"><option>Agustín Reimer</option><option>Martín Campasso</option></optgroup><optgroup label="General Villegas"><option>Marcelo Goedelmann</option></optgroup><optgroup label="Trenque Lauquen"><option>Demian García</option><option>Tomás Vía</option><option>José Cobo</option></optgroup><optgroup label="Salliqueló"><option>Juan Sierra</option></optgroup><optgroup label="General Pico"><option>Ramiro Enríquez</option></optgroup><optgroup label="Coronel Pringles"><option>Diego Choppi</option><option>Leandro Poloni</option></optgroup><optgroup label="Gerencia y otros"><option>Charlie Duckwen</option><option>Lucas Berger</option><option>Emiliano Berger</option><option>Gonzalo Goitía</option></optgroup></select>
         </div>
         <div class="asesor-row">
           <label>Cliente:</label>
-          <input type="text" id="clienteNombre" placeholder="Nombre del cliente" />
+          <input type="text" id="clienteNombre" placeholder="Nombre del cliente (obligatorio)" oninput="this.classList.remove('campo-falta');document.getElementById('faltaMsg').style.display='none';" />
         </div>
+        <div class="falta-msg" id="faltaMsg"></div>
         <div class="asesor-row">
           <label>CUIT:</label>
           <input type="text" id="clienteCuit" placeholder="CUIT (opcional)" />
@@ -3937,6 +3941,7 @@ function esCelular() {
 }
 
 function accionWhatsApp() {
+  if (!datosObligatoriosOK()) return;
   copiarWhatsApp();
   const txt = window._waTxt;
   if (!txt) { alert("No hay presupuesto para enviar."); return; }
@@ -4050,6 +4055,27 @@ function registrarPresupuesto(txt){
     catch(e){ if(navigator.sendBeacon) navigator.sendBeacon(REGISTRO_URL,new Blob([body],{type:"text/plain"})); }
   }catch(e){}
 }
+
+// ═══ Datos obligatorios: sin asesor y cliente no sale el presupuesto ═══
+function datosObligatoriosOK(){
+  const a=document.getElementById("asesorNombre"), c=document.getElementById("clienteNombre"), m=document.getElementById("faltaMsg");
+  const faltan=[];
+  if(!a.value){ a.classList.add("campo-falta"); faltan.push("tu nombre (Asesor)"); }
+  const cli=c.value.trim();
+  if(cli.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g,"").length<3){ c.classList.add("campo-falta"); faltan.push("el nombre del cliente"); }
+  if(!faltan.length){ if(m) m.style.display="none"; return true; }
+  if(m){ m.textContent="⚠️ Para enviar el presupuesto completá "+faltan.join(" y ")+"."; m.style.display="block"; }
+  (faltan[0].indexOf("Asesor")>=0?a:c).focus();
+  try{ window.scrollTo({top:0,behavior:"smooth"}); }catch(e){}
+  return false;
+}
+function guardarAsesor(sel){
+  sel.classList.remove("campo-falta");
+  const m=document.getElementById("faltaMsg"); if(m) m.style.display="none";
+  try{ localStorage.setItem("ft_asesor", sel.value); }catch(e){}
+}
+(function(){ try{ const v=localStorage.getItem("ft_asesor"); const s=document.getElementById("asesorNombre");
+  if(v && s && Array.from(s.options).some(function(o){return o.value===v;})) s.value=v; }catch(e){} })();
 </script>
 </body>
 </html>
