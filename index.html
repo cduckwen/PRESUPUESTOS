@@ -1273,31 +1273,34 @@ function filtrarModelos() {
 
 function actualizarCondicionesDePago(marcaActiva) {
   const sel = document.getElementById('selCondiciones');
-  const marcaObj = PRODUCTOS.find(p => p.marca === marcaActiva);
+  const prev = sel.value;
+  // Condición de una marca: la general de la marca o, si no tiene (ej. MAIZCO), la del modelo cargado en el presupuesto
+  const condDe = function(marca){
+    const obj = PRODUCTOS.find(function(p){ return p.marca === marca; });
+    if (obj && obj.condiciones) return { v: obj.condiciones, t: marca + ': ' + obj.condiciones };
+    const it = presupuesto.find(function(i){ return i.marca === marca && !i.esOpcional; });
+    const cat = it && obj ? obj.items.find(function(x){ return x.modelo === it.modelo; }) : null;
+    const cond = (it && it.cond) || (cat && cat.cond) || '';
+    if (it && cond) return { v: cond, t: marca + ' ' + it.modelo + ': ' + cond.replace(/^Pesos:\s*\*?\s*/,'').replace(/\n\*?\s*/g,' · ').replace(/^·\s*/,'') };
+    return null;
+  };
+  const recorta = function(t, n){ return t.length > n ? t.substring(0, n) + '...' : t; };
   sel.innerHTML = '<option value="">— Sin especificar —</option>';
-
-  // Siempre agregar opción genérica
-  const opt = document.createElement('option');
-  opt.value = marcaObj ? marcaObj.condiciones : '';
-  opt.textContent = marcaActiva ? marcaActiva + ': ' + (marcaObj ? marcaObj.condiciones.substring(0,60)+'...' : '') : 'Sin especificar';
-  if (marcaObj) sel.appendChild(opt);
-
-  // Opciones de todas las marcas con items en presupuesto
-  const marcasEnPresup = [...new Set(presupuesto.map(i => i.marca))];
-  marcasEnPresup.forEach(m => {
-    if (m === marcaActiva) return;
-    const mObj = PRODUCTOS.find(p => p.marca === m);
-    if (!mObj) return;
+  const marcas = [];
+  if (marcaActiva) marcas.push(marcaActiva);
+  presupuesto.forEach(function(i){ if (!i.esOpcional && marcas.indexOf(i.marca) < 0) marcas.push(i.marca); });
+  marcas.forEach(function(m, k){
+    const c = condDe(m); if (!c) return;
     const o = document.createElement('option');
-    o.value = mObj.condiciones;
-    o.textContent = m + ': ' + mObj.condiciones.substring(0,50)+'...';
+    o.value = c.v; o.textContent = recorta(c.t, k === 0 ? 70 : 60);
     sel.appendChild(o);
   });
-
   // Opción personalizada
   const oc = document.createElement('option');
   oc.value = '__custom__'; oc.textContent = '✏️ Escribir condición personalizada...';
   sel.appendChild(oc);
+  // Mantener lo que estaba elegido, si sigue disponible
+  if (prev && Array.from(sel.options).some(function(o){ return o.value === prev; })) sel.value = prev;
 }
 
 function validarTC() {
