@@ -21,7 +21,7 @@ const IMPACAR_ACCESORIOS = [
   { id:"imp_caldera",     label:"Caldera 12V a gasoil",                                                    precio:718000,   cant:1 },
 ];
 
-// Accesorios opcionales ROGRIV (costo de fábrica ÷ 0,75 = precio neto propio, IVA 21% aparte) — Lista 01/10/2026
+// Accesorios opcionales ROGRIV (precio neto, IVA 21% aparte) — Lista 01/10/2026
 const ROGRIV_ACCESORIOS = [
   { id:"rog_tanque",    label:"Tanque de baño",                       precio:279216,   cant:1 },
   { id:"rog_mosqvent",  label:"Mosquitero ventanas",                  precio:535275,   cant:1 },
@@ -124,7 +124,7 @@ const PRODUCTOS = [
 
   // ─── ALCAL ────────────────────────────────────────────────
   { marca:"ALCAL", lista:"N°121", vigencia:"hasta 30/09/2025", moneda:"USD", conIVA:false,
-    condiciones:"15% bonificación concesionario. Financiación consultar.",
+    condiciones:"Financiación consultar.",
     items:[
       { modelo:"MG 111 Fija Eléctrica",        desc:"5 tn maíz/h – motor eléctrico 20HP (no incl.)", precio:7412.80 },
       { modelo:"MG 111 Móvil Eléctrica",        desc:"Ídem + llantas s/cubiertas", precio:7764.96 },
