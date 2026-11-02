@@ -4109,8 +4109,8 @@ function guardarAsesor(sel){
 
 // ═══ Pestaña USADOS (con la clave de Gerencia): tasación de cabezales con la misma cuenta del cotizador de usados ═══
 var _usaModo = 'cab';
-var _usaS = {t:'Gruesa', m:'', l:'', d:'', a:'', pp:false, q:''};
-var _usaQ = {tipo:'Maicero', marca:'Maizco', surcos:'', dist:'52', anio:'', estado:'bueno', hid:'0', mod:'conv', mas:false};
+var _usaS = {t:'', m:'', l:'', d:'', a:'', pp:false, q:''};
+var _usaQ = {txt:'', tipo:'', marca:'', surcos:'', dist:'', anio:'', estado:'bueno', hid:'0', mod:'conv', mas:false};
 function renderUsados(){
   const box = document.getElementById('usaView'); if (!box) return;
   if (!_gerOK) {
@@ -4121,26 +4121,81 @@ function renderUsados(){
   if (_usaModo==='sem') { renderUsadosSem(box); return; }
   const q=_usaQ, U=USADOS;
   const op=function(v,t,sel){ return '<option value="'+v+'"'+(String(sel)===String(v)?' selected':'')+'>'+t+'</option>'; };
-  const dists = q.tipo==='Girasolero' ? ['52','70'] : (q.tipo==='Maicero' ? ['52','70','42'] : []);
+  const cual='<option value="">Cualquiera</option>';
   let anios=''; for(let y=2026;y>=1995;y--) anios+=op(y,y,q.anio);
   const st='padding:7px 8px;border:1.5px solid #bbb;border-radius:5px;font-size:0.9rem;width:100%;';
   const campo=function(l,html){ return '<label style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-weight:700;color:#555;">'+l+html+'</label>'; };
+  const P=usaEfectivo();
   let h=usaCabecera('cabezales');
-  h+='<div class="ger-card"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">';
-  h+=campo('Tipo','<select style="'+st+'" onchange="usaSet(\'tipo\',this.value)">'+['Maicero','Girasolero','Draper'].map(function(t){return op(t,t,q.tipo);}).join('')+'</select>');
-  h+=campo('Marca','<select style="'+st+'" onchange="usaSet(\'marca\',this.value)">'+U.MARCAS.map(function(m){return op(m,m,q.marca);}).join('')+'</select>');
-  h+=campo(q.tipo==='Draper'?'Pies':'Surcos','<input type="number" min="4" max="45" style="'+st+'" value="'+q.surcos+'" oninput="usaSet(\'surcos\',this.value,true)">');
-  if (dists.length) h+=campo('Distancia','<select style="'+st+'" onchange="usaSet(\'dist\',this.value)">'+dists.map(function(d){return op(d,d+' cm',q.dist);}).join('')+'</select>');
-  h+=campo('Año','<select style="'+st+'" onchange="usaSet(\'anio\',this.value)"><option value="">—</option>'+anios+'</select>');
-  h+=campo('Estado','<select style="'+st+'" onchange="usaSet(\'estado\',this.value)">'+op('imp','Impecable (+5%)',q.estado)+op('bueno','Bueno',q.estado)+op('cast','Castigado (−5%)',q.estado)+op('rep','Para reparar (−10%, tope 30%)',q.estado)+'</select>');
-  if (q.tipo==='Girasolero') h+=campo('Accionamiento','<select style="'+st+'" onchange="usaSet(\'hid\',this.value)">'+op('0','Mecánico',q.hid)+op('1','Hidráulico',q.hid)+'</select>');
-  if (q.marca==='Mainero' && q.tipo==='Maicero') h+=campo('Modelo Mainero','<select style="'+st+'" onchange="usaSet(\'mod\',this.value)">'+op('conv','Convencional',q.mod)+op('mdd','MDD',q.mod)+'</select>');
+  h+='<div class="ger-card"><input type="text" id="usaTxt" placeholder="Buscá libre: ej. maicero 14 52 · girasolero 2015 · mainero" value="'+String(q.txt).replace(/"/g,'&quot;')+'" oninput="usaSet(\'txt\',this.value,true)" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #888;border-radius:6px;font-size:0.95rem;margin-bottom:10px;">';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">';
+  h+=campo('Tipo','<select style="'+st+'" onchange="usaSet(\'tipo\',this.value)">'+cual+['Maicero','Girasolero','Draper'].map(function(t){return op(t,t,q.tipo);}).join('')+'</select>');
+  h+=campo('Marca','<select style="'+st+'" onchange="usaSet(\'marca\',this.value)">'+cual+U.MARCAS.map(function(m){return op(m,m,q.marca);}).join('')+'</select>');
+  h+=campo('Surcos / pies','<input type="number" min="4" max="45" placeholder="Cualquiera" style="'+st+'" value="'+q.surcos+'" oninput="usaSet(\'surcos\',this.value,true)">');
+  h+=campo('Distancia','<select style="'+st+'" onchange="usaSet(\'dist\',this.value)">'+cual+['42','52','70'].map(function(d){return op(d,d+' cm',q.dist);}).join('')+'</select>');
+  h+=campo('Año','<select style="'+st+'" onchange="usaSet(\'anio\',this.value)">'+cual+anios+'</select>');
+  h+=campo('Estado (para el valor)','<select style="'+st+'" onchange="usaSet(\'estado\',this.value)">'+op('imp','Impecable (+5%)',q.estado)+op('bueno','Bueno',q.estado)+op('cast','Castigado (−5%)',q.estado)+op('rep','Para reparar (−10%, tope 30%)',q.estado)+'</select>');
+  if (P.tipo==='Girasolero') h+=campo('Accionamiento','<select style="'+st+'" onchange="usaSet(\'hid\',this.value)">'+op('0','Mecánico',q.hid)+op('1','Hidráulico',q.hid)+'</select>');
+  if (P.marca==='Mainero' && P.tipo==='Maicero') h+=campo('Modelo Mainero','<select style="'+st+'" onchange="usaSet(\'mod\',this.value)">'+op('conv','Convencional',q.mod)+op('mdd','MDD',q.mod)+'</select>');
   h+='</div><label style="display:flex;gap:6px;align-items:center;font-size:0.82rem;margin-top:10px;"><input type="checkbox" '+(q.mas?'checked ':'')+'onchange="usaSet(\'mas\',this.checked)"> El cliente va por un nuevo de <b>más surcos</b></label></div>';
-  h+='<div id="usaRes">'+usaResultado()+'</div>';
+  h+='<div id="usaRes">'+usaResultadoCab()+'</div>';
   box.innerHTML=h;
 }
-function usaSet(k,v,soloRes){ _usaQ[k]=v; if(k==='tipo'){ if(v==='Draper'){_usaQ.dist='';} else if(!_usaQ.dist){_usaQ.dist='52';} }
-  if(soloRes){ const r=document.getElementById('usaRes'); if(r) r.innerHTML=usaResultado(); } else renderUsados(); }
+function _usaNorm(x){ return String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+// Lee el buscador libre: tipo, marca, surcos, distancia, año y palabras sueltas
+function usaParse(txt){
+  const U=USADOS; let t=' '+_usaNorm(txt).replace(/(\d+)\s*(?:x|a|-|\/)\s*(\d+)/g,'$1 $2').replace(/(\d+)\s*cm\b/g,'$1')+' ';
+  const r={tipo:'',marca:'',s:'',d:'',a:'',hid:false,w:[]};
+  if (/\bmai(z|cero)/.test(t)) r.tipo='Maicero'; else if (/\bgira/.test(t)) r.tipo='Girasolero'; else if (/\b(draper|plataforma)/.test(t)) r.tipo='Draper';
+  t=t.replace(/\b(maiceros?|maiz|girasoleros?|girasol|drapers?|plataformas?|cabezal(es)?|surcos?|pies|de|a)\b/g,' ');
+  U.MARCAS.slice().sort(function(x,y){return y.length-x.length;}).forEach(function(m){ const n=_usaNorm(m); if(!r.marca && t.indexOf(' '+n.split(' ')[0])>=0){ r.marca=m; t=t.replace(n,' ').replace(n.split(' ')[0],' '); } });
+  if (!r.marca && /\bjd\b/.test(t)) { r.marca='John Deere'; t=t.replace(/\bjd\b/,' '); }
+  if (/\bhidraul/.test(t)) { r.hid=true; t=t.replace(/\bhidraul\w*/,' '); }
+  t.split(/\s+/).filter(Boolean).forEach(function(w){
+    if (/^\d+$/.test(w)) { const n=+w;
+      if (n>=1990&&n<=2030) r.a=String(n); else if ((n===42||n===52||n===70)&&!r.d) r.d=String(n); else if (n>=4&&n<=45&&!r.s) r.s=String(n); else r.w.push(w);
+    } else r.w.push(w);
+  });
+  return r;
+}
+// Combina buscador + casillas (la casilla manda si está elegida)
+function usaEfectivo(){
+  const q=_usaQ, p=usaParse(q.txt);
+  return {tipo:q.tipo||p.tipo, marca:q.marca||p.marca, surcos:q.surcos||p.s, dist:q.dist||p.d, anio:q.anio||p.a, w:p.w,
+          hid:p.hid?'1':q.hid, estado:q.estado, mod:q.mod, mas:q.mas};
+}
+function usaResultadoCab(){
+  const U=USADOS, P=usaEfectivo(), s=+P.surcos, a=+P.anio;
+  let L=U.DATA.hist.filter(function(x){
+    if (P.tipo && x.t!==P.tipo) return false;
+    if (P.marca && x.m!==P.marca) return false;
+    if (s && x.s!==s) return false;
+    if (P.dist && String(x.d)!==String(P.dist)) return false;
+    if (a && !(x.a && Math.abs(x.a-a)<=2)) return false;
+    const txt=_usaNorm([x.m,x.mo,x.t,x.e].join(' '));
+    return P.w.every(function(w){ return txt.indexOf(w)>=0; });
+  });
+  L.sort(function(x,y){ return (a?Math.abs((x.a||a+50)-a)-Math.abs((y.a||a+50)-a):0) || U.fechaN(y.f)-U.fechaN(x.f); });
+  const fm=function(x){ const rg=function(v){ return !v?'–':(v[0]===v[1]?String(v[0]).replace('.',','):String(v[0]).replace('.',',')+'–'+String(v[1]).replace('.',','))+(x.mon==='USD'?' USD':''); };
+    return '<tr><td>'+x.f+'</td><td>'+x.t+' '+(x.m||'s/d')+' '+(x.mo||'')+' '+(x.s||'?')+(x.t==='Draper'?' p':'-'+(x.d||'?'))+'</td><td>'+(x.a||'s/año')+'</td><td>'+rg(x.tm)+'</td><td>'+rg(x.vt)+'</td><td>'+(x.pt!=null?String(x.pt).replace('.',',')+'%':'–')+'</td><td style="color:#666;">'+(x.e||'')+'</td></tr>'; };
+  const filtros=[P.tipo,P.marca,s?(s+(P.tipo==='Draper'?' pies':' surcos')):'',P.dist?('a '+P.dist):'',a?(a+' (±2)'):'' ].concat(P.w.map(function(w){return '"'+w+'"';})).filter(Boolean);
+  let h='';
+  // valor calculado: con tipo, surcos y año definidos
+  if (P.tipo && s && a) {
+    const qq={tipo:P.tipo, marca:P.marca||'Maizco', surcos:String(s), dist:P.tipo==='Draper'?'':(P.dist||'52'), anio:String(a), estado:P.estado, hid:P.hid, mod:P.mod, mas:P.mas};
+    let v=usaResultado(qq, true);
+    const notas=[]; if(!P.marca) notas.push('sin marca elegida: calculado como Maizco'); if(P.tipo!=='Draper'&&!P.dist) notas.push('sin distancia: calculado a 52');
+    if (notas.length) v=v.replace('<div class="ger-card">','<div class="ger-card"><div style="background:#e3f2fd;border-radius:6px;padding:5px 10px;font-size:0.8rem;margin-bottom:8px;">ℹ️ Valor de referencia — '+notas.join(' · ')+'. Elegí la marca para afinarlo.</div>');
+    h+=v;
+  } else h+='<div class="ger-card" style="color:#777;font-size:0.85rem;">Para ver el valor calculado definí tipo, surcos y año (en el buscador o en las casillas).</div>';
+  const thead='<tr style="font-weight:700;"><td>Fecha</td><td>Equipo</td><td>Año</td><td>Toma</td><td>Venta</td><td>% nuevo</td><td>Estado</td></tr>';
+  h+='<div class="ger-card"><h3>Casos del historial: '+L.length+(filtros.length?' <span style="font-weight:400;color:#666;font-size:0.85rem;">· '+filtros.join(' · ')+'</span>':' (todos)')+'</h3>';
+  h+=L.length?'<div style="overflow-x:auto;"><table class="ger-tbl">'+thead+L.slice(0,60).map(fm).join('')+'</table></div>'+(L.length>60?'<div style="font-size:0.78rem;color:#777;">Se muestran 60 de '+L.length+'. Afiná la búsqueda.</div>':''):'<div style="color:#777;font-size:0.85rem;">Sin casos con esos filtros. Sacá alguno para ampliar.</div>';
+  h+='<div style="font-size:0.74rem;color:#777;margin-top:8px;">Valores en millones de $ con IVA salvo indicación USD. Historial reducido (sin clientes ni notas); el completo está en el Drive.</div></div>';
+  return h;
+}
+function usaSet(k,v,soloRes){ _usaQ[k]=v;
+  if(soloRes){ const r=document.getElementById('usaRes'); if(r) r.innerHTML=usaResultadoCab(); } else renderUsados(); }
 function usaCalcular(q){
   const U=USADOS, C=U.CONFIG, s=+q.surcos, a=+q.anio; if(!s||!a) return null;
   const hid=q.hid==='1', linea=(q.tipo==='Maicero'&&q.marca==='Mainero'&&q.mod==='mdd')?'rowfree':'premium';
@@ -4158,8 +4213,8 @@ function usaCalcular(q){
   if(q.tipo==='Draper') av.push('Drapers: muy pocos datos.');
   return {N:N,T:T,F:F,E:E,pct:pct,pctF:pctF,tope:tope,toma:toma,piso:toma*(1+C.ventaPiso),pedir:toma*(1+C.ventaPedir),conf:['alta','media','baja'][conf],av:av,distE:distE};
 }
-function usaResultado(){
-  const q=_usaQ, r=usaCalcular(q);
+function usaResultado(q0, soloValor){
+  const q=q0||_usaQ, r=usaCalcular(q);
   if(!r) return '<div class="ger-card" style="color:#777;">Completá surcos y año para ver el valor.</div>';
   if(r.error) return '<div class="ger-card">'+r.error+'</div>';
   const U=USADOS, usd=r.N.mon==='USD';
@@ -4180,6 +4235,7 @@ function usaResultado(){
   if(q.mas) h+='<tr><td>Más surcos</td><td><b>'+pc(r.T.mas)+'</b></td></tr>';
   r.F.out.forEach(function(x){ h+='<tr><td>Marca / medida</td><td>'+x[1]+' · <b>×'+x[0].toLocaleString('es-AR')+'</b></td></tr>'; });
   h+='<tr><td>Estado</td><td>'+r.E.txt+(r.tope?' (tope 30%)':'')+'</td></tr><tr><td>% final del nuevo</td><td><b>'+pc(r.pctF)+'</b> → toma '+f1(r.toma)+'</td></tr></table></div>';
+  if (soloValor) return h;
   // comparables
   const fm=function(x){ const rg=function(v){ return !v?'–':(v[0]===v[1]?String(v[0]).replace('.',','):String(v[0]).replace('.',',')+'–'+String(v[1]).replace('.',','))+(x.mon==='USD'?' USD':''); };
     return '<tr><td>'+x.f+'</td><td>'+(x.m||'s/d')+' '+(x.mo||'')+' '+(x.s||'?')+(x.t==='Draper'?' p':'-'+(x.d||'?'))+'</td><td>'+(x.a||'s/año')+'</td><td>'+rg(x.tm)+'</td><td>'+rg(x.vt)+'</td><td>'+(x.pt!=null?String(x.pt).replace('.',',')+'%':'–')+'</td><td style="color:#666;">'+(x.e||'')+'</td></tr>'; };
@@ -4213,7 +4269,7 @@ function renderUsadosSem(box){
   h+=campo('Distancia (cm)','<input type="text" inputmode="decimal" placeholder="ej. 52,5" style="'+st+'" value="'+q.d+'" oninput="usaSemSet(\'d\',this.value,true)">');
   h+=campo('Año','<select style="'+st+'" onchange="usaSemSet(\'a\',this.value)"><option value="">Cualquiera</option>'+anios+'</select>');
   h+='</div><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:0.82rem;"><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" '+(q.pp?'checked ':'')+'onchange="usaSemSet(\'pp\',this.checked)"> Con Precision Planting (PP)</label>';
-  h+='<input type="text" placeholder="o buscá libre: ej. MXY alfalfero" value="'+String(q.q).replace(/"/g,'&quot;')+'" oninput="usaSemSet(\'q\',this.value,true)" style="flex:1;min-width:180px;padding:6px 8px;border:1.5px solid #bbb;border-radius:5px;"></div></div>';
+  h+='<input type="text" placeholder="Buscá libre: ej. gruesa 10 70 · agrometal mxy · fina 2018" value="'+String(q.q).replace(/"/g,'&quot;')+'" oninput="usaSemSet(\'q\',this.value,true)" style="flex:1;min-width:180px;padding:6px 8px;border:1.5px solid #bbb;border-radius:5px;"></div></div>';
   h+='<div id="usaRes">'+usaSemResultado()+'</div>';
   box.innerHTML=h;
 }
@@ -4228,12 +4284,16 @@ function usaSemResultado(){
   const a=+q.a, L=+q.l, D=numD(q.d);
   let lista, sinA, titulo, aviso='';
   if (String(q.q).trim()) {
-    const W=norm(q.q).split(/\s+/).filter(Boolean);
-    const txt=function(r){ return norm([r.m,r.mo,r.t,r.l&&(r.l+'-'+r.d),r.e,r.pp?'pp precision planting':''].join(' ')); };
-    const Lq=S.filter(function(r){ return W.every(function(w){return txt(r).indexOf(w)>=0;}) && (!q.pp||r.pp); });
+    const W=norm(q.q).replace(/(\d+)\s*(?:x|a|-|\/)\s*(\d+)/g,'$1 $2').split(/\s+/).filter(function(w){ return w && !/^(de|a|lineas?|surcos?|sembradoras?)$/.test(w); });
+    const txt=function(r){ return norm([r.m,r.mo,r.t,r.e,r.pp?'pp precision planting':''].join(' ')); };
+    const okW=function(r,w){ if(/^\d+([.,]\d+)?$/.test(w)){ const n=parseFloat(w.replace(',','.'));
+        if(n>=1990&&n<=2030) return r.a && Math.abs(r.a-n)<=1; return r.l===n || numD(r.d)===n; }
+      return txt(r).indexOf(w)>=0; };
+    const Lq=S.filter(function(r){ return W.every(function(w){return okW(r,w);}) && (!q.pp||r.pp)
+      && (!q.t||r.t===q.t) && (!q.m||r.m===q.m) && (!L||r.l===L) && (!D||numD(r.d)===D) && (!a||(r.a&&Math.abs(r.a-a)<=2)); });
     lista=Lq.filter(function(r){return r.a;}).sort(function(x,y){ return (a?Math.abs(x.a-a)-Math.abs(y.a-a):0)||U.fechaN(y.f)-U.fechaN(x.f); });
     sinA=Lq.filter(function(r){return !r.a;});
-    titulo='Búsqueda: "'+q.q+'"'; aviso=(lista.length+sinA.length)?'':'Sin resultados. Probá con menos palabras.';
+    titulo='Búsqueda: "'+q.q+'"'+(q.t?' · '+q.t:'')+(q.m?' · '+q.m:'')+(L?' · '+L+' líneas':'')+(D?' · a '+q.d:'')+(a?' · '+a+' (±2)':''); aviso=(lista.length+sinA.length)?'':'Sin resultados. Probá con menos palabras.';
   } else {
     const base=S.filter(function(r){ return (q.t?r.t===q.t:true) && !!r.pp===!!q.pp; });
     const A=L&&D?L*D:null;
