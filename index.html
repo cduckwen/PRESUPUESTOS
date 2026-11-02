@@ -1925,7 +1925,7 @@ function copiarWhatsApp() {
         descWASingle = descWASingle.replace(/^(\d+)/, function(m){ return "De " + (parseInt(m)/100); });
       }
       if (descWASingle || timonesStr) txt += "   " + descWASingle + timonesStr + "\n";
-      if (item.llantas) txt += "   Llantas: " + item.llantas + "\n";
+      if (item.llantas) txt += "   Llantas: " + _llantaSinNota(item.llantas) + "\n";
       if (item.qty > 1) txt += "   Cantidad: " + item.qty + "\n";
       presupuesto.filter(function(i){ return i.esOpcional; }).forEach(function(op){
         const baseOp = op.conIVA ? op.precio*(100/110.5) : op.precio;
@@ -1973,7 +1973,7 @@ function copiarWhatsApp() {
           txt += "   " + descWA + timsStr2 + "\n";
         }
         if (item.qty > 1 && !item.esOpcional) txt += "   Cantidad: " + item.qty + "\n";
-        if (!item.esOpcional && item.llantas) txt += "   Llantas: " + item.llantas + "\n";
+        if (!item.esOpcional && item.llantas) txt += "   Llantas: " + _llantaSinNota(item.llantas) + "\n";
         let civaAccs = 0;
         if (sacarAcc && !item.esOpcional) {
           presupuesto.filter(function(x){ return x.esOpcional && principalDe(x) === item; }).forEach(function(op){
@@ -2211,6 +2211,11 @@ function copiarWhatsApp() {
   }
 
   if (obs) txt += "\n" + obs + "\n";
+  try {
+    const notasLl = [];
+    presupuesto.forEach(function(i){ if (!i.esOpcional && i.llantas) _llantaNotas(i.llantas).forEach(function(n){ if (notasLl.indexOf(n)<0) notasLl.push(n); }); });
+    notasLl.forEach(function(n){ txt += "\n_* Opcional llantas: " + n + "._"; });
+  } catch(e) {}
   txt += "\n_Valores a confirmar con seña._";
   txt += "\n_Presupuesto válido por 7 días._";
 
@@ -4254,6 +4259,10 @@ function usaSemResultado(){
   h+='<div style="font-size:0.74rem;color:#777;margin-top:8px;">Valores en USD. Criterios del referente de Agrometal: pierde ~50% al salir de fábrica y ~20% por año; a placa castiga fuerte; monitor +3-6 mil; reparaciones típicas 15-30 mil. Historial reducido; el completo está en el Drive.</div></div>';
   return h;
 }
+
+// Llantas: los opcionales con precio "(+$...)" se sacan de la línea y van como nota al pie del presupuesto
+function _llantaNotas(t){ return (String(t||"").match(/\(\s*\+\s*\$[^)]*\)/g)||[]).map(function(x){ return x.replace(/^\(\s*|\s*\)$/g,"").replace(/^\+\s*/,"+"); }).map(function(x){ const m=x.match(/^(\+\$\s?[\d.,]+)\s*(.*)$/); return m ? (m[2]+" "+m[1]).trim() : x; }); }
+function _llantaSinNota(t){ return String(t||"").replace(/\s*\(\s*\+\s*\$[^)]*\)/g,"").trim(); }
 </script>
 </body>
 </html>
