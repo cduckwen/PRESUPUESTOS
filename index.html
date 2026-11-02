@@ -2217,7 +2217,7 @@ function copiarWhatsApp() {
   try {
     const notasLl = [];
     presupuesto.forEach(function(i){ if (!i.esOpcional && i.llantas) _llantaNotas(i.llantas).forEach(function(n){ if (notasLl.indexOf(n)<0) notasLl.push(n); }); });
-    notasLl.forEach(function(n){ txt += "\n_* Opcional llantas: " + n + "._"; });
+    notasLl.forEach(function(n){ txt += "\n_* Opcional: " + n + "._"; });
   } catch(e) {}
   txt += "\n_Valores a confirmar con seña._";
   txt += "\n_Presupuesto válido por 7 días._";

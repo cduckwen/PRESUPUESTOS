@@ -1313,16 +1313,17 @@ const NEU_CHALERO_VERTEBRADA = {
 };
 
 // ═══════════ Tablas complementarias (movidas desde index.html, 30/10/2026) ═══════════
+// Llantas CONESE (lista N°96). Lo que va entre paréntesis con "+$" sale como nota al pie del presupuesto (no suma al precio).
 const LLANTAS_CONESE = {
-  "TA-2.0 Tanque 2.000 lts": "Simples 15 o 16",
-  "TA-3.0 Tanque 3.000 lts": "Simples 15 o 16",
-  "TCA3-2 Tanque 3.000 lts + Taller": "Duales 15-16 o simples 17 (+$2.950.000 duales 17)",
-  "TCA4-2 Tanque 4.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.540.000 duales 17/18)",
-  "TCA5-2 Tanque 5.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.540.000 duales 17/18)",
-  "TCA6-2 Tanque 6.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.540.000 duales 17/18)",
-  "TT-1 Tanque 5.000 lts + Taller Rodante": "Duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.540.000 duales 17/18)",
+  "TA-2.0 Tanque 2.000 lts": "Simples 15 o 16 (+$680.000 duales 15 o 16) (+$460.000 simples 17 u 8x16) (+$380.000 portaauxilio y auxiliar)",
+  "TA-3.0 Tanque 3.000 lts": "Simples 15 o 16 (+$680.000 duales 15 o 16) (+$460.000 simples 17 u 8x16) (+$380.000 portaauxilio y auxiliar)",
+  "TCA3-2 Tanque 3.000 lts + Taller": "Duales 15-16 o simples 17 (+$3.010.000 duales 17, incluye masa grande, elásticos y guardabarros) (+$380.000 portaauxilio y auxiliar)",
+  "TCA4-2 Tanque 4.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)",
+  "TCA5-2 Tanque 5.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)",
+  "TCA6-2 Tanque 6.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)",
+  "TT-1 Tanque 5.000 lts + Taller Rodante": "Duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)",
   "TRD-2 Taller Dron": "Simples 15 o 16 - sin cubiertas",
-  "TT-2 Tanque 3.000 lts + Taller Rodante": "Duales 16 ctro gde (+$1.540.000 duales 17/18)"
+  "TT-2 Tanque 3.000 lts + Taller Rodante": "Duales 16 ctro gde (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)"
 };
 
 const CUBIERTAS_COMOFRA = {
