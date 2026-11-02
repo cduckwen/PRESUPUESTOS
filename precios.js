@@ -93,7 +93,7 @@ const PRODUCTOS = [
   },
 
   // ─── STEFONI ─────────────────────────────────────
-  { marca:"STEFONI", lista:"N°52", vigencia:"01/10/2026", moneda:"Pesos", conIVA:false, fleteSinIVA:true,
+  { marca:"STEFONI", lista:"N°52", vigencia:"01/10/2026", moneda:"Pesos", conIVA:false,
     condiciones:"* Contado -10%: 5 cheques (0 a 120 dias)\n* Precio lista: 8 cheques (0 a 210 dias)",
     items:[
       { modelo:"R.D.A. 97 – 4,50 m", desc:"Rolo transportable hidráulico c/alas rebatibles · 3 cil. hidr. · 3 rolos · 2 ruedas · transporte 2,80 m", precio:12700000, ruedas:2, cond:"* Contado -10%: 5 cheques (0 a 120 dias)\n* Precio lista: 8 cheques (0 a 210 dias)" },

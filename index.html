@@ -1351,9 +1351,9 @@ function mostrarPreview() {
       if (moneda === "USD") fleteExtraP = fObjP.costo;
       else { const tcP = getTipoCambio(); if (tcP) fleteExtraP = fObjP.costo * tcP; }
     } else if (moneda === "USD") {
-      precioBase = item.precio + fObjP.costo;
+      precioBase = item.precio + fObjP.costo * (esConIva ? 1 + ivaRateP : 1);
     } else {
-      const tcP = getTipoCambio(); if (tcP) precioBase = item.precio + fObjP.costo * tcP;
+      const tcP = getTipoCambio(); if (tcP) precioBase = item.precio + fObjP.costo * tcP * (esConIva ? 1 + ivaRateP : 1);
     }
   }
   const iva = esConIva ? precioBase * (ivaRateP*100/(100+ivaRateP*100)) : precioBase * ivaRateP;
@@ -1501,10 +1501,13 @@ function _ejecutarAgregarProducto(marca, idx, qty, tipoDescargaATF) {
       }
     } else if (fObj.esPct) {
       pFlete = precioBase * (1 + fObj.pct / 100);
-    } else if (monedaEfectiva === "USD") {
-      pFlete = precioBase + fObj.costo;
     } else {
-      const tc = getTipoCambio(); if (tc) pFlete = precioBase + fObj.costo * tc;
+      // Criterio único: flete de tabla en USD sin IVA; si la lista viene con IVA, se le suma el IVA al flete
+      const _conIvaF = (item.conIVA !== undefined ? item.conIVA : fab.conIVA);
+      const _ivaF = (item.ivaRate !== undefined ? item.ivaRate : (fab.ivaRate !== undefined ? fab.ivaRate : 0.105));
+      const _fIva = _conIvaF ? 1 + _ivaF : 1;
+      if (monedaEfectiva === "USD") pFlete = precioBase + fObj.costo * _fIva;
+      else { const tc = getTipoCambio(); if (tc) pFlete = precioBase + fObj.costo * tc * _fIva; }
     }
   }
   // USADOS BERGER: no se agrega al presupuesto, solo activa el panel de cuotas
