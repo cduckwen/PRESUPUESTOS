@@ -2945,7 +2945,11 @@ function calcularPlanMaizco(plan, tasa){
 }
 function _mzFU(v){ return "USD "+v.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function htmlDetalleMaizco(r, itemId){
-  if (!r) return 'Cargá el tipo de cambio para calcular las cuotas.';
+  if (!r) {
+    const b = _mzBaseUSD();
+    if (!b.tc) return 'Cargá el tipo de cambio para calcular las cuotas.';
+    return '<span style="color:#b00;font-weight:700;">⚠️ No hay diferencia para financiar: el usado vale igual o más que el nuevo.</span><br><span style="font-size:0.78rem;">Revisá el valor y la <b>moneda</b> del usado (¿cargaste pesos como USD?).</span>';
+  }
   if (!r.conTasa || !r.filas.length) return r.lineas.join('<br>')+'<br>'+r.total.replace(/\n/g,'<br>');
   let h = '<table style="width:100%;border-collapse:collapse;font-size:0.74rem;margin-top:4px;"><tr style="text-align:right;color:#555"><th style="text-align:left">Vencim.</th><th>Días</th><th>Capital</th><th>Interés</th><th>Cuota</th></tr>';
   r.filas.forEach(function(f){ h += '<tr style="text-align:right"><td style="text-align:left">'+f.fecha+'</td><td>'+f.dias+'</td><td>'+_mzFU(f.cap)+'</td><td>'+_mzFU(f.monto-f.cap)+'</td><td><strong>'+_mzFU(f.monto)+'</strong></td></tr>'; });
@@ -3449,6 +3453,16 @@ function recalcularTotal() {
     const diferencia = tot - usadoUSD;
     if (tot > 0) {
       if (lbl) lbl.textContent = diferencia >= 0 ? "Diferencia a saldar" : "Saldo a favor del cliente";
+      (function(){ try{
+        const vEl=document.getElementById("usadoValor"), mEl=document.getElementById("usadoMoneda");
+        let av=document.getElementById("usadoAvisoMoneda");
+        if(!av && vEl){ av=document.createElement("div"); av.id="usadoAvisoMoneda"; av.style.cssText="color:#b00;font-size:0.8rem;font-weight:700;margin:6px 0;"; vEl.parentNode.parentNode.insertBefore(av, vEl.parentNode.nextSibling); }
+        const v=parseFloat(vEl&&vEl.value)||0, esUSD=mEl&&/usd/i.test(mEl.value);
+        let msg="";
+        if(esUSD && v>=1000000) msg="⚠️ ¿El usado vale USD "+v.toLocaleString("es-AR")+"? Si lo cargaste en pesos, cambiá la moneda a Pesos.";
+        else if(diferencia<0) msg="⚠️ El usado supera al nuevo: no queda diferencia para financiar. Revisá valor y moneda.";
+        if(av){ av.textContent=msg; av.style.display=msg?"block":"none"; }
+      }catch(e){} })();
       if (valEl) valEl.textContent = fmt(Math.abs(diferencia));
       if (subEl) subEl.textContent = "Total " + fmt(tot) + " − Usado " + fmt(usadoUSD) + (det ? " (" + det + ")" : "");
     } else {
