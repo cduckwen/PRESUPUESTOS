@@ -4208,8 +4208,7 @@ function renderUsados(){
     return;
   }
   if (typeof USADOS === 'undefined') { box.innerHTML = '<div class="ger-card">No se pudo cargar usados.js.</div>'; return; }
-  if (_usaModo==='sem') { renderUsadosSem(box); return; }
-  if (_usaModo==='mer') { renderUsadosMer(box); return; }
+  renderUsadosUni(box); return;
   const q=_usaQ, U=USADOS;
   const op=function(v,t,sel){ return '<option value="'+v+'"'+(String(sel)===String(v)?' selected':'')+'>'+t+'</option>'; };
   const cual='<option value="">Cualquiera</option>';
@@ -4385,7 +4384,7 @@ function usaResultado(q0, soloValor){
 // Cada fuente pesa completo con ≥3 comparables; casos de más de 12 meses pesan la mitad.
 var _merQ = {txt:'', rubro:'', medida:'', anio:'', estado:'bueno', neg:10};
 const _MER_RUBROS = [
-  [/\bmai(z|cero)/, 'Cabezal maicero'], [/\b(draper|plataforma|trigo|soja|sojero)/, 'Cabezal trigo/soja'],
+  [/\bgira/, 'Cabezal girasolero'], [/\b(maiz\b|maicer)/, 'Cabezal maicero'], [/\b(draper|plataforma|trigo|soja|sojero)/, 'Cabezal trigo/soja'],
   [/\b(sembradora|gruesa|fina|combinada)/, 'Sembradora'], [/\btolva/, 'Tolva autodescargable'],
   [/\bpala/, 'Pala cargadora'], [/\b(segadora|moco|acondicionadora)/, 'Segadora acondicionadora'],
   [/\b(mixer|mezclador)/, 'Mixer'], [/\bembolsadora/, 'Embolsadora de granos'], [/\brastra/, 'Rastra de discos'],
@@ -4396,7 +4395,7 @@ function _merRubros(){ const s={}; (window.MERCADO||[]).forEach(function(x){ s[x
 function merParse(txt){
   let t=' '+_usaNorm(txt).replace(/(\d+)\s*(?:x|a|-|\/)\s*(\d+)/g,'$1 $2').replace(/(\d+)\s*(cm|tn|m3|m|pies|discos|lts)\b/g,'$1')+' ';
   const r={rubro:'', a:'', nums:[], w:[]};
-  for (let i=0;i<_MER_RUBROS.length;i++) if (_MER_RUBROS[i][0].test(t)) { r.rubro=_MER_RUBROS[i][1]; t=t.replace(_MER_RUBROS[i][0],' '); break; }
+  for (let i=0;i<_MER_RUBROS.length;i++) if (_MER_RUBROS[i][0].test(t)) { r.rubro=_MER_RUBROS[i][1]; t=t.replace(new RegExp(_MER_RUBROS[i][0].source+'\\w*','g'),' '); break; }
   t=t.replace(/\b(cabezal(es)?|surcos?|de|a|con|usad[oa]s?|autodescargables?|cargadoras?|discos|pies)\b/g,' ');
   t.split(/\s+/).filter(Boolean).forEach(function(w){
     const n=+w.replace(',','.');
@@ -4407,10 +4406,37 @@ function merParse(txt){
 }
 function _merUSD(x){ const tc=(window.MERCADO_TC||{})[x[0]] || (typeof TC_DIA!=='undefined'?TC_DIA.valor:0); return x[10]==='USD'?x[9]:(tc?x[9]/tc:null); }
 function _merDias(f){ const p=String(f).split('/'); return (Date.now()-new Date(+p[2],+p[1]-1,+p[0]).getTime())/864e5; }
-function merEfectivo(){
-  const q=_merQ, p=merParse(q.txt);
+// ── Buscador único: nuestro historial (cabezales y sembradoras) + fórmula del cotizador + avisos de mercado ──
+var _uQ = {txt:'', rubro:'', medida:'', dist:'', anio:'', estado:'bueno', neg:10, hid:'0', mod:'conv', mas:false, pp:false};
+const _UNI_CAB = {'Cabezal maicero':'Maicero','Cabezal girasolero':'Girasolero','Cabezal trigo/soja':'Draper'};
+function _uniRubros(){ const s={'Cabezal maicero':1,'Cabezal girasolero':1,'Cabezal trigo/soja':1,'Sembradora':1}; (window.MERCADO||[]).forEach(function(x){ s[x[1]]=1; }); return Object.keys(s).sort(); }
+function uniEfectivo(){
+  const q=_uQ, p=merParse(q.txt);
+  if (!p.rubro && /\bgira/.test(_usaNorm(q.txt))) p.rubro='Cabezal girasolero';
+  const hidT=/\bhidraul/.test(_usaNorm(q.txt));
+  p.w=p.w.filter(function(w){ return !/^(gira|hidraul|mecanic)/.test(w); });
+  if (!q.rubro && !p.rubro && p.w.length) {   // sin rubro escrito: lo deduce de la marca/modelo
+    const semTxt=USADOS.DATA.sem.map(function(x){ return ' '+_usaNorm([x.m,x.mo].join(' '))+' '; });
+    if (p.w.some(function(w){ return semTxt.some(function(t){ return t.indexOf(' '+w)>=0; }); })) p.rubro='Sembradora';
+    else { const rs={}; (window.MERCADO||[]).forEach(function(x){ const t=' '+_usaNorm([x[2],x[3]].join(' '))+' '; if (p.w.every(function(w){ return t.indexOf(w)>=0; })) rs[x[1]]=(rs[x[1]]||0)+1; });
+      const k=Object.keys(rs); if (k.length===1) p.rubro=k[0]; }
+  }
+  const rubro=q.rubro||p.rubro, cab=_UNI_CAB[rubro]||'', sem=rubro==='Sembradora';
   const nums=p.nums.slice(); if (q.medida) nums.unshift(+String(q.medida).replace(',','.'));
-  return {rubro:q.rubro||p.rubro, anio:q.anio||p.a, nums:nums, w:p.w, estado:q.estado, neg:+q.neg||0};
+  let s=null, d=q.dist?+String(q.dist).replace(',','.'):null;
+  if (cab) {
+    const nd=nums.filter(function(n){ return n!==42&&n!==52&&n!==70; });
+    s=(nd.length?nd:nums).find(function(n){ return n>=4&&n<=45; })||null;
+    if (!d) d=nums.find(function(n){ return n!==s&&(n===42||n===52||n===70); })||null;
+  } else if (sem) {
+    s=nums.find(function(n){ return n>=5&&n<=70&&n===Math.round(n); })||null;
+    if (!d) d=nums.find(function(n){ return n!==s&&n>=15&&n<=80; })||null;
+  } else s=nums[0]||null;
+  if (q.dist && nums.indexOf(d)<0) nums.push(d);
+  const mk=cab?USADOS.MARCAS.find(function(m){ return p.w.indexOf(_usaNorm(m).split(' ')[0])>=0; }):'';
+  if (!mk && cab && p.w.indexOf('jd')>=0) { p.w=p.w.filter(function(w){return w!=='jd';}); }
+  return {rubro:rubro, cab:cab, sem:sem, anio:q.anio||p.a, nums:nums, s:s, d:d, w:p.w, marca:mk||(cab&&/\bjd\b/.test(_usaNorm(q.txt))?'John Deere':''),
+          estado:q.estado, neg:+q.neg||0, hid:hidT?'1':q.hid, mod:q.mod, mas:q.mas, pp:q.pp};
 }
 function merFiltrar(P, tolA){
   const a=+P.anio;
@@ -4423,121 +4449,176 @@ function merFiltrar(P, tolA){
       if (new RegExp('\\D'+String(n).replace('.','[.,]')+'\\D').test(txt)) return true;           // aparece en el aviso (ej. "moco 635")
       const tol=/^(Cabezal|Sembradora)/.test(x[1])?0:Math.max(0.15*n,0.01);                           // surcos exactos; resto ±15%
       if (x[5]!=null && Math.abs(x[5]-n)<=tol) return true;
-      if (x[15]!=null && x[15]===n) return true;                                                    // distancia (cabezales)
+      if (x[15]!=null && x[15]===n) return true;
       return false;
     });
   });
 }
-// Fuente "historial propio": cabezales (DATA.hist, % del nuevo × lista vigente) o sembradoras (DATA.sem, venta USD)
-function merHistorial(P){
-  const U=USADOS, a=+P.anio, TC=(typeof TC_DIA!=='undefined'?TC_DIA.valor:0);
-  const peso=function(f){ return _merDias(f)>365?0.5:1; };
-  const wmed=function(arr){ let sw=0,s=0; arr.forEach(function(o){ s+=o.v*o.w; sw+=o.w; }); return sw?{v:s/sw,n:sw,k:arr.length}:null; };
-  const cab={'Cabezal maicero':'Maicero','Cabezal trigo/soja':'Draper'}[P.rubro];
-  if (cab) {
-    const s=P.nums.find(function(n){ return n>=4&&n<=45; }), d=P.nums.find(function(n){ return n===42||n===52||n===70; });
-    if (!s) return {nota:'Para el historial de cabezales indicá surcos / pies.'};
-    const L=U.DATA.hist.filter(function(x){ return x.t===cab && x.s===s && x.pt!=null && (!d||String(x.d)===String(d)) && (!a||(x.a&&Math.abs(x.a-a)<=2)); });
-    const r=wmed(L.map(function(x){ return {v:x.pt,w:peso(x.f)}; })); if(!r) return {nota:'Sin casos propios de '+cab.toLowerCase()+' '+s+(a?' cerca de '+a:'')+'.'};
-    let N=null; try { N=U.nuevo(cab, s, cab==='Draper'?null:String(d||52), false, 'premium'); } catch(e) {}
+// Nuestros casos (lista completa para mostrar) + valor de historial para la mezcla
+function uniCasos(P){
+  const U=USADOS, a=+P.anio;
+  if (P.cab) {
+    const base=U.DATA.hist.filter(function(x){
+      if (x.t!==P.cab) return false;
+      if (P.s && x.s!==P.s) return false;
+      if (P.d && P.cab!=='Draper' && String(x.d)!==String(P.d)) return false;
+      if (a && !(x.a && Math.abs(x.a-a)<=2)) return false;
+      return true;
+    });
+    let L=base, sinMarca=false;
+    if (P.marca) { const Lm=base.filter(function(x){ return x.m===P.marca; }); if (Lm.length) L=Lm; else sinMarca=true; }
+    L.sort(function(x,y){ return (a?Math.abs((x.a||a+50)-a)-Math.abs((y.a||a+50)-a):0) || U.fechaN(y.f)-U.fechaN(x.f); });
+    return {tipo:'cab', L:L, sinMarca:sinMarca};
+  }
+  if (P.sem) {
+    const pal=P.w.filter(function(w){ return w!=='pp'; });
+    const L=U.DATA.sem.filter(function(x){
+      if (P.s && x.l!==P.s) return false;
+      if (P.d && Math.abs(parseFloat(String(x.d).replace(',','.'))-P.d)>0.6) return false;
+      if (a && !(x.a && Math.abs(x.a-a)<=2)) return false;
+      if (P.pp && !x.pp) return false;
+      const t=_usaNorm([x.m,x.mo,x.t].join(' '));
+      return pal.every(function(w){ return t.indexOf(w)>=0; });
+    }).sort(function(x,y){ return (a?Math.abs((x.a||a+50)-a)-Math.abs((y.a||a+50)-a):0) || U.fechaN(y.f)-U.fechaN(x.f); });
+    return {tipo:'sem', L:L};
+  }
+  return {tipo:'', L:[]};
+}
+function uniHistValor(P, C){
+  const U=USADOS, TC=TC_DIA.valor, peso=function(f){ return _merDias(f)>365?0.5:1; };
+  const wavg=function(arr){ let sw=0,s=0; arr.forEach(function(o){ s+=o.v*o.w; sw+=o.w; }); return sw?{v:s/sw,n:sw,k:arr.length}:null; };
+  if (C.tipo==='cab') {
+    if (!P.s) return {nota:'Indicá surcos / pies para usar nuestros casos.'};
+    const r=wavg(C.L.filter(function(x){return x.pt!=null;}).map(function(x){ return {v:x.pt,w:peso(x.f)}; }));
+    if (!r) return {nota:'Sin casos propios con % del nuevo para esa medida'+(P.anio?' y año':'')+'.'};
+    let N=null; try { N=U.nuevo(P.cab, P.s, P.cab==='Draper'?null:String(P.d||52), P.hid==='1', 'premium'); } catch(e) {}
     if (!N||!N.v) return {nota:'No hay lista de nuevo para esa medida.'};
-    const nUSD=N.mon==='USD'?N.v:N.v*1e6/TC, toma=nUSD*r.v/100;
-    return {v:toma*(1+U.CONFIG.ventaPiso), n:r.n, k:r.k, det:r.k+(r.k===1?' caso · ':' casos · ')+r.v.toLocaleString('es-AR',{maximumFractionDigits:1})+'% del nuevo ('+N.desc+') → toma ×1,18'};
+    const nUSD=N.mon==='USD'?N.v:N.v*1e6/TC;
+    return {v:nUSD*r.v/100*(1+U.CONFIG.ventaPiso), n:r.n, det:r.k+(r.k===1?' caso':' casos')+' · '+r.v.toLocaleString('es-AR',{maximumFractionDigits:1})+'% del nuevo ('+N.desc+') → toma ×1,18'+(C.sinMarca?' · sin casos de '+P.marca+', se usan todas las marcas':'')};
   }
-  if (P.rubro==='Sembradora') {
-    const l=P.nums.find(function(n){ return n>=5&&n<=70; });
-    const L=U.DATA.sem.filter(function(x){ return (x.v0||x.tm0) && (!l||x.l===l) && (!a||(x.a&&Math.abs(x.a-a)<=2)) && P.w.every(function(w){ return _usaNorm([x.m,x.mo,x.t].join(' ')).indexOf(w)>=0; }); });
-    const r=wmed(L.map(function(x){ const v=x.v0?(x.v0+(x.v1||x.v0))/2:(x.tm0+(x.tm1||x.tm0))/2*(1+U.CONFIG.ventaPiso); return {v:v,w:peso(x.f)}; }));
-    return r?{v:r.v, n:r.n, k:r.k, det:r.k+' sembradoras propias (venta real, o toma ×1,18)'}:{nota:'Sin sembradoras propias con esos datos.'};
+  if (C.tipo==='sem') {
+    const r=wavg(C.L.filter(function(x){return x.v0||x.tm0;}).map(function(x){ const v=x.v0?(x.v0+(x.v1||x.v0))/2:(x.tm0+(x.tm1||x.tm0))/2*(1+U.CONFIG.ventaPiso); return {v:v,w:peso(x.f)}; }));
+    return r?{v:r.v, n:r.n, det:r.k+' sembradora'+(r.k===1?'':'s')+' propia'+(r.k===1?'':'s')+' (venta real, o toma ×1,18)'}:{nota:'Sin sembradoras propias con esos datos.'};
   }
-  return {nota:'Todavía no hay historial propio cargado para este rubro.'};
+  return {nota:P.rubro?'Todavía no hay casos propios cargados para este rubro.':'Elegí o escribí el rubro.'};
 }
-function merFormula(P){
-  const cab={'Cabezal maicero':'Maicero','Cabezal trigo/soja':'Draper'}[P.rubro]; if(!cab||!P.anio) return null;
-  const s=P.nums.find(function(n){ return n>=4&&n<=45; }); if(!s) return null;
-  const d=P.nums.find(function(n){ return n===42||n===52||n===70; });
-  const marcas=USADOS.MARCAS, mk=marcas.find(function(m){ return P.w.indexOf(_usaNorm(m).split(' ')[0])>=0; });
-  const r=usaCalcular({tipo:cab, marca:mk||'Maizco', surcos:String(s), dist:cab==='Draper'?'':String(d||52), anio:String(P.anio), estado:P.estado, hid:'0', mod:'conv', mas:false});
-  if(!r||r.error) return null;
-  const TC=TC_DIA.valor, v=r.N.mon==='USD'?r.piso:r.piso*1e6/TC;
-  return {v:v, n:3, k:1, det:'venta mínima del cotizador ('+(mk||'Maizco')+', '+r.pctF.toLocaleString('es-AR',{maximumFractionDigits:1})+'% del nuevo)'};
+function uniFormula(P){
+  if (!P.cab||!P.s||!P.anio) return null;
+  const q={tipo:P.cab, marca:P.marca||'Maizco', surcos:String(P.s), dist:P.cab==='Draper'?'':String(P.d||52), anio:String(P.anio), estado:P.estado, hid:P.hid, mod:P.mod, mas:P.mas};
+  const r=usaCalcular(q); if(!r||r.error) return null;
+  return {q:q, v:r.N.mon==='USD'?r.piso:r.piso*1e6/TC_DIA.valor, n:3,
+          det:'venta mínima del cotizador ('+q.marca+(P.marca?'':' por defecto')+(P.cab!=='Draper'&&!P.d?', a 52':'')+', '+r.pctF.toLocaleString('es-AR',{maximumFractionDigits:1})+'% del nuevo)'};
 }
-function merCombinar(P, M){
+function uniCombinar(P, M, C){
   const Ef={imp:1.05,bueno:1,cast:0.95,rep:0.9}[P.estado]||1;
-  const vals=M.map(function(x){ return _merUSD(x); }).filter(function(v){ return v; });
-  const merc=vals.length?{v:USADOS.med(vals)*(1-P.neg/100)*Ef, n:vals.length, k:vals.length, det:vals.length+' avisos · mediana pedido USD '+Math.round(USADOS.med(vals)).toLocaleString('es-AR')+' −'+P.neg+'%'}:null;
-  const hist=merHistorial(P); const H=hist.v?{v:hist.v*Ef,n:hist.n,k:hist.k,det:hist.det}:null;
-  const F=merFormula(P);
-  const base=F?{H:.5,F:.3,M:.2}:(H?{H:.6,M:.4}:{M:1});
-  const S={H:H,F:F,M:merc}; let sw=0, sv=0; const usadas=[];
-  Object.keys(base).forEach(function(k){ const s=S[k]; if(!s) return; const w=base[k]*Math.min(1,s.n/3); s.w=w; sw+=w; sv+=w*s.v; usadas.push(s.v); });
-  if (!sw) return {S:S, hist:hist};
+  const vals=M.map(_merUSD).filter(function(v){ return v; });
+  const merc=vals.length?{v:USADOS.med(vals)*(1-P.neg/100)*Ef, n:vals.length, det:vals.length+' aviso'+(vals.length===1?'':'s')+' · mediana pedido USD '+Math.round(USADOS.med(vals)).toLocaleString('es-AR')+' −'+P.neg+'%'}:null;
+  const hv=uniHistValor(P, C), H=hv.v?{v:hv.v*Ef, n:hv.n, det:hv.det}:null, F=uniFormula(P);
+  const base=F?{H:.5,F:.3,M:.2}:(H?{H:.6,M:.4}:{M:1}), S={H:H,F:F,M:merc};
+  let sw=0, sv=0; const usadas=[];
+  Object.keys(base).forEach(function(k){ const s=S[k]; if(!s) return; s.w=base[k]*Math.min(1,s.n/3); sw+=s.w; sv+=s.w*s.v; usadas.push(s.v); });
+  if (!sw) return {S:S, hv:hv};
   Object.keys(S).forEach(function(k){ if(S[k]&&S[k].w!=null) S[k].pct=S[k].w/sw; });
-  const V=sv/sw, div=usadas.length>1?Math.max.apply(null,usadas)/Math.min.apply(null,usadas)-1:0;
-  const fuerza=sw/(Object.keys(base).reduce(function(s,k){return s+base[k];},0));
-  const conf=(Object.keys(S).filter(function(k){return S[k]&&S[k].w;}).length>=2 && fuerza>0.8 && div<0.2)?'alta':(fuerza>=0.5?'media':'baja');
-  return {V:V, S:S, hist:hist, div:div, conf:H||F?conf:'baja'};
+  const div=usadas.length>1?Math.max.apply(null,usadas)/Math.min.apply(null,usadas)-1:0, fuerza=sw/Object.keys(base).reduce(function(s,k){return s+base[k];},0);
+  const n=Object.keys(S).filter(function(k){return S[k]&&S[k].w;}).length;
+  let conf=(n>=2&&fuerza>0.8&&div<0.2)?'alta':((H||F)&&fuerza>=0.5?'media':'baja');
+  if (!P.anio||!P.s) conf='baja';   // sin año o sin medida mezcla equipos distintos
+  return {V:sv/sw, S:S, hv:hv, F:F, div:div, conf:conf};
 }
-function renderUsadosMer(box){
-  const q=_merQ, P=merEfectivo();
+function renderUsadosUni(box){
+  const q=_uQ, P=uniEfectivo();
   const op=function(v,t,sel){ return '<option value="'+v+'"'+(String(sel)===String(v)?' selected':'')+'>'+t+'</option>'; };
   const st='padding:7px 8px;border:1.5px solid #bbb;border-radius:5px;font-size:0.9rem;width:100%;';
   const campo=function(l,html){ return '<label style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-weight:700;color:#555;">'+l+html+'</label>'; };
   let anios=''; for(let y=2026;y>=1985;y--) anios+=op(y,y,q.anio);
-  let h=usaCabecera('mercado');
-  if (!window.MERCADO) { box.innerHTML=h+'<div class="ger-card">Los avisos de mercado no están cargados en esta versión.</div>'; return; }
-  h+='<div class="ger-card"><input type="text" placeholder="Buscá libre: ej. tolva 14 2015 · rastra 44 · moco 635 · maicero 16 52 2015" value="'+String(q.txt).replace(/"/g,'&quot;')+'" oninput="merSet(\'txt\',this.value,true)" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #888;border-radius:6px;font-size:0.95rem;margin-bottom:10px;">';
+  let h=usaCabecera('nuestro historial + mercado');
+  h+='<div class="ger-card"><input type="text" id="usaTxt" placeholder="Buscá libre: ej. maicero 16 52 2015 · girasolero maizco · agrometal mxy 2018 · tolva 14 · moco 635" value="'+String(q.txt).replace(/"/g,'&quot;')+'" oninput="uniSet(\'txt\',this.value,true)" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #888;border-radius:6px;font-size:0.95rem;margin-bottom:10px;">';
   h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">';
-  h+=campo('Rubro','<select style="'+st+'" onchange="merSet(\'rubro\',this.value)"><option value="">Cualquiera</option>'+_merRubros().map(function(r){return op(r,r,q.rubro);}).join('')+'</select>');
-  h+=campo('Medida (surcos, tn, m³, discos, m)','<input type="text" inputmode="decimal" placeholder="Cualquiera" style="'+st+'" value="'+q.medida+'" oninput="merSet(\'medida\',this.value,true)">');
-  h+=campo('Año (±2)','<select style="'+st+'" onchange="merSet(\'anio\',this.value)"><option value="">Cualquiera</option>'+anios+'</select>');
-  h+=campo('Estado','<select style="'+st+'" onchange="merSet(\'estado\',this.value)">'+op('imp','Impecable (+5%)',q.estado)+op('bueno','Bueno',q.estado)+op('cast','Castigado (−5%)',q.estado)+op('rep','Para reparar (−10%)',q.estado)+'</select>');
-  h+=campo('Negociación s/ pedido','<select style="'+st+'" onchange="merSet(\'neg\',this.value)">'+[0,5,10,15,20].map(function(n){return op(n,'−'+n+'%',q.neg);}).join('')+'</select>');
-  h+='</div><div style="font-size:0.75rem;color:#777;margin-top:8px;">'+window.MERCADO.length+' avisos de Agroads y Agrofy. Los avisos en $ se pasan a USD con el TC del día de la consulta.</div></div>';
-  h+='<div id="usaRes">'+merResultado()+'</div>';
+  h+=campo('Rubro','<select style="'+st+'" onchange="uniSet(\'rubro\',this.value)"><option value="">Auto</option>'+_uniRubros().map(function(r){return op(r,r,q.rubro);}).join('')+'</select>');
+  h+=campo(P.cab?'Surcos / pies':(P.sem?'Líneas':'Medida (tn, m³, discos, m, lts)'),'<input type="text" inputmode="decimal" placeholder="Cualquiera" style="'+st+'" value="'+q.medida+'" oninput="uniSet(\'medida\',this.value,true)">');
+  if (P.cab && P.cab!=='Draper') h+=campo('Distancia','<select style="'+st+'" onchange="uniSet(\'dist\',this.value)"><option value="">Auto</option>'+['42','52','70'].map(function(d){return op(d,d+' cm',q.dist);}).join('')+'</select>');
+  if (P.sem) h+=campo('Distancia (cm)','<input type="text" inputmode="decimal" placeholder="ej. 52,5" style="'+st+'" value="'+q.dist+'" oninput="uniSet(\'dist\',this.value,true)">');
+  h+=campo('Año (±2)','<select style="'+st+'" onchange="uniSet(\'anio\',this.value)"><option value="">Cualquiera</option>'+anios+'</select>');
+  h+=campo('Estado','<select style="'+st+'" onchange="uniSet(\'estado\',this.value)">'+op('imp','Impecable (+5%)',q.estado)+op('bueno','Bueno',q.estado)+op('cast','Castigado (−5%)',q.estado)+op('rep','Para reparar (−10%)',q.estado)+'</select>');
+  h+=campo('Negociación s/ aviso','<select style="'+st+'" onchange="uniSet(\'neg\',this.value)">'+[0,5,10,15,20].map(function(n){return op(n,'−'+n+'%',q.neg);}).join('')+'</select>');
+  if (P.cab==='Girasolero') h+=campo('Accionamiento','<select style="'+st+'" onchange="uniSet(\'hid\',this.value)">'+op('0','Mecánico',q.hid)+op('1','Hidráulico',q.hid)+'</select>');
+  if (P.cab==='Maicero' && P.marca==='Mainero') h+=campo('Modelo Mainero','<select style="'+st+'" onchange="uniSet(\'mod\',this.value)">'+op('conv','Convencional',q.mod)+op('mdd','MDD',q.mod)+'</select>');
+  h+='</div>';
+  if (P.cab) h+='<label style="display:flex;gap:6px;align-items:center;font-size:0.82rem;margin-top:10px;"><input type="checkbox" '+(q.mas?'checked ':'')+'onchange="uniSet(\'mas\',this.checked)"> El cliente va por un nuevo de <b>más surcos</b></label>';
+  if (P.sem) h+='<label style="display:flex;gap:6px;align-items:center;font-size:0.82rem;margin-top:10px;"><input type="checkbox" '+(q.pp?'checked ':'')+'onchange="uniSet(\'pp\',this.checked)"> Con Precision Planting (PP)</label>';
+  h+='<div style="font-size:0.75rem;color:#777;margin-top:8px;">Busca en nuestro historial ('+USADOS.DATA.hist.length+' cabezales, '+USADOS.DATA.sem.length+' sembradoras) y en '+(window.MERCADO||[]).length+' avisos de Agroads y Agrofy. Avisos en $ → USD al TC del día de la consulta.</div></div>';
+  h+='<div id="usaRes">'+uniResultado()+'</div>';
   box.innerHTML=h;
 }
-function merSet(k,v,soloRes){ _merQ[k]=v; if(soloRes){ const r=document.getElementById('usaRes'); if(r) r.innerHTML=merResultado(); } else renderUsados(); }
-function merResultado(){
-  const P=merEfectivo(); let M=merFiltrar(P,2), tol=2;
+var _uniRubroPrev='';
+function uniSet(k,v,soloRes){
+  _uQ[k]=v;
+  if (soloRes) { const P=uniEfectivo(); if (P.rubro===_uniRubroPrev) { const r=document.getElementById('usaRes'); if(r) r.innerHTML=uniResultado(); return; } }
+  const el=document.activeElement, id=el&&el.id, pos=el&&el.selectionStart;
+  renderUsados();
+  if (id) { const n=document.getElementById(id); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } }
+}
+function uniResultado(){
+  const P=uniEfectivo(); _uniRubroPrev=P.rubro;
+  let M=merFiltrar(P,2), tol=2;
   if (P.anio && M.length<3) { const M4=merFiltrar(P,4); if (M4.length>M.length) { M=M4; tol=4; } }
+  const C=uniCasos(P);
   const fU=function(v){ return 'USD '+(Math.round(v/100)*100).toLocaleString('es-AR'); };
   const kpi=function(t,v,sub,bg){ return '<div style="background:'+bg+';border-radius:8px;padding:10px;"><div style="font-size:0.75rem;color:#555;font-weight:700;">'+t+'</div><div style="font-size:1.25rem;font-weight:800;">'+v+'</div><div style="font-size:0.75rem;color:#666;">'+sub+'</div></div>'; };
-  let h='';
-  const filtrado=P.rubro||P.anio||P.nums.length||P.w.length;
-  if (filtrado) {
-    const C=merCombinar(P,M);
-    if (C.V) {
-      const col={alta:'#2e7d32',media:'#ef6c00',baja:'#c62828'}[C.conf], toma=C.V/(1+USADOS.CONFIG.ventaPiso);
-      h+='<div class="ger-card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;"><h3 style="margin:0;">Precio sugerido combinado</h3><span style="background:'+col+';color:#fff;border-radius:10px;padding:2px 10px;font-size:0.75rem;font-weight:700;">Confianza '+C.conf+'</span></div>';
+  const aviso=function(t){ return '<div style="background:#fff3cd;border:1px solid #ffe08a;border-radius:6px;padding:6px 10px;font-size:0.8rem;margin-top:8px;">⚠️ '+t+'</div>'; };
+  const ent=[P.rubro, P.marca, P.s?(P.cab?P.s+(P.cab==='Draper'?' pies':' surcos'):(P.sem?P.s+' líneas':'medida '+P.s)):'', P.d&&(P.cab||P.sem)?'a '+P.d+' cm':'', P.anio?'año '+P.anio:'', P.hid==='1'&&P.cab==='Girasolero'?'hidráulico':'', P.pp?'PP':''].concat(P.w.filter(function(w){ return !P.marca||w!==_usaNorm(P.marca).split(' ')[0]; }).map(function(w){return '"'+w+'"';})).filter(Boolean);
+  let h=ent.length?'<div style="font-size:0.8rem;color:#555;margin:-4px 0 10px 2px;">Entendí: <b>'+ent.join(' · ')+'</b></div>':'';
+  if (!P.rubro) h+='<div class="ger-card" style="color:#555;font-size:0.88rem;">Escribí o elegí el <b>rubro</b> (maicero, girasolero, sembradora, tolva, rastra, mixer…) para ver el precio sugerido.</div>';
+  else {
+    const R=uniCombinar(P,M,C);
+    if (R.V) {
+      const col={alta:'#2e7d32',media:'#ef6c00',baja:'#c62828'}[R.conf], toma=R.V/(1+USADOS.CONFIG.ventaPiso);
+      h+='<div class="ger-card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;"><h3 style="margin:0;">Precio sugerido · '+P.rubro+(P.marca?' '+P.marca:'')+(P.s?' '+P.s+(P.cab==='Draper'?' pies':(P.cab||P.sem)&&P.d?' a '+P.d:''):'')+(P.anio?' · '+P.anio:'')+'</h3><span style="background:'+col+';color:#fff;border-radius:10px;padding:2px 10px;font-size:0.75rem;font-weight:700;">Confianza '+R.conf+'</span></div>';
       h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px;">';
-      h+=kpi('TOMA',fU(toma),'venta estimada ÷ 1,18','#e3f2fd')+kpi('VENTA MÍNIMA',fU(C.V),'venta estimada hoy','#fff8e1')+kpi('PARA PEDIR',fU(toma*(1+USADOS.CONFIG.ventaPedir)),'toma +'+Math.round(USADOS.CONFIG.ventaPedir*100)+'%','#e8f5e9');
-      h+='</div><table class="ger-tbl" style="margin-top:10px;"><tr style="font-weight:700;"><td>Fuente</td><td>Venta estimada</td><td>Peso</td><td>De dónde sale</td></tr>';
-      [['H','Historial propio'],['F','Fórmula cotizador'],['M','Mercado']].forEach(function(p){ const s=C.S[p[0]];
+      h+=kpi('TOMA',fU(toma),'venta estimada ÷ 1,18','#e3f2fd')+kpi('VENTA MÍNIMA',fU(R.V),'venta estimada hoy','#fff8e1')+kpi('PARA PEDIR',fU(toma*(1+USADOS.CONFIG.ventaPedir)),'toma +'+Math.round(USADOS.CONFIG.ventaPedir*100)+'%','#e8f5e9');
+      h+='</div><div style="overflow-x:auto;"><table class="ger-tbl" style="margin-top:10px;"><tr style="font-weight:700;"><td>Fuente</td><td>Venta estimada</td><td>Peso</td><td>De dónde sale</td></tr>';
+      [['H','Nuestro historial'],['F','Fórmula cotizador'],['M','Mercado']].forEach(function(p){ const s=R.S[p[0]];
         if (s) h+='<tr><td>'+p[1]+'</td><td><b>'+fU(s.v)+'</b></td><td>'+(s.pct!=null?Math.round(s.pct*100)+'%':'–')+'</td><td style="color:#555;">'+s.det+(s.n<3?' · <i>pocos comparables, pesa menos</i>':'')+'</td></tr>';
-        else if (p[0]==='H' && C.hist.nota) h+='<tr><td>'+p[1]+'</td><td>–</td><td>–</td><td style="color:#999;">'+C.hist.nota+'</td></tr>';
+        else if (p[0]==='H') h+='<tr><td>'+p[1]+'</td><td>–</td><td>–</td><td style="color:#999;">'+(R.hv.nota||'')+'</td></tr>';
+        else if (p[0]==='M') h+='<tr><td>'+p[1]+'</td><td>–</td><td>–</td><td style="color:#999;">Sin avisos con esos datos.</td></tr>';
       });
-      h+='</table>';
-      if (C.div>0.2) h+='<div style="background:#fff3cd;border:1px solid #ffe08a;border-radius:6px;padding:6px 10px;font-size:0.8rem;margin-top:8px;">⚠️ Las fuentes difieren '+Math.round(C.div*100)+'%: mirá los avisos y los casos antes de dar un número.</div>';
+      h+='</table></div>';
+      if (R.div>0.2) h+=aviso('Las fuentes difieren '+Math.round(R.div*100)+'%: mirá los casos y los avisos antes de dar un número.');
+      const falta=[]; if(!P.s&&P.rubro) falta.push(P.cab?'surcos':(P.sem?'líneas':'medida')); if(P.cab&&P.cab!=='Draper'&&!P.d) falta.push('distancia'); if(!P.anio) falta.push('año'); if(P.cab&&!P.marca) falta.push('marca');
+      if (falta.length) h+=aviso('Referencia aproximada. Para afinar sumá: <b>'+falta.join(', ')+'</b>.');
       if (tol>2) h+='<div style="font-size:0.78rem;color:#666;margin-top:6px;">Pocos avisos con año ±2: se amplió a ±4.</div>';
-      const falta=[]; if(!P.rubro) falta.push('rubro'); if(!P.nums.length) falta.push('medida'); if(!P.anio) falta.push('año');
-      if (falta.length) h+='<div style="background:#fff3cd;border:1px solid #ffe08a;border-radius:6px;padding:6px 10px;font-size:0.8rem;margin-top:8px;">⚠️ Referencia aproximada: mezcla distintas medidas o años. Para afinar sumá: <b>'+falta.join(', ')+'</b>.</div>';
-      if (P.estado!=='bueno') h+='<div style="font-size:0.78rem;color:#666;margin-top:6px;">Estado aplicado a mercado e historial; la fórmula ya lo trae.</div>';
+      if (P.estado!=='bueno') h+='<div style="font-size:0.78rem;color:#666;margin-top:6px;">Estado aplicado a historial y mercado; la fórmula ya lo trae.</div>';
+      if (R.F) h+='<details style="margin-top:10px;"><summary style="cursor:pointer;font-size:0.85rem;font-weight:700;">Detalle de la fórmula del cotizador</summary>'+usaResultado(R.F.q,true).replace('<div class="ger-card">','<div style="margin-top:6px;">')+'</details>';
       h+='</div>';
-    } else h+='<div class="ger-card" style="color:#777;font-size:0.85rem;">Sin avisos ni casos con esos filtros: sacá alguno para tener referencia.</div>';
+    } else h+='<div class="ger-card" style="color:#777;font-size:0.85rem;">'+(C.L.length&&R.hv.nota?R.hv.nota:'Sin casos propios ni avisos con esos filtros: sacá alguno para tener referencia.')+'</div>';
   }
+  // Nuestros casos
+  const rg=function(v,mon){ return !v?'–':(v[0]===v[1]?String(v[0]).replace('.',','):String(v[0]).replace('.',',')+'–'+String(v[1]).replace('.',','))+(mon==='USD'?' USD':''); };
+  if (C.tipo==='cab') {
+    const fm=function(x){ return '<tr><td>'+x.f+'</td><td>'+x.t+' '+(x.m||'s/d')+' '+(x.mo||'')+' '+(x.s||'?')+(x.t==='Draper'?' p':'-'+(x.d||'?'))+'</td><td>'+(x.a||'s/año')+'</td><td>'+rg(x.tm,x.mon)+'</td><td>'+rg(x.vt,x.mon)+'</td><td>'+(x.pt!=null?String(x.pt).replace('.',',')+'%':'–')+'</td><td style="color:#666;">'+(x.e||'')+'</td></tr>'; };
+    h+='<div class="ger-card"><h3>Nuestros casos: '+C.L.length+(C.sinMarca?' <span style="font-weight:400;color:#666;font-size:0.85rem;">(sin casos de '+P.marca+': todas las marcas)</span>':'')+'</h3>';
+    h+=C.L.length?'<div style="overflow-x:auto;"><table class="ger-tbl"><tr style="font-weight:700;"><td>Fecha</td><td>Equipo</td><td>Año</td><td>Toma</td><td>Venta</td><td>% nuevo</td><td>Estado</td></tr>'+C.L.slice(0,40).map(fm).join('')+'</table></div>':'<div style="color:#777;font-size:0.85rem;">Sin casos con esos filtros.</div>';
+    h+='<div style="font-size:0.74rem;color:#777;margin-top:8px;">Valores en millones de $ con IVA salvo indicación USD.</div></div>';
+  } else if (C.tipo==='sem') {
+    const usd=function(a,b){ return a?'USD '+(a===b||!b?a.toLocaleString('es-AR'):a.toLocaleString('es-AR')+'–'+b.toLocaleString('es-AR')):'–'; };
+    const fs=function(x){ return '<tr><td>'+x.f+'</td><td>'+[x.t,x.m,x.mo].filter(Boolean).join(' ')+' '+(x.l||'?')+' a '+(x.d||'?')+(x.pp?' · PP':'')+'</td><td>'+(x.a||'s/año')+'</td><td>'+usd(x.tm0,x.tm1)+'</td><td>'+usd(x.v0,x.v1)+'</td><td style="color:#666;">'+(x.e||'')+'</td></tr>'; };
+    h+='<div class="ger-card"><h3>Nuestros casos: '+C.L.length+'</h3>';
+    h+=C.L.length?'<div style="overflow-x:auto;"><table class="ger-tbl"><tr style="font-weight:700;"><td>Fecha</td><td>Equipo</td><td>Año</td><td>Toma</td><td>Venta</td><td>Estado</td></tr>'+C.L.slice(0,40).map(fs).join('')+'</table></div>':'<div style="color:#777;font-size:0.85rem;">Sin casos con esos filtros.</div>';
+    h+='</div>';
+  }
+  // Mercado
   M.sort(function(x,y){ const a=+P.anio; return (a?Math.abs((x[6]||a+50)-a)-Math.abs((y[6]||a+50)-a):0) || (_merUSD(x)||0)-(_merUSD(y)||0); });
   const fila=function(x){ const u=_merUSD(x), viejo=_merDias(x[0])>182;
-    return '<tr'+(viejo?' style="opacity:.45;" title="Aviso de más de 6 meses"':'')+'><td>'+x[0].slice(0,5)+'</td><td>'+x[1]+'</td><td>'+(x[2]||'s/d')+' '+(x[3]||'')+'</td><td>'+(x[4]||'')+'</td><td>'+(x[6]||'–')+'</td><td style="white-space:nowrap;">'+(x[10]==='USD'?'USD '+x[9].toLocaleString('es-AR'):'$ '+(x[9]/1e6).toLocaleString('es-AR',{maximumFractionDigits:1})+' M')+'</td><td style="white-space:nowrap;"><b>'+(u?fU(u):'–')+'</b></td><td style="color:#666;">'+[x[11],x[12]].filter(Boolean).join(' · ')+'</td><td>'+(x[14]?'<a href="'+x[14]+'" target="_blank" rel="noopener">'+x[13]+'</a>':x[13])+'</td></tr>'; };
-  h+='<div class="ger-card"><h3>Avisos: '+M.length+(filtrado?'':' (todos)')+'</h3>';
-  h+=M.length?'<div style="overflow-x:auto;"><table class="ger-tbl"><tr style="font-weight:700;"><td>Fecha</td><td>Rubro</td><td>Equipo</td><td>Medida</td><td>Año</td><td>Pedido</td><td>En USD</td><td>Vendedor</td><td>Sitio</td></tr>'+M.slice(0,80).map(fila).join('')+'</table></div>'+(M.length>80?'<div style="font-size:0.78rem;color:#777;">Se muestran 80 de '+M.length+'. Afiná la búsqueda.</div>':''):'<div style="color:#777;font-size:0.85rem;">Sin avisos con esos filtros.</div>';
+    return '<tr'+(viejo?' style="opacity:.45;" title="Aviso de más de 6 meses"':'')+'><td>'+x[0].slice(0,5)+'</td><td>'+(P.rubro?'':x[1]+' · ')+(x[2]||'s/d')+' '+(x[3]||'')+'</td><td>'+(x[4]||'')+'</td><td>'+(x[6]||'–')+'</td><td style="white-space:nowrap;">'+(x[10]==='USD'?'USD '+x[9].toLocaleString('es-AR'):'$ '+(x[9]/1e6).toLocaleString('es-AR',{maximumFractionDigits:1})+' M')+'</td><td style="white-space:nowrap;"><b>'+(u?fU(u):'–')+'</b></td><td style="color:#666;">'+[x[11],x[12]].filter(Boolean).join(' · ')+'</td><td>'+(x[14]?'<a href="'+x[14]+'" target="_blank" rel="noopener">'+x[13]+'</a>':x[13])+'</td></tr>'; };
+  h+='<div class="ger-card"><h3>Mercado (Agroads / Agrofy): '+M.length+' aviso'+(M.length===1?'':'s')+'</h3>';
+  h+=M.length?'<div style="overflow-x:auto;"><table class="ger-tbl"><tr style="font-weight:700;"><td>Fecha</td><td>Equipo</td><td>Medida</td><td>Año</td><td>Pedido</td><td>En USD</td><td>Vendedor</td><td>Sitio</td></tr>'+M.slice(0,60).map(fila).join('')+'</table></div>'+(M.length>60?'<div style="font-size:0.78rem;color:#777;">Se muestran 60 de '+M.length+'. Afiná la búsqueda.</div>':''):'<div style="color:#777;font-size:0.85rem;">Sin avisos con esos filtros.</div>';
   h+='<div style="font-size:0.74rem;color:#777;margin-top:8px;">Precios <b>pedidos</b> (no de cierre); el IVA no siempre está aclarado. En gris, avisos de más de 6 meses.</div></div>';
   return h;
 }
 
 function usaCabecera(t){
   const b=function(k,l){ return '<button class="tab-btn'+(_usaModo===k?' on':'')+'" style="border-radius:6px;border-bottom:1.5px solid #ccc;" onclick="_usaModo=\''+k+'\';renderUsados()">'+l+'</button>'; };
-  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;"><h2 style="font-size:1.05rem;">🔒 Usados — '+t+'</h2><span style="display:flex;gap:6px;">'+b('cab','Cabezales')+b('sem','Sembradoras')+b('mer','Mercado')+'<button class="btn-opcionales" onclick="gerSalir()">Salir</button></span></div>';
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;"><h2 style="font-size:1.05rem;">🔒 Usados — '+t+'</h2><span style="display:flex;gap:6px;">'+'<button class="btn-opcionales" onclick="gerSalir()">Salir</button></span></div>';
 }
 function renderUsadosSem(box){
   const U=USADOS, q=_usaS, S=U.DATA.sem;
