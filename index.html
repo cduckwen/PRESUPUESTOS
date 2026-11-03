@@ -183,9 +183,11 @@
   <button class="tab-btn on" id="tabBtnPres" onclick="mostrarTab('pres')">📋 Presupuesto</button>
   <button class="tab-btn" id="tabBtnGer" onclick="mostrarTab('ger')">🔒 Gerencia</button>
   <button class="tab-btn" id="tabBtnUsa" onclick="mostrarTab('usa')">🔒 Usados</button>
+  <button class="tab-btn" id="tabBtnChq" onclick="mostrarTab('chq')">🔒 Cheques</button>
 </div>
 <div class="ger-view" id="gerView" style="display:none;"></div>
 <div class="ger-view" id="usaView" style="display:none;"></div>
+<div class="ger-view" id="chqView" style="display:none;"></div>
 
 <div class="container" id="mainContainer">
 
@@ -3089,7 +3091,7 @@ async function _privConClave(v){
 }
 let _gerOK = false;
 try { const _k0 = sessionStorage.getItem('gerK');
-  if (_k0) _privAbrir(_b64u(_k0)).then(function(){ _gerOK = true; if (_tabActual==='ger') renderGerencia(); if (_tabActual==='usa') renderUsados(); }).catch(function(){ try { sessionStorage.removeItem('gerK'); } catch(e) {} });
+  if (_k0) _privAbrir(_b64u(_k0)).then(function(){ _gerOK = true; if (_tabActual==='ger') renderGerencia(); if (_tabActual==='usa') renderUsados(); if (_tabActual==='chq') renderCheques(); }).catch(function(){ try { sessionStorage.removeItem('gerK'); } catch(e) {} });
 } catch(e) {}
 var _tabActual = 'pres';
 function mostrarTab(t){
@@ -3097,18 +3099,96 @@ function mostrarTab(t){
   document.getElementById('mainContainer').style.display = t==='pres' ? '' : 'none';
   document.getElementById('gerView').style.display = t==='ger' ? 'block' : 'none';
   document.getElementById('usaView').style.display = t==='usa' ? 'block' : 'none';
+  document.getElementById('chqView').style.display = t==='chq' ? 'block' : 'none';
   document.getElementById('tabBtnPres').classList.toggle('on', t==='pres');
   document.getElementById('tabBtnGer').classList.toggle('on', t==='ger');
   document.getElementById('tabBtnUsa').classList.toggle('on', t==='usa');
+  document.getElementById('tabBtnChq').classList.toggle('on', t==='chq');
   if (t==='ger') renderGerencia();
   if (t==='usa') renderUsados();
+  if (t==='chq') renderCheques();
+}
+
+// ═══ Pestaña CHEQUES (con la clave de Gerencia): cuánto queda al vender los cheques en el mercado (MAV) ═══
+var _chq = {mon:'USD', monto:'', tc:'', n:12, d0:0, cada:30, tasa:27, com:1, contado:10, filas:null};
+function _chqNum(v){ return parseFloat(String(v==null?'':v).replace(/\./g,'').replace(',','.')) || 0; }
+function _chqPct(v){ return parseFloat(String(v==null?'':v).replace(',','.')) || 0; }
+function chqGenerar(){
+  const q=_chq, n=Math.max(1,Math.min(60,parseInt(q.n)||1)), tc=_chqNum(q.tc), m=_chqNum(q.monto);
+  const totP = q.mon==='USD' ? m*tc : m;
+  q.filas=[]; for(let i=0;i<n;i++) q.filas.push({d:(parseInt(q.d0)||0)+i*(parseInt(q.cada)||0), m:Math.round(totP/n)});
+}
+function chqSet(k,v,regen){ _chq[k]=v; if(regen) chqGenerar(); renderCheques(k); }
+function chqFila(i,k,v){ if(!_chq.filas) return; _chq.filas[i][k]=k==='d'?(parseInt(v)||0):_chqNum(v); const r=document.getElementById('chqRes'); if(r) r.innerHTML=chqResultado(); }
+function chqAgregar(){ if(!_chq.filas) _chq.filas=[]; const u=_chq.filas[_chq.filas.length-1]; _chq.filas.push({d:u?u.d+30:0, m:u?u.m:0}); renderCheques(); }
+function chqQuitar(i){ _chq.filas.splice(i,1); renderCheques(); }
+function renderCheques(foco){
+  const box=document.getElementById('chqView'); if(!box) return;
+  if(!_gerOK){
+    box.innerHTML='<div class="ger-key"><strong>🔒 Cheques</strong><div style="font-size:0.8rem;color:#666;margin-top:4px;">Venta de cheques en el mercado — misma clave que Gerencia.</div><div style="margin-top:8px;"><input type="password" id="gerClave" placeholder="Clave" onkeydown="if(event.key===\'Enter\')gerEntrar()" style="padding:6px 8px;border:1.5px solid #bbb;border-radius:5px;"> <button class="btn-opcionales" onclick="gerEntrar()">Entrar</button></div><div id="gerMsg" style="color:#b00;font-size:0.82rem;margin-top:6px;"></div></div>';
+    return;
+  }
+  const q=_chq; if(!q.tc){ const t=getTipoCambio(); if(t) q.tc=String(t); }
+  if(!q.filas) chqGenerar();
+  const st='padding:7px 8px;border:1.5px solid #bbb;border-radius:5px;font-size:0.9rem;width:100%;box-sizing:border-box;';
+  const campo=function(l,html){ return '<label style="display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-weight:700;color:#555;">'+l+html+'</label>'; };
+  const inp=function(k,ph,regen){ return '<input type="text" inputmode="decimal" id="chq_'+k+'" style="'+st+'" placeholder="'+ph+'" value="'+String(q[k]).replace(/"/g,'&quot;')+'" onchange="chqSet(\''+k+'\',this.value,'+(regen?'true':'false')+')">'; };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;"><h2 style="font-size:1.05rem;">🔒 Cheques — cuánto me queda al venderlos</h2><button class="btn-opcionales" onclick="gerSalir()">Salir</button></div>';
+  h+='<div class="ger-card"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">';
+  h+=campo('Moneda del precio','<select style="'+st+'" onchange="chqSet(\'mon\',this.value,true)"><option value="USD"'+(q.mon==='USD'?' selected':'')+'>USD (se pesifica)</option><option value="ARS"'+(q.mon==='ARS'?' selected':'')+'>Pesos</option></select>');
+  h+=campo('Monto total del plan',inp('monto','ej. 100.000',true));
+  h+=campo('TC del día ($/USD)',inp('tc','1.565',true));
+  h+=campo('Cantidad de cheques',inp('n','12',true));
+  h+=campo('Primer cheque a (días)',inp('d0','0',true));
+  h+=campo('Cada (días)',inp('cada','30',true));
+  h+=campo('Tasa venta MAV (% anual)',inp('tasa','27',false));
+  h+=campo('Comisiones (%)',inp('com','1',false));
+  h+=campo('Contado: descuento (%)',inp('contado','10',false));
+  h+='</div><div style="font-size:0.74rem;color:#777;margin-top:6px;">Tasa de referencia en <a href="https://mav-sa.com.ar/?no_cache=1" target="_blank" rel="noopener">mav-sa.com.ar</a> (Datos de mercado: avalado SGR suele ser la más baja; cheque directo depende del firmante). Cambiar monto, TC o plan regenera los cheques; abajo se pueden editar uno por uno.</div></div>';
+  h+='<div id="chqRes">'+chqResultado()+'</div>';
+  box.innerHTML=h;
+  if(foco){ const e=document.getElementById('chq_'+foco); if(e){ try{ e.focus(); }catch(x){} } }
+}
+function chqCalc(){
+  const q=_chq, tasa=_chqPct(q.tasa)/100, com=_chqPct(q.com)/100, tc=_chqNum(q.tc), F=q.filas||[];
+  let tot=0, hoy=0, sd=0, sdm=0;
+  const rows=F.map(function(f){ const vh=f.m/(1+tasa*Math.max(0,f.d)/365); tot+=f.m; hoy+=vh; sd+=f.d; sdm+=f.d*f.m; return {d:f.d,m:f.m,vh:vh}; });
+  const neto=hoy*(1-com);
+  return {rows:rows, tot:tot, hoy:hoy, neto:neto, com:hoy-neto, tc:tc, n:F.length,
+    pSimple:F.length?sd/F.length:0, pPond:tot?sdm/tot:0, factor:tot?neto/tot:0};
+}
+function chqResultado(){
+  const q=_chq, r=chqCalc();
+  if(!r.n || !r.tot) return '<div class="ger-card" style="color:#777;">Cargá el monto (y el TC si es en dólares) para ver el resultado.</div>';
+  const fP=function(v){ return '$ '+Math.round(v).toLocaleString('es-AR'); };
+  const fU=function(v){ return r.tc ? 'USD '+Math.round(v/r.tc).toLocaleString('es-AR') : '–'; };
+  const pc=function(v){ return (Math.round(v*1000)/10).toLocaleString('es-AR')+'%'; };
+  const kpi=function(t,v,sub,bg){ return '<div style="background:'+bg+';border-radius:8px;padding:10px;"><div style="font-size:0.75rem;color:#555;font-weight:700;">'+t+'</div><div style="font-size:1.2rem;font-weight:800;">'+v+'</div><div style="font-size:0.75rem;color:#666;">'+sub+'</div></div>'; };
+  const c=_chqPct(q.contado)/100, contado=r.tot*(1-c), recargo=r.factor?((1-c)/r.factor-1):0;
+  let h='<div class="ger-card"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">';
+  h+=kpi('TOTAL EN CHEQUES',fP(r.tot),fU(r.tot)+' · '+r.n+' cheques','#f5f5f5');
+  h+=kpi('PLAZO PROMEDIO',Math.round(r.pPond)+' días','ponderado por monto (simple: '+Math.round(r.pSimple)+')','#f5f5f5');
+  h+=kpi('COBRO HOY (neto)',fP(r.neto),'descuento '+fP(r.hoy*0+r.tot-r.hoy)+' + comisión '+fP(r.com),'#e3f2fd');
+  h+=kpi('👉 ME QUEDAN',fU(r.neto),'pérdida '+pc(1-r.factor)+' sobre el plan','#e8f5e9');
+  h+='</div>';
+  const mejor = r.neto>=contado;
+  h+='<div style="background:'+(mejor?'#e8f5e9':'#fff3cd')+';border:1px solid '+(mejor?'#a5d6a7':'#ffe08a')+';border-radius:6px;padding:8px 10px;font-size:0.85rem;margin-top:10px;">';
+  h+='Contado −'+pc(c)+': '+fP(contado)+' ('+fU(contado)+'). '+(mejor?'✅ El plan en cheques deja <b>más</b> que el contado ('+fU(r.neto-contado)+' a favor).':'⚠️ El contado deja <b>más</b> que los cheques ('+fU(contado-r.neto)+' de diferencia).');
+  h+='<br>Para que el plan en cheques equivalga al contado −'+pc(c)+', habría que <b>'+(recargo>=0?'recargar '+pc(recargo):'bajar '+pc(-recargo))+'</b> sobre ese total.</div></div>';
+  h+='<div class="ger-card"><h3>Detalle por cheque</h3><div style="overflow-x:auto;"><table class="ger-tbl"><tr style="font-weight:700;"><td>#</td><td>Días</td><td>Monto ($)</td><td>Valor hoy ($)</td><td></td></tr>';
+  r.rows.forEach(function(x,i){
+    h+='<tr><td>'+(i+1)+'</td><td><input type="number" value="'+x.d+'" style="width:70px;" onchange="chqFila('+i+',\'d\',this.value)"></td><td><input type="text" inputmode="decimal" value="'+Math.round(x.m).toLocaleString('es-AR')+'" style="width:130px;" onchange="chqFila('+i+',\'m\',this.value)"></td><td>'+fP(x.vh)+'</td><td><button class="btn-opcionales" style="margin:0;padding:1px 7px;" onclick="chqQuitar('+i+')">✕</button></td></tr>';
+  });
+  h+='</table></div><button class="btn-opcionales" onclick="chqAgregar()">+ Agregar cheque</button>';
+  h+='<div style="font-size:0.74rem;color:#777;margin-top:8px;">Valor hoy = monto ÷ (1 + tasa × días ÷ 365), como descuenta el mercado. "Me quedan" = cobro neto ÷ TC del día. Si es cheque directo o largo (más de 180 días), la tasa suele ser más alta.</div></div>';
+  return h;
 }
 function gerEntrar(){
   const v = (document.getElementById('gerClave')||{}).value || '';
   const m = document.getElementById('gerMsg'); if (m) m.textContent = 'Abriendo…';
   _privConClave(v).then(function(rawK){
     _gerOK = true; try { sessionStorage.setItem('gerK', btoa(String.fromCharCode.apply(null, rawK))); } catch(e) {}
-    if (_tabActual==='usa') renderUsados(); else renderGerencia();
+    if (_tabActual==='usa') renderUsados(); else if (_tabActual==='chq') renderCheques(); else renderGerencia();
   }).catch(function(){ if (m) m.textContent = 'Clave incorrecta.'; });
 }
 function gerSalir(){
