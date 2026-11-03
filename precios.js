@@ -903,7 +903,7 @@ const PRODUCTOS = [
       { modelo:"YN938G", desc:"Cargadora frontal", precio:78455 },
       { modelo:"YN928D", desc:"Cargadora frontal", precio:37570 },
       { modelo:"YN930D", desc:"Cargadora frontal", precio:44200 },
-      { modelo:"YN959G", desc:"Cargadora frontal", precio:121550 },
+      { modelo:"YN958G", desc:"Cargadora frontal 5 tn – balde 3 m3", precio:121550 },
       { modelo:"YN928EN", desc:"Cargadora frontal", precio:30940 },
       { modelo:"YN936EN", desc:"Cargadora frontal", precio:35360 },
       { modelo:"YN9358G", desc:"Cargadora frontal", precio:91297 },
