@@ -422,6 +422,10 @@ const PRODUCTOS = [
       { modelo:"SF/H10 M3 RE BAL",      desc:"Mixer horiz. 10m3 – Balancín – Reductor epicicloidal", precio:41114589 },
       { modelo:"SF/H10 M3 RE-CUT 1 EJE",desc:"Mixer horiz. 10m3 – 1 eje – Reductor + CUTER", precio:42628426 },
       { modelo:"SF/H10 M3 RE-CUT BAL",  desc:"Mixer horiz. 10m3 – Balancín – Reductor + CUTER", precio:43947698 },
+      { modelo:"SF/H10 M3 TC BAL – DOBLE DESCARGA", desc:"Mixer horiz. 10m3 – Balancín – Cadenas+engranajes – DOBLE DESCARGA: batea lateral + tubo sinfín Ø194 × 6 m hidráulico – p/concentrado y secos (no apto silo picado)", precio:36856000 },
+      { modelo:"SF/H10 M3 TC BAL – DESCARGA X TUBO", desc:"Mixer horiz. 10m3 – Balancín – Cadenas+engranajes – DESCARGA POR TUBO: sinfín Ø194 × 6 m hidráulico, sin batea – p/concentrado y secos (no apto silo picado)", precio:35020000 },
+      { modelo:"SF/H10 M3 RE BAL – DOBLE DESCARGA", desc:"Mixer horiz. 10m3 – Balancín – Reductor epicicloidal – DOBLE DESCARGA: batea lateral + tubo sinfín Ø194 × 6 m hidráulico – p/concentrado y secos (no apto silo picado)", precio:48402000 },
+      { modelo:"SF/H10 M3 RE BAL – DESCARGA X TUBO", desc:"Mixer horiz. 10m3 – Balancín – Reductor epicicloidal – DESCARGA POR TUBO: sinfín Ø194 × 6 m hidráulico, sin batea – p/concentrado y secos (no apto silo picado)", precio:46445000 },
       { modelo:"SF/H14 M3 RE 1 EJE",   desc:"Mixer horiz. 14m3 – 1 eje – Reductor epicicloidal", precio:56629529 },
       { modelo:"SF/H14 M3 RE BAL",      desc:"Mixer horiz. 14m3 – Balancín – Reductor epicicloidal", precio:58853337 },
       { modelo:"SF/H14 M3 RE-CUT 1 EJE",desc:"Mixer horiz. 14m3 – 1 eje – Reductor + CUTER", precio:58051731 },
@@ -430,6 +434,8 @@ const PRODUCTOS = [
       { modelo:"SF/H16 M3 RE 2 EJES",  desc:"Mixer horiz. 16m3 – 2 ejes – Reductor epicicloidal", precio:71368721 },
       { modelo:"SF/H16 M3 RE-CUT 1 EJE",desc:"Mixer horiz. 16m3 – 1 eje – Reductor + CUTER", precio:69429354 },
       { modelo:"SF/H16 M3 RE-CUT 2 EJES",desc:"Mixer horiz. 16m3 – 2 ejes – Reductor + CUTER", precio:72638361 },
+      { modelo:"SF/H16 M3 RE 1 EJE – DOBLE DESCARGA", desc:"Mixer horiz. 16m3 – 1 eje – Reductor epicicloidal – DOBLE DESCARGA: batea lateral + tubo sinfín Ø194 × 6 m hidráulico – p/concentrado y secos (no apto silo picado)", precio:72297600 },
+      { modelo:"SF/H16 M3 RE 1 EJE – DESCARGA X TUBO", desc:"Mixer horiz. 16m3 – 1 eje – Reductor epicicloidal – DESCARGA POR TUBO: sinfín Ø194 × 6 m hidráulico, sin batea – p/concentrado y secos (no apto silo picado)", precio:69700000 },
       { modelo:"MV6/1 Mixer Vertical",  desc:"Mixer vertical 6m3 – 1 eje", precio:33590913 },
       { modelo:"MV10/1 Mixer Vertical", desc:"Mixer vertical 10m3 – 1 eje", precio:43325381 },
       { modelo:"MV14/1 Mixer Vertical", desc:"Mixer vertical 14m3 – 1 eje – Draper T80", precio:52280218 },
@@ -1409,49 +1415,49 @@ const BALANZAS_COMOFRA = {
     {desc:"Hook AT-455 45.000L 2ejes",precio:7471500}
   ],
   mixer_h_balancin:[
-    {desc:"Magris MX-8M Mix.H 6/10m3 balancin",precio:5176000},
-    {desc:"Magris Mass-68 Mix.H 6/10m3 balancin",precio:6326000},
+    {desc:"Magris MX-8M Mix.H 6/10m3 balancin",precio:5439000},
+    {desc:"Magris Mass-68 Mix.H 6/10m3 balancin",precio:6659000},
     {desc:"Hook AT-150 Mix.H H6/H10m3 balancin",precio:5192000},
     {desc:"Hook AT-456 Mix.H H6/H10m3 balancin",precio:5400500}
   ],
   mixer_h10_1eje:[
-    {desc:"Magris MX-8M Mix.H 10m3 1eje",precio:5176000},
-    {desc:"Magris Mass-68 Mix.H 10m3 1eje",precio:6326000},
+    {desc:"Magris MX-8M Mix.H 10m3 1eje",precio:5439000},
+    {desc:"Magris Mass-68 Mix.H 10m3 1eje",precio:6659000},
     {desc:"Hook AT-150 Mix.H H10m3 1eje",precio:5192000},
     {desc:"Hook AT-456 Mix.H H10m3 1eje",precio:5400500}
   ],
   mixer_h14_1eje:[
-    {desc:"Magris MX-8M Mix.H 14/16m3 1eje",precio:6239000},
-    {desc:"Magris Mass-68 Mix.H 14/16m3 1eje",precio:8584000},
+    {desc:"Magris MX-8M Mix.H 14/16m3 1eje",precio:6555000},
+    {desc:"Magris Mass-68 Mix.H 14/16m3 1eje",precio:7775000},
     {desc:"Hook ST-456 Mix.H 14/16m3 1eje",precio:5342000}
   ],
   mixer_h14_balancin:[
-    {desc:"Magris MX-8M Mix.H 14m3 balancin",precio:6239000},
-    {desc:"Magris Mass-68 Mix.H 14m3 balancin",precio:8200000},
+    {desc:"Magris MX-8M Mix.H 14m3 balancin",precio:6555000},
+    {desc:"Magris Mass-68 Mix.H 14m3 balancin",precio:7775000},
     {desc:"Hook ST-456 Mix.H 14m3 balancin",precio:5342000}
   ],
   mixer_h16_1eje:[
-    {desc:"Magris MX-8M Mix.H 16m3 1eje",precio:6239000},
-    {desc:"Magris Mass-68 Mix.H 16m3 1eje",precio:8584000},
+    {desc:"Magris MX-8M Mix.H 16m3 1eje",precio:6555000},
+    {desc:"Magris Mass-68 Mix.H 16m3 1eje",precio:7775000},
     {desc:"Hook ST-456 Mix.H 16m3 1eje",precio:5342000}
   ],
   mixer_h16_2ejes:[
-    {desc:"Magris MX-8M Mix.H 2ejes",precio:7434000},
-    {desc:"Magris Mass-68 Mix.H 2ejes",precio:8200000}
+    {desc:"Magris MX-8M Mix.H 2ejes",precio:7810000},
+    {desc:"Magris Mass-68 Mix.H 2ejes",precio:9030000}
   ],
   mixer_v_1eje:[
-    {desc:"Magris MX-8M Mix.V 6m3",precio:5176000},
-    {desc:"Magris MX-8M Mix.V 10/14m3",precio:5617000},
-    {desc:"Magris Mass-68 Mix.V 6m3",precio:6326000},
-    {desc:"Magris Mass-68 Mix.V 10/14m3",precio:6767000},
+    {desc:"Magris MX-8M Mix.V 6m3",precio:5439000},
+    {desc:"Magris MX-8M Mix.V 10/14m3",precio:5902000},
+    {desc:"Magris Mass-68 Mix.V 6m3",precio:6659000},
+    {desc:"Magris Mass-68 Mix.V 10/14m3",precio:7122000},
     {desc:"Hook AT-150 Mix.V MV10/MV14",precio:6646000},
     {desc:"Hook AT-456 Mix.V MV10/MV14",precio:6354500},
     {desc:"Vesta 3530 Mix.V MV10/MV14",precio:5872000},
     {desc:"Vesta 3535 Mix.V MV10/MV14",precio:6397000}
   ],
   mixer_v25:[
-    {desc:"Magris MX-8M Mix.V 21/25m3",precio:6267000},
-    {desc:"Magris Mass-68 Mix.V 21/25m3",precio:7417000}
+    {desc:"Magris MX-8M Mix.V 21/25m3",precio:6585000},
+    {desc:"Magris Mass-68 Mix.V 21/25m3",precio:7805000}
   ]
 };
 
