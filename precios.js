@@ -1390,27 +1390,28 @@ const CUBIERTAS_COMOFRA = {
 
 const BALANZAS_COMOFRA = {
   autodesc_1eje:[
-    {desc:"Magris MTV-206 17.500/21.500L 1eje",precio:5394000},
-    {desc:"Magris MTV-207A 17.500/21.500L 1eje",precio:5684000},
-    {desc:"Magris MTV-306 17.500/21.500L 1eje",precio:6581000},
+    {desc:"Magris MTV-206 17.500/21.500L 1eje",precio:6032000},
+    {desc:"Magris MTV-207A 17.500L 1eje",precio:7115000},
+    {desc:"Magris MTV-207A 21.500L 1eje",precio:6342000},
+    {desc:"Magris MTV-306 17.500/21.500L 1eje",precio:6932000},
     {desc:"Hook ST-108 17.500/21.500L 1eje",precio:5637000},
     {desc:"Hook AT-455 17.500/21.500L 1eje",precio:5845500},
     {desc:"Vesta 3520 Basico 17.500/21.500L 1eje",precio:5235000},
     {desc:"Vesta 3525 17.500/21.500L 1eje",precio:5610000}
   ],
   autodesc_2ejes:[
-    {desc:"Magris MTV-206 26/30/35/38.000L 2ejes",precio:6638000},
-    {desc:"Magris MTV-207A 26/30/35/38.000L 2ejes",precio:6928000},
-    {desc:"Magris MTV-306 26/30/35/38.000L 2ejes",precio:7478000},
+    {desc:"Magris MTV-206 26/30/35/38.000L 2ejes",precio:6975000},
+    {desc:"Magris MTV-207A 26/30/35/38.000L 2ejes",precio:6975000},
+    {desc:"Magris MTV-306 26/30/35/38.000L 2ejes",precio:7875000},
     {desc:"Hook ST-108 26/30/35/38.000L 2ejes",precio:6777000},
     {desc:"Hook AT-455 26/30/35/38.000L 2ejes",precio:6985500},
     {desc:"Vesta 3520 26/30/35/38.000L 2ejes",precio:7113000},
     {desc:"Vesta 3525 26/30/35/38.000L 2ejes",precio:7428000}
   ],
   autodesc_45:[
-    {desc:"Magris MTV-206 45.000L 2ejes",precio:8186000},
-    {desc:"Magris MTV-207A 45.000L 2ejes",precio:8476000},
-    {desc:"Magris MTV-306 45.000L 2ejes",precio:9026000},
+    {desc:"Magris MTV-206 45.000L 2ejes",precio:8601000},
+    {desc:"Magris MTV-207A 45.000L 2ejes",precio:8911000},
+    {desc:"Magris MTV-306 45.000L 2ejes",precio:9501000},
     {desc:"Hook ST-108 45.000L 2ejes",precio:7276500},
     {desc:"Hook AT-455 45.000L 2ejes",precio:7471500}
   ],
