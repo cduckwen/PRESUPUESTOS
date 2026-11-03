@@ -665,6 +665,13 @@ function tipoComofra(m) {
   return null;
 }
 
+// COMOFRA: si no se eligió cubierta para el equipo, "Ruedas X" sale como "Llantas para ruedas X"
+function _descRuedas(item, desc){
+  desc = desc || "";
+  if (!item || item.marca !== "COMOFRA" || !/\bRuedas\s/.test(desc)) return desc;
+  const conCub = presupuesto.some(function(x){ return x.esOpcional && /^Cubierta/.test(x.modelo) && x.desc && x.desc.indexOf("p/"+item.modelo) >= 0; });
+  return conCub ? desc : desc.replace(/\bRuedas\s/, "Llantas para ruedas ");
+}
 function mostrarOpcionalesPanel(itemId) {
   itemId = Number(itemId);
   const item = presupuesto.find(function(x){return x.id===itemId;});
@@ -1923,7 +1930,7 @@ function copiarWhatsApp() {
       // Agregar timones DOLBI al final de la desc
       const timonesOpc = presupuesto.filter(function(i){ return i.esOpcional && i.marca==="DOLBI" && /Timón/.test(i.modelo); });
       const timonesStr = timonesOpc.length > 0 ? " + " + timonesOpc.reduce(function(s,t){return s+t.qty;},0) + " Timones" : "";
-      let descWASingle = item.desc || "";
+      let descWASingle = _descRuedas(item, item.desc);
       if (item.marca==="DOLBI" && /^PD/.test(item.modelo)) {
         descWASingle = descWASingle.replace(/^(\d+)/, function(m){ return "De " + (parseInt(m)/100); });
       }
@@ -1969,7 +1976,7 @@ function copiarWhatsApp() {
           const timsStr2 = (item.marca==="DOLBI" && /^PD/.test(item.modelo) && timsOpc2.length>0)
             ? " + " + timsOpc2.reduce(function(s,t){return s+t.qty;},0) + " Timones" : "";
           // PD DOLBI: "600 timones curvos" → "De 6 timones curvos"
-          let descWA = item.desc || "";
+          let descWA = _descRuedas(item, item.desc);
           if (item.marca==="DOLBI" && /^PD/.test(item.modelo)) {
             descWA = descWA.replace(/^(\d+)/, function(m){ return "De " + (parseInt(m)/100); });
           }
