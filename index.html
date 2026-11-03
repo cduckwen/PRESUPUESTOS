@@ -605,6 +605,9 @@ function obtenerFlete(marca, modelo, desc) {
   if (marca === "RICHIGER" && /^BC/.test(modelo)) return { costo: null, pct: 10, moneda: "Pesos", esPct: true };
   // COMOFRA: diferenciar autdescargable vs embolsadora
   if (marca === "COMOFRA") {
+    if (typeof FLETES_COMOFRA !== "undefined") {
+      for (var _i = 0; _i < FLETES_COMOFRA.length; _i++) if (FLETES_COMOFRA[_i][0].test(modelo)) return { costo: FLETES_COMOFRA[_i][1], moneda: "USD" };
+    }
     const esEmbolsadora = /embolsadora/i.test(modelo) || /embolsadora/i.test(desc);
     return esEmbolsadora ? FLETES["COMOFRA_EMBOLSADORA"] : FLETES["COMOFRA_AUTDESCARGABLE"];
   }

@@ -1271,7 +1271,7 @@ const FLETES = {
   "BAIMA":     { costo: 1100, moneda: "USD" },
   "DOLBI":     { costo: 1430, moneda: "USD" },
   "SODE_900": { costo: 1035, moneda: "USD" },
-  // COMOFRA: diferenciado por modelo
+  // COMOFRA: por modelo, ver FLETES_COMOFRA (camión completo Monte Buey ≈ USD 2.310 ÷ equipos por camión)
   "COMOFRA_AUTDESCARGABLE": { costo: 1155, moneda: "USD" },
   "COMOFRA_EMBOLSADORA":    { costo: 550,  moneda: "USD" },
   "COMOFRA_OTROS":          { costo: 935,  moneda: "USD" },
@@ -1652,3 +1652,20 @@ const CONESE_SEL_OPC = {
   luces_led:    { label:"Luces LED", usd:261, grupo:"luces" }
 };
 
+
+// Flete COMOFRA por modelo (USD sin IVA, puesto en sucursal). Primer patrón que coincide con el modelo. Acordado con Charlie 03/11/2026.
+const FLETES_COMOFRA = [
+  [/TA-45/,                    2000], // autodescargable grande: 1 por camión
+  [/^TA-/,                     1155], // autodescargables TA-17,5 a TA-38: 2 por camión
+  [/MVD21|MV25/,               1155], // mixer vertical grande
+  [/MV14/,                     1155], // mixer vertical 14
+  [/MV6|MV10/,                  770], // mixer vertical chico: 3 por camión
+  [/SF\/H14|SF\/H16/,          1155], // mixer horizontal 14-16: 2 por camión
+  [/SF\/H6|SF\/H10/,            770], // mixer horizontal 6-10: 3 por camión
+  [/ATF/,                      1155], // tolvas semilleras (12000, 17500 y 26000)
+  [/BV-04|BV-05/,               578], // bateas chicas: 4 por camión
+  [/BV-15/,                    2310], // batea grande: 1 por camión
+  [/BV-/,                      1155], // bateas 7,5 y 9,5: 2 por camión
+  [/Embolsadora|E-09/i,         550], // embolsadora
+  [/ATAM|ACIS/,                 770], // acoplado rural y tanques: 3 por camión
+];
