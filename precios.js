@@ -628,7 +628,7 @@ const PRODUCTOS = [
 
   // ─── GROSSPAL ─────────────────────────────────────────────
   { marca:"GROSSPAL", lista:"V-2025", vigencia:"04/08/2025", moneda:"USD", conIVA:false, tcFabrica:1150, // lista siempre en USD; Grosspal factura con TC propio $1.150 (avisan cuando cambia)
-    condiciones:"Op.1 (0-30-60 dias): -10%-5%. Op.2 (0-30-60-90-120): -10%. Op.3 (0-30-60-90-120-150): -5%. Op.4 (0-30-60-90-120-150-180): Neto.",
+    condiciones:"Op.1 Contado (0-30 dias): -10%-5%. Op.2 (0-30-60-90): -10%. Op.3 (0-30-60-90-120): -5%. Op.4 (0-30-60-90-120-150): Neto. Credito bancario (Bco. Cordoba y Bco. Nacion): solo -10%; Bco. Macro sujeto al credito otorgado; creditos en dolares consultar.",
     items:[
       // PASTURAS – DESMALEZADORAS
       { modelo:"DAV5000",    desc:"Desmalezadora Articulada de Arrastre", precio:28667 },
@@ -646,6 +646,8 @@ const PRODUCTOS = [
       { modelo:"3pVG200",    desc:"Desmalezadora para Tres Puntos", precio:4814 },
       { modelo:"3pVG150",    desc:"Desmalezadora para Tres Puntos", precio:4222 },
       { modelo:"3pVG120",    desc:"Desmalezadora para Tres Puntos", precio:3842 },
+      { modelo:"Cespera 1,20",  desc:"Desmalezadora Cespera - Parquera de 1,20 m", precio:3220 },
+      { modelo:"Cespera 1,50",  desc:"Desmalezadora Cespera - Parquera de 1,50 m", precio:3440 },
       // PASTURAS – RASTRILLOS
       { modelo:"REV16000",   desc:"Rastrillo Estelar con rodamientos", precio:28700 },
       { modelo:"REV18000",   desc:"Rastrillo Estelar con rodamientos", precio:30320 },

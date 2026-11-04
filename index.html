@@ -623,7 +623,7 @@ function obtenerFlete(marca, modelo, desc) {
   }
   // GROSSPAL desmalezadoras (línea pasturas)
   if (marca === "GROSSPAL") {
-    const esDesmale = /desmalezadora|DAV|AVF|VG421|VG420|VG320|VG300|AVG|3pVG/i.test(modelo);
+    const esDesmale = /desmalezadora|DAV|AVF|VG421|VG420|VG320|VG300|AVG|3pVG|Cespera/i.test(modelo);
     return esDesmale ? FLETES["DESMALEZADORA"] : null;
   }
   return FLETES[marca] || null;
