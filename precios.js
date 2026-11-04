@@ -384,7 +384,7 @@ const PRODUCTOS = [
 
   // ─── DOLBI ────────────────────────────────────────────────
   { marca:"DOLBI", lista:"N°184/26", vigencia:"agosto 2026", moneda:"USD", conIVA:false,
-    condiciones:"Contado (0-30): -12%. Pago 0-30-60-90: -10%. Pago 0-30-60-90-120-150-180: -5%. Pago 12 valores (0-330 dias): Neto. Creditos convenios bancos: -2% sobre lo otorgado por el banco (excepto Bco. Nacion en dolares). Bco. Nacion en dolares: -10% sin convenio banco.",
+    condiciones:"Contado (0-30): -12%. Pago 0-30-60-90: -10%. Pago 0-30-60-90-120-150-180: -5%. Pago 0-30-60-90-120-150-180-210-240-270: Neto. Creditos convenios bancos: -2% sobre lo otorgado por el banco (excepto Bco. Nacion en dolares). Bco. Nacion en dolares: -10% sin convenio banco.",
     items:[
       { modelo:"RG 4500",  desc:"Rolo Triturador 90cm – 3 rolos – 4,50m ancho", precio:21280 },
       { modelo:"RG 5250",  desc:"Rolo Triturador 90cm – 3 rolos – 5,25m ancho", precio:26334 },
