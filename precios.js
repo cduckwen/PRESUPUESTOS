@@ -1,24 +1,34 @@
 // precios.js — listas de precios del presupuestador Ferrero Implementos
 // Actualizar listas SOLO acá. La pantalla y la lógica están en index.html.
 // Accesorios opcionales IMPACAR (precios netos, IVA 21% aparte) — Lista N°109 abr-2026
-const IMPACAR_ACCESORIOS = [
-  { id:"imp_calefactor",  label:"Calefactor 4000 CAL",                                                precio:342000,   cant:1 },
+const IMPACAR_ACCESORIOS = [   // Lista N°111 (sept-26) — precios netos + IVA 21%
   { id:"imp_toldo",       label:"Toldo",                                                                precio:496011,   cant:1 },
-  { id:"imp_inodoro",     label:"Inodoro con depósito y cámara séptica",                                 precio:495000,   cant:1 },
-  { id:"imp_split",       label:"Split frío/calor 3200 frigorías inverter",                               precio:1550000,  cant:1 },
-  { id:"imp_solar160",    label:"Pantalla solar 160W + Regulador 30 AMP (instalación 12V)",               precio:410000,   cant:1 },
-  { id:"imp_cocina",      label:"Cocina con horno industrial",                                            precio:585800,   cant:1 },
-  { id:"imp_cajonera",    label:"Cajonera bajo cama (800x800x270) x4",                                    precio:322000,   cant:1 },
-  { id:"imp_banco",       label:"Banco despensero (1000x500x700)",                                        precio:172098,   cant:1 },
-  { id:"imp_solar220",    label:"Sist. solar 220 off-grid (inv. 3kVA – 4 paneles 485W – 2 bat. 100Ah litio)", precio:6755000, cant:1 },
-  { id:"imp_heladera220", label:"Heladera c/freezer eléctrica 220V cat. A++",                              precio:1699000,  cant:1 },
-  { id:"imp_tv",          label:"TV 32\" con DirecTV",                                                     precio:458000,   cant:1 },
-  { id:"imp_vanitory",    label:"Vanitory completo con espejo",                                            precio:283294,   cant:1 },
-  { id:"imp_mueble",      label:"Mueble 2 puertas c/estéreo Pioneer, parlantes y antena",                  precio:328220,   cant:1 },
-  { id:"imp_cortinas",    label:"Cortinas Roller Black Out (habitación y cocina)",                         precio:483600,   cant:1 },
-  { id:"imp_heladera12v", label:"Heladera c/freezer eléctrica 12V c/pantalla y regulador",                 precio:1690000,  cant:1 },
-  { id:"imp_mesa",        label:"Mesa de caño, melamina y terminaciones de aluminio",                      precio:218000,   cant:1 },
-  { id:"imp_caldera",     label:"Caldera 12V a gasoil",                                                    precio:718000,   cant:1 },
+  { id:"imp_calefactor",  label:"Calefactor 4000 CAL",                                                  precio:342000,   cant:1 },
+  { id:"imp_caldera",     label:"Caldera 12V a gasoil",                                                 precio:718000,   cant:1 },
+  { id:"imp_solar160",    label:"Pantalla solar 160W + Regulador 30 AMP (instalación 12V, sin batería)", precio:410000,   cant:1 },
+  { id:"imp_solar585",    label:"Pantalla solar 585W + inversor regulador 1.000W + 1 batería 200 A",     precio:1420000,  cant:1 },
+  { id:"imp_solar220",    label:"Sist. solar 220 off-grid (inv. 3 kVA – 4 paneles 585W – 1 bat. 100 litio)", precio:6755000, cant:1 },
+  { id:"imp_solar220g",   label:"Sist. solar 220 off-grid (inv. 5 kVA – 6 paneles 585W – 2 bat. 100 litio)", precio:8455000, cant:1 },
+  { id:"imp_inodoro",     label:"Inodoro con depósito y cámara séptica",                                precio:495000,   cant:1 },
+  { id:"imp_split",       label:"Split frío/calor 3200 frigorías inverter",                             precio:1250000,  cant:1 },
+  { id:"imp_cocina",      label:"Cocina con horno industrial",                                          precio:585800,   cant:1 },
+  { id:"imp_heladera220", label:"Heladera c/freezer eléctrica 220V cat. A++",                            precio:1699000,  cant:1 },
+  { id:"imp_heladera12v", label:"Heladera c/freezer 12V c/pantalla, regulador y batería 200 A",          precio:2470000,  cant:1 },
+  { id:"imp_tv",          label:"TV 32\" con DirecTV",                                                   precio:458000,   cant:1 },
+  { id:"imp_extractor",   label:"Extractor de 110 en cocina",                                           precio:189700,   cant:1 },
+  { id:"imp_mueble",      label:"Mueble 2 puertas c/estéreo Pioneer, parlantes y antena",                precio:328220,   cant:1 },
+  { id:"imp_vanitory",    label:"Vanitory completo con espejo",                                          precio:283294,   cant:1 },
+  { id:"imp_escobero",    label:"Mueble escobero",                                                       precio:221000,   cant:1 },
+  { id:"imp_cortinas",    label:"Cortinas Roller Black Out (habitación y cocina)",                       precio:483600,   cant:1 },
+  { id:"imp_mesa",        label:"Mesa de caño, melamina y terminaciones de aluminio",                    precio:278800,   cant:1 },
+  { id:"imp_cajonera",    label:"Cajonera bajo cama (800x800x270) x4",                                  precio:382000,   cant:1 },
+  { id:"imp_banco",       label:"Banco despensero (1000x500x700)",                                      precio:212098,   cant:1 },
+  { id:"imp_ejes3",       label:"Ejes x3 de 3\" maza 9/11 p/cub. alta flotación c/llantas 400-60 15,5",  precio:2140000,  cant:1 },
+  { id:"imp_bauleras",    label:"Bauleras exteriores de chapa plegada x2",                               precio:870000,   cant:1 },
+  { id:"imp_cub400",      label:"Cubierta 400/60-15,5 alta flotación (c/u)",                             precio:430000,   cant:1 },
+  { id:"imp_cub15",       label:"Cubierta rodado 15 de carga importada (c/u)",                           precio:155000,   cant:1 },
+  { id:"imp_cub14",       label:"Cubierta rodado 14 de carga importada (c/u)",                           precio:136000,   cant:1 },
+  { id:"imp_tanque",      label:"Tanque de agua extra 300 L",                                            precio:459000,   cant:1 },
 ];
 
 // Accesorios opcionales ROGRIV (precio neto, IVA 21% aparte) — Lista 01/10/2026
@@ -60,16 +70,16 @@ const SYL_OPC_SEMILLA_SIN_DUALES = SYL_CUBIERTAS;
 const PRODUCTOS = [
 
   // ─── IMPACAR ───────────────────────────────────────────────
-  { marca:"IMPACAR", lista:"N°109", vigencia:"abr-2026", moneda:"Pesos", conIVA:false, ivaRate:0.21,
+  { marca:"IMPACAR", lista:"N°111", vigencia:"sept-26", moneda:"Pesos", conIVA:false, ivaRate:0.21,
     condiciones:"Precios netos + IVA 21%. Flete USD 550 (puesto en sucursal), incluido en el precio con IVA. Cubiertas a cargo del cliente (elección de medida sin costo). Consultar condiciones de financiación con la fábrica.",
     items:[
-      { modelo:"Modelo N°1", desc:"Largo 4,50m / Ancho 2,60m / 2 Camas", precio:29982245, opcionales:IMPACAR_ACCESORIOS },
-      { modelo:"Modelo N°2", desc:"Largo 5,20m / Ancho 2,60m / 2-3 Camas", precio:35175453, opcionales:IMPACAR_ACCESORIOS },
-      { modelo:"Modelo N°3", desc:"Largo 6,10m / Ancho 2,60m / 2-3 Camas", precio:38297161, opcionales:IMPACAR_ACCESORIOS },
-      { modelo:"Modelo N°4", desc:"Largo 6,60m / Ancho 2,60m / 4 Camas", precio:40141000, opcionales:IMPACAR_ACCESORIOS },
-      { modelo:"Modelo N°5", desc:"Largo 7,60m / Ancho 2,60m / Opcional", precio:42165227, opcionales:IMPACAR_ACCESORIOS },
-      { modelo:"Modelo N°6", desc:"Largo 8,60m / Ancho 2,60m / Opcional", precio:43309593, opcionales:IMPACAR_ACCESORIOS },
-      { modelo:"Modelo N°7", desc:"Largo 9,60m / Ancho 2,60m / Opcional", precio:47566209, opcionales:IMPACAR_ACCESORIOS },
+      { modelo:"Modelo N°1", desc:"Largo 4,50m / Ancho 2,60m / 2 Camas", precio:32881712, opcionales:IMPACAR_ACCESORIOS },
+      { modelo:"Modelo N°2", desc:"Largo 5,20m / Ancho 2,60m / 2-3 Camas", precio:36230716, opcionales:IMPACAR_ACCESORIOS },
+      { modelo:"Modelo N°3", desc:"Largo 6,10m / Ancho 2,60m / 2-3 Camas", precio:39446075, opcionales:IMPACAR_ACCESORIOS },
+      { modelo:"Modelo N°4", desc:"Largo 6,60m / Ancho 2,60m / 4 Camas", precio:41345230, opcionales:IMPACAR_ACCESORIOS },
+      { modelo:"Modelo N°5", desc:"Largo 7,60m / Ancho 2,60m / Opcional", precio:44890620, opcionales:IMPACAR_ACCESORIOS },
+      { modelo:"Modelo N°6", desc:"Largo 8,60m / Ancho 2,60m / Opcional", precio:47608880, opcionales:IMPACAR_ACCESORIOS },
+      { modelo:"Modelo N°7", desc:"Largo 9,60m / Ancho 2,60m / Opcional", precio:54993195, opcionales:IMPACAR_ACCESORIOS },
     ]
   },
 
