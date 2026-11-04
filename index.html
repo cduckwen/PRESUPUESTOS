@@ -587,6 +587,7 @@
 </div>
 
 <script src="tc.js"></script>
+<script src="tasa.js"></script>
 <script src="precios.js"></script>
 <script src="privado.js"></script>
 <script>
@@ -3115,7 +3116,9 @@ function mostrarTab(t){
 }
 
 // ═══ Pestaña CHEQUES (con la clave de Gerencia): cuánto queda al vender los cheques en el mercado (MAV) ═══
-var _chq = {mon:'USD', monto:'', tc:'', n:12, d0:0, cada:30, tasa:27, com:1, contado:10, filas:null};
+var _chqMAV = (typeof TASA_MAV!=='undefined' && TASA_MAV && TASA_MAV.valor) ? TASA_MAV : {valor:27, fecha:''};
+var _chq = {mon:'USD', monto:'', tc:'', n:12, d0:0, cada:30, tasa:String(_chqMAV.valor).replace('.',','), margen:10, com:0, contado:10, filas:null};
+function _chqTasaUsada(){ return _chqPct(_chq.tasa)+_chqPct(_chq.margen); }
 function _chqNum(v){ return parseFloat(String(v==null?'':v).replace(/\./g,'').replace(',','.')) || 0; }
 function _chqPct(v){ return parseFloat(String(v==null?'':v).replace(',','.')) || 0; }
 function chqGenerar(){
@@ -3123,6 +3126,7 @@ function chqGenerar(){
   const totP = q.mon==='USD' ? m*tc : m;
   q.filas=[]; for(let i=0;i<n;i++) q.filas.push({d:(parseInt(q.d0)||0)+i*(parseInt(q.cada)||0), m:Math.round(totP/n)});
 }
+function _chqTasaTxt(){ const f=function(v){ return (Math.round(v*100)/100).toLocaleString('es-AR'); }; return 'Tasa usada: MAV '+f(_chqPct(_chq.tasa))+'% + '+f(_chqPct(_chq.margen))+' = '+f(_chqTasaUsada())+'% anual'; }
 function chqSet(k,v,regen){ _chq[k]=v; if(regen) chqGenerar(); renderCheques(k); }
 function chqFila(i,k,v){ if(!_chq.filas) return; _chq.filas[i][k]=k==='d'?(parseInt(v)||0):_chqNum(v); const r=document.getElementById('chqRes'); if(r) r.innerHTML=chqResultado(); }
 function chqAgregar(){ if(!_chq.filas) _chq.filas=[]; const u=_chq.filas[_chq.filas.length-1]; _chq.filas.push({d:u?u.d+30:0, m:u?u.m:0}); renderCheques(); }
@@ -3146,16 +3150,17 @@ function renderCheques(foco){
   h+=campo('Cantidad de cheques',inp('n','12',true));
   h+=campo('Primer cheque a (días)',inp('d0','0',true));
   h+=campo('Cada (días)',inp('cada','30',true));
-  h+=campo('Tasa venta MAV (% anual)',inp('tasa','27',false));
-  h+=campo('Comisiones (%)',inp('com','1',false));
+  h+=campo('Tasa MAV avalado (% anual)'+(_chqMAV.fecha?' · '+_chqMAV.fecha:''),inp('tasa',String(_chqMAV.valor),false));
+  h+=campo('Margen (+ puntos)',inp('margen','10',false));
+  h+=campo('Comisiones (%)',inp('com','0',false));
   h+=campo('Contado: descuento (%)',inp('contado','10',false));
-  h+='</div><div style="font-size:0.74rem;color:#777;margin-top:6px;">Tasa de referencia en <a href="https://mav-sa.com.ar/?no_cache=1" target="_blank" rel="noopener">mav-sa.com.ar</a> (Datos de mercado: avalado SGR suele ser la más baja; cheque directo depende del firmante). Cambiar monto, TC o plan regenera los cheques; abajo se pueden editar uno por uno.</div></div>';
+  h+='</div><div id="chqTasaUsada" style="font-size:0.85rem;font-weight:700;margin-top:8px;">'+_chqTasaTxt()+'</div><div style="font-size:0.74rem;color:#777;margin-top:6px;">La tasa MAV se actualiza sola cada día (Echeq avalado, promedio de plazos de 90 días o más). El margen cubre gastos, aval y suba de tasas; si sumás margen dejá Comisiones en 0. Tasa de referencia en <a href="https://mav-sa.com.ar/?no_cache=1" target="_blank" rel="noopener">mav-sa.com.ar</a> (Datos de mercado: avalado SGR suele ser la más baja; cheque directo depende del firmante). Cambiar monto, TC o plan regenera los cheques; abajo se pueden editar uno por uno.</div></div>';
   h+='<div id="chqRes">'+chqResultado()+'</div>';
   box.innerHTML=h;
   if(foco){ const e=document.getElementById('chq_'+foco); if(e){ try{ e.focus(); }catch(x){} } }
 }
 function chqCalc(){
-  const q=_chq, tasa=_chqPct(q.tasa)/100, com=_chqPct(q.com)/100, tc=_chqNum(q.tc), F=q.filas||[];
+  const q=_chq, tasa=_chqTasaUsada()/100, com=_chqPct(q.com)/100, tc=_chqNum(q.tc), F=q.filas||[];
   let tot=0, hoy=0, sd=0, sdm=0;
   const rows=F.map(function(f){ const vh=f.m/(1+tasa*Math.max(0,f.d)/365); tot+=f.m; hoy+=vh; sd+=f.d; sdm+=f.d*f.m; return {d:f.d,m:f.m,vh:vh}; });
   const neto=hoy*(1-com);
