@@ -1300,7 +1300,7 @@ function actualizarCondicionesDePago(marcaActiva) {
     const it = presupuesto.find(function(i){ return i.marca === marca && !i.esOpcional; });
     const cat = it && obj ? obj.items.find(function(x){ return x.modelo === it.modelo; }) : null;
     const cond = (it && it.cond) || (cat && cat.cond) || '';
-    if (it && cond) return { v: cond, t: marca + ' ' + it.modelo + ': ' + cond.replace(/^Pesos:\s*\*?\s*/,'').replace(/\n\*?\s*/g,' · ').replace(/^·\s*/,'') };
+    if (it && cond) return { v: cond, t: marca + ' ' + it.modelo + ': ' + _mzFechasTxt(cond).replace(/^Pesos:\s*\*?\s*/,'').replace(/\n\*?\s*/g,' · ').replace(/^·\s*/,'') };
     return null;
   };
   const recorta = function(t, n){ return t.length > n ? t.substring(0, n) + '...' : t; };
@@ -1822,7 +1822,7 @@ function copiarWhatsApp() {
   const asesor  = document.getElementById("asesorNombre").value.trim();
   const cliente = document.getElementById("clienteNombre").value.trim();
   const condSel = document.getElementById("selCondiciones");
-  const cond    = condSel && condSel.value !== "__custom__" ? condSel.value : "";
+  const cond    = _mzFechasTxt(condSel && condSel.value !== "__custom__" ? condSel.value : "");
   const obs     = document.getElementById("observaciones").value.trim();
   const fecha   = new Date().toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"});
   const tcWA    = getTipoCambio();
@@ -2873,11 +2873,13 @@ function _mzFecha(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.ge
 function _mzEtiquetaADate(et){
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   if (/^cdo$/i.test(et)) return hoy;
-  const m = /^(Ene|Jul)(\d{2})$/i.exec(et);
+  const m = /^(\d{1,2})?(Ene|Jul)(\d{2})$/i.exec(et);   // "Ene27" = 31/01/27 · "30Ene27" = 30/01/27
   if (!m) return null;
-  return new Date(2000+parseInt(m[2],10), m[1].toLowerCase()==='ene' ? 0 : 6, 31);
+  return new Date(2000+parseInt(m[3],10), m[2].toLowerCase()==='ene' ? 0 : 6, m[1] ? parseInt(m[1],10) : 31);
 }
 function _mzEtiquetaAFecha(et){ const d=_mzEtiquetaADate(et); return d ? _mzFecha(d) : et; }
+// "30Ene27" → "30/01/27" para mostrar
+function _mzFechasTxt(t){ return String(t).replace(/\b(\d{1,2})(Ene|Jul)(\d{2})\b/gi, function(a,d,m,y){ return d+'/'+(m.toLowerCase()==='ene'?'01':'07')+'/'+y; }); }
 // Parsea los planes desde el texto "cond" del item MAIZCO
 function parsearPlanesMaizco(cond){
   const planes = [];
@@ -2895,7 +2897,7 @@ function parsearPlanesMaizco(cond){
       const rec = m[1] ? +m[1] : 0;
       const cupo = !!m[2];
       const pagos = m[3].split(',').map(function(p){ const q=/(\d+)%\s*(\S+)/.exec(p.trim()); return q ? {pct:+q[1], et:q[2]} : null; }).filter(Boolean);
-      planes.push({tipo:'usd', moneda:'USD', label:'USD lista'+(rec?' +'+rec+'%':'')+(cupo?' · CUPO LIMITADO':'')+': '+m[3], rec:rec, cupo:cupo, pagos:pagos});
+      planes.push({tipo:'usd', moneda:'USD', label:'USD lista'+(rec?' +'+rec+'%':'')+(cupo?' · CUPO LIMITADO':'')+': '+_mzFechasTxt(m[3]), rec:rec, cupo:cupo, pagos:pagos});
     }
   });
   return planes;
