@@ -852,29 +852,29 @@ const PRODUCTOS = [
   },
 
   // ─── CONESE ────────────────────────────────────────────
-  { marca:"CONESE", lista:"N°96", vigencia:"23/10/2026", moneda:"Pesos", conIVA:false,
+  { marca:"CONESE", lista:"N°97", vigencia:"06/11/2026", moneda:"Pesos", conIVA:false,
     condiciones:"Contado (0-30 dias): -15% dto. 5 valores mensuales (0-120 dias): -5% dto. 8 cuotas mensuales (0-210 dias): NETO.",
     items:[
-      { modelo:"TA-2.0 Tanque 2.000 lts", desc:"2.000 lts, 2 ejes c/boca pasa-hombre - ll. simples 15 o 16", precio:9340000, cubiertasQty:true, selOpc:["bomba","cuentalitros","luces_com","luces_led"] },
-      { modelo:"TA-3.0 Tanque 3.000 lts", desc:"3.000 lts, 2 ejes c/boca pasa-hombre - ll. simples 15 o 16", precio:10190000, cubiertasQty:true, selOpc:["bomba","cuentalitros","luces_com","luces_led"] },
-      { modelo:"TCA3-2 Tanque 3.000 lts + Taller", desc:"3.000 lts + cajon herramientas + 2 bauleras 1m + Tanque FV FP 750 lts arriba - ll. duales 15-16 o simples 17", precio:18470000, cubiertasQty:true, selOpc:["bomba","cuentalitros","luces_com","luces_led"] },
-      { modelo:"TCA4-2 Tanque 4.000 lts + Taller", desc:"4.000 lts + cajon herramientas + 2 bauleras + Tanque FV FP 1.000 lts arriba - ll. 8,25x22,5 o duales 16 o alta flotacion", precio:23510000, cubiertasQty:true, selOpc:["luces_com","luces_led"] },
-      { modelo:"TCA5-2 Tanque 5.000 lts + Taller", desc:"5.000 lts + cajon herramientas + 2 bauleras 1,50m + Tanque FV FP 1.000 lts arriba - ll. 8,25x22,5 o duales 16 o alta flotacion", precio:26300000, cubiertasQty:true, selOpc:["luces_com","luces_led"], altaFlotacionQty:true },
-      { modelo:"TCA6-2 Tanque 6.000 lts + Taller", desc:"6.000 lts + cajon herramientas + 2 bauleras 1,50m + Tanque FV FP 1.000 lts arriba - ll. 8,25x22,5 o duales 16 o alta flotacion", precio:28610000, cubiertasQty:true, selOpc:["luces_com","luces_led"], altaFlotacionQty:true },
-      { modelo:"TT-1 Tanque 5.000 lts + Taller Rodante", desc:"5.000 lts + taller rodante + 2 tanques INOX 400 lts agua + bauleras - ll. duales 16 ctro gde o alta flotacion 400x60x15,1/2", precio:37280000,
+      { modelo:"TA-2.0 Tanque 2.000 lts", desc:"2.000 lts, 2 ejes c/boca pasa-hombre - ll. simples 15 o 16", precio:10000000, cubiertasQty:true, selOpc:["bomba","cuentalitros","luces_com","luces_led"] },
+      { modelo:"TA-3.0 Tanque 3.000 lts", desc:"3.000 lts, 2 ejes c/boca pasa-hombre - ll. simples 15 o 16", precio:10910000, cubiertasQty:true, selOpc:["bomba","cuentalitros","luces_com","luces_led"] },
+      { modelo:"TCA3-2 Tanque 3.000 lts + Taller", desc:"3.000 lts + cajon herramientas + 2 bauleras 1m + Tanque FV FP 750 lts arriba - ll. duales 15-16 o simples 17", precio:19770000, cubiertasQty:true, selOpc:["bomba","cuentalitros","luces_com","luces_led"] },
+      { modelo:"TCA4-2 Tanque 4.000 lts + Taller", desc:"4.000 lts + cajon herramientas + 2 bauleras + Tanque FV FP 1.000 lts arriba - ll. 8,25x22,5 o duales 16 o alta flotacion", precio:25160000, cubiertasQty:true, selOpc:["luces_com","luces_led"] },
+      { modelo:"TCA5-2 Tanque 5.000 lts + Taller", desc:"5.000 lts + cajon herramientas + 2 bauleras 1,50m + Tanque FV FP 1.000 lts arriba - ll. 8,25x22,5 o duales 16 o alta flotacion", precio:28150000, cubiertasQty:true, selOpc:["luces_com","luces_led"], altaFlotacionQty:true },
+      { modelo:"TCA6-2 Tanque 6.000 lts + Taller", desc:"6.000 lts + cajon herramientas + 2 bauleras 1,50m + Tanque FV FP 1.000 lts arriba - ll. 8,25x22,5 o duales 16 o alta flotacion", precio:30620000, cubiertasQty:true, selOpc:["luces_com","luces_led"], altaFlotacionQty:true },
+      { modelo:"TT-1 Tanque 5.000 lts + Taller Rodante", desc:"5.000 lts + taller rodante + 2 tanques INOX 400 lts agua + bauleras - ll. duales 16 ctro gde o alta flotacion 400x60x15,1/2", precio:39890000,
         cubiertasQty:true, altaFlotacionQty:true
       },
-      { modelo:"TT-2 Tanque 3.000 lts + Taller Rodante", desc:"3.000 lts + taller rodante + tanque INOX 500 lts agua + bauleras - ll. duales 16 ctro gde", precio:29820000,
+      { modelo:"TT-2 Tanque 3.000 lts + Taller Rodante", desc:"3.000 lts + taller rodante + tanque INOX 500 lts agua + bauleras - ll. duales 16 ctro gde", precio:31910000,
         cubiertasQty:true, selOpc:["bomba","cuentalitros"]
       },
       { modelo:"TRD-2 Taller Dron", desc:"4,60m largo x 1,90 ancho x 1,80 alto - divisorio, 5 puertas c/amortiguador, escalera, terraza y barandas pleg. - ll. simples 15 o 16 - sin cubiertas - Mixer Alemor MM-CM 500 lts: consultar",
-        precio:27670000,
+        precio:29610000,
         cubiertasQty:true,
         opcionales:[
-          { id:"trd2_tanque_inox", label:"Tanque 1.100 lts Acero Inoxidable 304 L2B (c/soporte grupo + banco)", precio:4530000, defecto:false },
-          { id:"trd2_tanque_plas", label:"Tanque 1.150 lts Plástico (c/soporte grupo + banco)", precio:2270000, defecto:false },
-          { id:"trd2_aparejo",     label:"Aparejo eléctrico c/carro p/Dron", precio:1850000, defecto:false },
-          { id:"trd2_tablero",     label:"Tablero eléctrico 220v c/reflectores, disyuntor, térmica, enchufes", precio:1580000, defecto:false }
+          { id:"trd2_tanque_inox", label:"Tanque 1.100 lts Acero Inoxidable 304 L2B (c/soporte grupo + banco)", precio:4850000, defecto:false },
+          { id:"trd2_tanque_plas", label:"Tanque 1.150 lts Plástico (c/soporte grupo + banco)", precio:2430000, defecto:false },
+          { id:"trd2_aparejo",     label:"Aparejo eléctrico c/carro p/Dron", precio:1980000, defecto:false },
+          { id:"trd2_tablero",     label:"Tablero eléctrico 220v c/reflectores, disyuntor, térmica, enchufes", precio:1700000, defecto:false }
         ]
       }
     ]
@@ -1331,17 +1331,17 @@ const NEU_CHALERO_VERTEBRADA = {
 };
 
 // ═══════════ Tablas complementarias (movidas desde index.html, 30/10/2026) ═══════════
-// Llantas CONESE (lista N°96). Lo que va entre paréntesis con "+$" sale como nota al pie del presupuesto (no suma al precio).
+// Llantas CONESE (lista N°97). Lo que va entre paréntesis con "+$" sale como nota al pie del presupuesto (no suma al precio).
 const LLANTAS_CONESE = {
-  "TA-2.0 Tanque 2.000 lts": "Simples 15 o 16 (+$680.000 duales 15 o 16) (+$460.000 simples 17 u 8x16) (+$380.000 portaauxilio y auxiliar)",
-  "TA-3.0 Tanque 3.000 lts": "Simples 15 o 16 (+$680.000 duales 15 o 16) (+$460.000 simples 17 u 8x16) (+$380.000 portaauxilio y auxiliar)",
-  "TCA3-2 Tanque 3.000 lts + Taller": "Duales 15-16 o simples 17 (+$3.010.000 duales 17, incluye masa grande, elásticos y guardabarros) (+$380.000 portaauxilio y auxiliar)",
-  "TCA4-2 Tanque 4.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)",
-  "TCA5-2 Tanque 5.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)",
-  "TCA6-2 Tanque 6.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)",
-  "TT-1 Tanque 5.000 lts + Taller Rodante": "Duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)",
+  "TA-2.0 Tanque 2.000 lts": "Simples 15 o 16 (+$730.000 duales 15 o 16) (+$500.000 simples 17 u 8x16) (+$410.000 portaauxilio y auxiliar)",
+  "TA-3.0 Tanque 3.000 lts": "Simples 15 o 16 (+$730.000 duales 15 o 16) (+$500.000 simples 17 u 8x16) (+$410.000 portaauxilio y auxiliar)",
+  "TCA3-2 Tanque 3.000 lts + Taller": "Duales 15-16 o simples 17 (+$3.230.000 duales 17, incluye masa grande, elásticos y guardabarros) (+$410.000 portaauxilio y auxiliar)",
+  "TCA4-2 Tanque 4.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.700.000 duales 17/18) (+$530.000 portaauxilio y auxiliar)",
+  "TCA5-2 Tanque 5.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.700.000 duales 17/18) (+$530.000 portaauxilio y auxiliar)",
+  "TCA6-2 Tanque 6.000 lts + Taller": "8,25x22,5 o duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.700.000 duales 17/18) (+$530.000 portaauxilio y auxiliar)",
+  "TT-1 Tanque 5.000 lts + Taller Rodante": "Duales 16 ctro gde o alta flotacion 400x60x15,1/2 (+$1.700.000 duales 17/18) (+$530.000 portaauxilio y auxiliar)",
   "TRD-2 Taller Dron": "Simples 15 o 16 - sin cubiertas",
-  "TT-2 Tanque 3.000 lts + Taller Rodante": "Duales 16 ctro gde (+$1.580.000 duales 17/18) (+$490.000 portaauxilio y auxiliar)"
+  "TT-2 Tanque 3.000 lts + Taller Rodante": "Duales 16 ctro gde (+$1.700.000 duales 17/18) (+$530.000 portaauxilio y auxiliar)"
 };
 
 const CUBIERTAS_COMOFRA = {
