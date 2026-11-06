@@ -1667,8 +1667,8 @@ const CONESE_ALTA_FLOTACION_USD = 345;
 const CONESE_SEL_OPC = {
   bomba:        { label:"Bomba Rossi p/gas-oil 50 lts/min (pico común, surtidor, filtro, 5 m manguera)", usd:1401 },
   cuentalitros: { label:"Cuentalitros 3 dígitos (Piusi)", usd:554 },
-  luces_com:    { label:"Luces comunes", usd:137, grupo:"luces" },
-  luces_led:    { label:"Luces LED", usd:261, grupo:"luces" }
+  luces_com:    { label:"Luces comunes", usd:183, grupo:"luces" },
+  luces_led:    { label:"Luces LED", usd:343, grupo:"luces" }
 };
 
 
