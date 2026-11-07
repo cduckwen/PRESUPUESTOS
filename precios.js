@@ -867,14 +867,15 @@ const PRODUCTOS = [
       { modelo:"TT-2 Tanque 3.000 lts + Taller Rodante", desc:"3.000 lts + taller rodante + tanque INOX 500 lts agua + bauleras - ll. duales 16 ctro gde", precio:31910000,
         cubiertasQty:true, selOpc:["bomba","cuentalitros"]
       },
-      { modelo:"TRD-2 Taller Dron", desc:"4,60m largo x 1,90 ancho x 1,80 alto - divisorio, 5 puertas c/amortiguador, escalera, terraza y barandas pleg. - ll. simples 15 o 16 - sin cubiertas - Mixer Alemor MM-CM 500 lts: consultar",
+      { modelo:"TRD-2 Taller Dron", desc:"4,60m largo x 1,90 ancho x 1,80 alto - divisorio, 5 puertas c/amortiguador, escalera, terraza y barandas pleg. - ll. simples 15 o 16 - sin cubiertas",
         precio:29610000,
         cubiertasQty:true,
         opcionales:[
           { id:"trd2_tanque_inox", label:"Tanque 1.100 lts Acero Inoxidable 304 L2B (c/soporte grupo + banco)", precio:4850000, defecto:false },
           { id:"trd2_tanque_plas", label:"Tanque 1.150 lts Plástico (c/soporte grupo + banco)", precio:2430000, defecto:false },
           { id:"trd2_aparejo",     label:"Aparejo eléctrico c/carro p/Dron", precio:1980000, defecto:false },
-          { id:"trd2_tablero",     label:"Tablero eléctrico 220v c/reflectores, disyuntor, térmica, enchufes", precio:1700000, defecto:false }
+          { id:"trd2_tablero",     label:"Tablero eléctrico 220v c/reflectores, disyuntor, térmica, enchufes", precio:1700000, defecto:false },
+          { id:"trd2_mixer",       label:"Mixer Alemor MM-CM 500 lts INSTALADO c/conexiones al tanque agua", precioUSD:7810, defecto:false }   // sin precio en LP97: último precio $12.260.000 ÷ TC 1.570 (07/11/2026)
         ]
       }
     ]
