@@ -1662,6 +1662,7 @@ const ATF_OPCIONES_DESCARGA = {
 };
 
 const CONESE_CUBIERTA_USD = 145; // cubierta radial, USD c/u IVA incl.
+const CONESE_CUBIERTA_AGRO_USD = 120; // cubierta agrícola c/cámara, vel. máx. 60 km/h, USD c/u IVA incl.
 
 const CONESE_ALTA_FLOTACION_USD = 345;
 

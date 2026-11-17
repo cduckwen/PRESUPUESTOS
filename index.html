@@ -2740,13 +2740,17 @@ function mostrarOpcionalesCONESE(itemId) {
     });
   }
   if (itemDef.cubiertasQty) {
-    const yaAgregadoCub = presupuesto.some(function(i){ return i.esOpcional && i.esCubiertaCONESE && i.desc && i.desc.includes(item.modelo); });
-    const precioCubFmt = "USD " + CONESE_CUBIERTA_USD + " c/u IVA incl." + (tcConese ? " (≈ $" + Math.round(CONESE_CUBIERTA_USD * tcConese).toLocaleString("es-AR") + " c/u)" : "");
+    const cubAgregada = presupuesto.find(function(i){ return i.esOpcional && i.esCubiertaCONESE && i.desc && i.desc.includes(item.modelo); });
+    const fmtCub = function(u){ return "USD " + u + " c/u IVA incl." + (tcConese ? " (\u2248 $" + Math.round(u * tcConese).toLocaleString("es-AR") + " c/u)" : ""); };
     html += "<div style=\"margin-top:8px;padding-top:8px;border-top:1px solid #ddd;\">";
-    html += "<label style=\"display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px;\">Cubiertas radiales <span style=\"font-weight:400;color:#888;\">(" + precioCubFmt + ")</span></label>";
-    if (yaAgregadoCub) {
-      html += "<span style=\"color:green;font-size:0.8rem;\">\u2713 agregado</span>";
+    html += "<label style=\"display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px;\">Cubiertas</label>";
+    if (cubAgregada) {
+      html += "<span style=\"color:green;font-size:0.8rem;\">\u2713 agregado: " + cubAgregada.modelo + "</span>";
     } else {
+      html += "<select id=\"cubTipoCONESE-" + itemId + "\" style=\"font-size:0.85rem;padding:2px 4px;margin-bottom:6px;max-width:100%;\">" +
+        "<option value=\"radial\">Radial \u2013 " + fmtCub(CONESE_CUBIERTA_USD) + "</option>" +
+        "<option value=\"agro\">Agr\u00edcola c/c\u00e1mara, vel. m\u00e1x. 60 km/h \u2013 " + fmtCub(CONESE_CUBIERTA_AGRO_USD) + "</option>" +
+        "</select><br>";
       html += "<span style=\"font-size:0.85rem;\">Cantidad: <input type=\"number\" id=\"cubQtyCONESE-" + itemId + "\" value=\"4\" min=\"0\" style=\"width:56px;padding:2px 4px;margin:0 8px;\"> " +
         "<button class=\"btn-opcionales\" onclick=\"agregarCubiertasCONESE(" + itemId + ")\">+ Agregar cubiertas</button></span>";
     }
@@ -2798,13 +2802,16 @@ function agregarCubiertasCONESE(itemId) {
   if (qty === 0) return;
   const tc = getTipoCambio();
   if (!tc) { alert("Cargá el Tipo de Cambio antes de agregar las cubiertas."); return; }
-  const precioFinal = Math.round(qty * CONESE_CUBIERTA_USD * tc);
+  const tipoEl = document.getElementById("cubTipoCONESE-" + itemId);
+  const agro = tipoEl && tipoEl.value === "agro";
+  const usd = agro ? CONESE_CUBIERTA_AGRO_USD : CONESE_CUBIERTA_USD;
+  const nombre = agro ? (qty > 1 ? "s agrícolas c/cámara (vel. máx. 60 km/h)" : " agrícola c/cámara (vel. máx. 60 km/h)") : (qty > 1 ? "s radiales" : " radial");
   presupuesto.push({
     marca: "CONESE", lista: item.lista, vigencia: item.vigencia,
     moneda: "Pesos", conIVA: false,
-    modelo: qty + " Cubierta" + (qty > 1 ? "s radiales" : " radial"),
-    desc: "Opcional p/" + item.modelo + " – USD " + CONESE_CUBIERTA_USD + " c/u (IVA incl.) al TC del día",
-    precio: precioFinal, qty: 1, esOpcional: true, esCubiertaCONESE: true, conIVA: true, ivaOpcional: 0.105,
+    modelo: qty + " Cubierta" + nombre,
+    desc: "Opcional p/" + item.modelo + " – USD " + usd + " c/u (IVA incl.) al TC del día",
+    precio: Math.round(qty * usd * tc), qty: 1, esOpcional: true, esCubiertaCONESE: true, conIVA: true, ivaOpcional: 0.105,
     id: Date.now() + Math.random()
   });
   renderPresupuesto();
