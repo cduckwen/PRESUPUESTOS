@@ -1661,7 +1661,7 @@ const ATF_OPCIONES_DESCARGA = {
   "ATF 26000": { sinfin: 45610169, noria: 51858000, sintubo: 43110000 }
 };
 
-const CONESE_CUBIERTA_USD = 130;
+const CONESE_CUBIERTA_USD = 145; // cubierta radial, USD c/u IVA incl.
 
 const CONESE_ALTA_FLOTACION_USD = 345;
 

@@ -2743,7 +2743,7 @@ function mostrarOpcionalesCONESE(itemId) {
     const yaAgregadoCub = presupuesto.some(function(i){ return i.esOpcional && i.esCubiertaCONESE && i.desc && i.desc.includes(item.modelo); });
     const precioCubFmt = "USD " + CONESE_CUBIERTA_USD + " c/u IVA incl." + (tcConese ? " (≈ $" + Math.round(CONESE_CUBIERTA_USD * tcConese).toLocaleString("es-AR") + " c/u)" : "");
     html += "<div style=\"margin-top:8px;padding-top:8px;border-top:1px solid #ddd;\">";
-    html += "<label style=\"display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px;\">Cubiertas <span style=\"font-weight:400;color:#888;\">(" + precioCubFmt + ")</span></label>";
+    html += "<label style=\"display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px;\">Cubiertas radiales <span style=\"font-weight:400;color:#888;\">(" + precioCubFmt + ")</span></label>";
     if (yaAgregadoCub) {
       html += "<span style=\"color:green;font-size:0.8rem;\">\u2713 agregado</span>";
     } else {
@@ -2802,7 +2802,7 @@ function agregarCubiertasCONESE(itemId) {
   presupuesto.push({
     marca: "CONESE", lista: item.lista, vigencia: item.vigencia,
     moneda: "Pesos", conIVA: false,
-    modelo: qty + " Cubierta" + (qty > 1 ? "s" : ""),
+    modelo: qty + " Cubierta" + (qty > 1 ? "s radiales" : " radial"),
     desc: "Opcional p/" + item.modelo + " – USD " + CONESE_CUBIERTA_USD + " c/u (IVA incl.) al TC del día",
     precio: precioFinal, qty: 1, esOpcional: true, esCubiertaCONESE: true, conIVA: true, ivaOpcional: 0.105,
     id: Date.now() + Math.random()
