@@ -212,7 +212,7 @@
         </div>
         <div class="asesor-row">
           <label>USD:</label>
-          <input type="number" id="tipoCambio" placeholder="Tipo de cambio" min="1" step="1" style="max-width:130px;" oninput="validarTC()" />
+          <input type="number" id="tipoCambio" placeholder="Tipo de cambio" min="1" step="1" style="max-width:130px;" oninput="validarTC(); if(typeof _hayTCFab==='function' && _hayTCFab()) renderPresupuesto();" />
           <span id="tcFuente" style="font-size:0.78rem;color:#888;">$ / USD</span>
         </div>
         <div id="tcAlerta" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:5px;padding:6px 10px;font-size:0.8rem;color:#856404;margin-top:4px;">
@@ -1353,20 +1353,22 @@ function mostrarPreview() {
   const fab = PRODUCTOS.find(p => p.marca === marca);
   const item = fab.items[parseInt(idx)];
 
-  const moneda = item.monedaItem || fab.moneda;
+  const tcfP = (fab.tcFabrica && (item.monedaItem || fab.moneda) === "USD") ? fab.tcFabrica : 0;
+  const moneda = tcfP ? "Pesos" : (item.monedaItem || fab.moneda);
+  const precioItemP = tcfP ? item.precio * tcfP : item.precio;
   const esConIva = fab.conIVA;
   const ivaRateP = item.ivaRate !== undefined ? item.ivaRate : (fab.ivaRate !== undefined ? fab.ivaRate : 0.105);
   const fObjP = obtenerFlete(fab.marca, item.modelo, item.desc||"");
-  let precioBase = item.precio;
+  let precioBase = precioItemP;
   let fleteExtraP = 0;
   if (fObjP) {
     if (fab.fleteSinIVA) {
       if (moneda === "USD") fleteExtraP = fObjP.costo;
       else { const tcP = getTipoCambio(); if (tcP) fleteExtraP = fObjP.costo * tcP; }
     } else if (moneda === "USD") {
-      precioBase = item.precio + fObjP.costo * (esConIva ? 1 + ivaRateP : 1);
+      precioBase = precioItemP + fObjP.costo * (esConIva ? 1 + ivaRateP : 1);
     } else {
-      const tcP = getTipoCambio(); if (tcP) precioBase = item.precio + fObjP.costo * tcP * (esConIva ? 1 + ivaRateP : 1);
+      const tcP = getTipoCambio(); if (tcP) precioBase = precioItemP + fObjP.costo * tcP * (esConIva ? 1 + ivaRateP : 1);
     }
   }
   const iva = esConIva ? precioBase * (ivaRateP*100/(100+ivaRateP*100)) : precioBase * ivaRateP;
@@ -1474,11 +1476,12 @@ function _ejecutarAgregarProducto(marca, idx, qty, tipoDescargaATF) {
   const fab = PRODUCTOS.find(p => p.marca === marca);
   const item = fab.items[idx];
 
-  const monedaEfectiva = item.monedaItem || fab.moneda;
+  const tcfA = (fab.tcFabrica && (item.monedaItem || fab.moneda) === "USD") ? fab.tcFabrica : 0;
+  const monedaEfectiva = tcfA ? "Pesos" : (item.monedaItem || fab.moneda);
   const fObj = obtenerFlete(fab.marca, item.modelo, item.desc||"");
 
   // ATF: aplicar precio según tipo de tubo de descarga elegido (sinfín/noria/sin tubo)
-  let precioBase = item.precio;
+  let precioBase = tcfA ? item.precio * tcfA : item.precio;
   let modeloFinal = item.modelo;
   let descFinal = item.desc;
   if (tipoDescargaATF === "noria" || tipoDescargaATF === "sintubo") {
@@ -1533,6 +1536,7 @@ function _ejecutarAgregarProducto(marca, idx, qty, tipoDescargaATF) {
       modelo: modeloFinal, desc: descFinal,
       precio: pFlete, flete: fleteExtra, qty, llantas,
       esDron: !!item.esDron,
+      _tcFab: tcfA || undefined,
       id: Date.now()
     });
   }
@@ -1702,7 +1706,29 @@ function quitarItem(id) {
   calcularDiferencia();
 }
 
+// ============================================================
+// TC DE FÁBRICA (Grosspal $1.150, S y L $1.550): el equipo y sus opcionales de fábrica se pasan a
+// pesos con el TC propio de la fábrica. Si hay alguno en el presupuesto, todo el presupuesto va en
+// pesos: el resto de los ítems en USD (otras marcas, cubiertas S y L) se pasa al TC oficial del día.
+// Los fletes siempre al TC oficial.
+// ============================================================
+function _tcFabDe(marca){ const f = PRODUCTOS.find(function(p){return p.marca===marca;}); return f && f.tcFabrica ? f.tcFabrica : 0; }
+function _hayTCFab(){ return presupuesto.some(function(i){ return i._tcFab; }); }
+function _normalizarTCFabrica(){
+  const tc = getTipoCambio();
+  const hay = _hayTCFab();
+  presupuesto.forEach(function(i){
+    if (i._tcFab) return;
+    if (i._usdOrig) { i.precio = i._usdOrig.precio; i.flete = i._usdOrig.flete; i.moneda = 'USD'; delete i._usdOrig; }
+    if (hay && i.moneda === 'USD' && tc) {
+      i._usdOrig = { precio: i.precio, flete: i.flete || 0 };
+      i.precio = i.precio * tc; i.flete = (i.flete || 0) * tc; i.moneda = 'Pesos';
+    }
+  });
+}
+
 function renderPresupuesto() {
+  _normalizarTCFabrica();
   const list = document.getElementById('itemsList');
   const empty = document.getElementById('emptyState');
   const totalBox = document.getElementById('totalBox');
@@ -1748,6 +1774,7 @@ function renderPresupuesto() {
           Base: ${fmt(base2 * item.qty)} · IVA: ${fmt(iva2 * item.qty)} · <strong>Total: ${fmt(total2 * item.qty)}</strong>
         </div>
         ${!item.esDron ? `<div style="margin-top:3px;font-size:0.72rem;color:#c05000;">📦 Producto a retirar de sucursal</div>` : ''}
+        ${item._tcFab ? `<div style="margin-top:3px;font-size:0.72rem;color:#1565c0;">💱 TC fábrica $${Math.round(item._tcFab).toLocaleString('es-AR')} (uso interno, no sale en el presupuesto)</div>` : (item._usdOrig ? `<div style="margin-top:3px;font-size:0.72rem;color:#1565c0;">💱 Pasado a pesos al TC oficial</div>` : '')}
         ${item.esDron ? `
         <div style="margin-top:8px;padding:8px;background:#f0f4ff;border-radius:6px;border:1px solid #b0c4e8;">
           <div style="font-size:0.78rem;font-weight:700;color:#1a4a8a;margin-bottom:5px;">🚁 Forma de pago:</div>
@@ -1796,7 +1823,7 @@ function renderPresupuesto() {
     const tcTB = getTipoCambio();
     const uRow = document.getElementById("totalUSDRow");
     if (uRow) {
-      if (todosPesos && tcTB) {
+      if (todosPesos && tcTB && !_hayTCFab()) {
         document.getElementById("totalUSD").textContent = "USD "+(totalSinIva/tcTB).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
         uRow.style.display = "flex";
       } else { uRow.style.display = "none"; }
@@ -1910,7 +1937,7 @@ function copiarWhatsApp() {
   const cuit = document.getElementById("clienteCuit") ? document.getElementById("clienteCuit").value.trim() : "";
   if (cuit) txt += "   CUIT: " + cuit + "\n";
   if (asesor) txt += "🧑 Asesor: " + asesor + "\n";
-  if (tcWA) txt += "💱 TC: $" + Math.round(tcWA).toLocaleString("es-AR") + " / USD\n";
+  if (tcWA && !_hayTCFab()) txt += "💱 TC: $" + Math.round(tcWA).toLocaleString("es-AR") + " / USD\n";
   txt += sep;
 
   // ── 1. NUEVOS DE LISTA ─────────────────────────────────────
@@ -1963,7 +1990,7 @@ function copiarWhatsApp() {
       }
       if (!ocultarLista) txt += "🆕 *Precio c/IVA: " + (item.moneda==="USD"
         ? fmt2(granTotalUSDcombinado)
-        : fmtP(granTotalPesos) + (tcWA ? " (USD " + granTotalUSDcombinado.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2}) + ")" : "")) + "*\n";
+        : fmtP(granTotalPesos) + (tcWA && !_hayTCFab() ? " (USD " + granTotalUSDcombinado.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2}) + ")" : "")) + "*\n";
     } else {
       let nPrinWA = 0;
       presupuesto.forEach(function(item, i) {
@@ -2007,7 +2034,9 @@ function copiarWhatsApp() {
         }
       });
       txt += sep;
-      const totalNuevoLabel = todosPesos && tcWA
+      const totalNuevoLabel = todosPesos && tcWA && _hayTCFab()
+        ? fmtP(granTotalPesos)
+        : todosPesos && tcWA
         ? fmtP(granTotalPesos) + " (USD " + granTotalUSDcombinado.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2}) + ")"
         : fmt2(granTotalUSDcombinado);
       if (!ocultarLista) txt += "🆕 *Nuevo c/IVA: " + totalNuevoLabel + "*\n";
@@ -2307,11 +2336,15 @@ function mostrarOpcionalesSYL(itemId) {
   panel.className = "opcionales-panel";
 
   let html = "<h4>⚙️ Opcionales S y L – " + item.modelo + "</h4>";
+  const tcfS = fab.tcFabrica || 0, tcOf = getTipoCambio();
   def.opcionales.forEach(function(opc) {
     const total = opc.precio * opc.cant;
+    const esCub = /^syl_cub/.test(opc.id);
+    const tcU = esCub ? tcOf : tcfS;
     html += "<div style='margin-bottom:8px;font-size:0.83rem;'>";
     html += "<strong>" + opc.label + "</strong><br>";
-    html += "USD " + total.toLocaleString("es-AR") + " + IVA";
+    html += tcU ? ("$ " + Math.round(total*tcU).toLocaleString("es-AR") + " + IVA <span style='color:#888'>(USD " + total.toLocaleString("es-AR") + " a TC " + (esCub ? "oficial" : "fábrica") + " $" + Math.round(tcU).toLocaleString("es-AR") + ")</span>")
+                : ("USD " + total.toLocaleString("es-AR") + " + IVA");
     html += "<br><button class='btn-opcionales' style='margin-top:4px;' onclick='agregarOpcionalSYL(" + itemId + ",\"" + opc.id + "\")'>+ Agregar</button>";
     html += "</div>";
   });
@@ -2330,13 +2363,18 @@ function agregarOpcionalSYL(itemId, opcId) {
   const opc  = def.opcionales.find(function(o){ return o.id === opcId; });
   if (!opc) return;
 
+  // Cubiertas: no las pone la fábrica -> TC oficial (quedan en USD y se pasan a pesos al TC del día).
+  // Resto de opcionales (duales, divisorio, lona, etc.): TC de fábrica.
+  const esCubS = /^syl_cub/.test(opc.id);
+  const tcfO = (!esCubS && fab.tcFabrica) ? fab.tcFabrica : 0;
   presupuesto.push({
     marca: item.marca, lista: item.lista, vigencia: item.vigencia,
-    moneda: fab.moneda, conIVA: false,
+    moneda: tcfO ? "Pesos" : fab.moneda, conIVA: false,
     modelo: opc.label,
     desc: "Opcional p/" + item.modelo,
-    precio: opc.precio * opc.cant, qty: 1,
+    precio: opc.precio * opc.cant * (tcfO || 1), qty: 1,
     esOpcional: true, ivaOpcional: 0.105,
+    _tcFab: tcfO || undefined,
     id: Date.now()
   });
 

@@ -344,7 +344,7 @@ const PRODUCTOS = [
   },
 
   // ─── S y L ────────────────────────────────────────────────
-  { marca:"S y L", lista:"S y L feb-2026", vigencia:"feb-2026", moneda:"USD", conIVA:false,
+  { marca:"S y L", lista:"S y L feb-2026", vigencia:"feb-2026", moneda:"USD", conIVA:false, tcFabrica:1550, // lista en USD; S y L factura con TC propio $1.550 (cubiertas al TC oficial)
     condiciones:"3 valores (0-30-60d): -10%. 9 valores (0-30-60-90-120-150-180-210-240d): -5%. Valores 0-360d: precio de lista (Neto).",
     items:[
       { modelo:"Tolva Silero 4 TN",  desc:"Chasis ref. ch.1/4 – tolva ch.12 – arcos p/lona – boquilla descarga – llantas 750x16 – sin lona, sin divisorio, sin chimango", precio:5300, opcionales:SYL_OPC_SILERO },
