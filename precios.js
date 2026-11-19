@@ -1345,6 +1345,9 @@ const LLANTAS_CONESE = {
   "TT-2 Tanque 3.000 lts + Taller Rodante": "Duales 16 ctro gde (+$1.700.000 duales 17/18) (+$530.000 portaauxilio y auxiliar)"
 };
 
+// ATF 17500: diferencia por pasar a ruedas duales (solo llantas, sin cubiertas) — Lista N°181 (vig. 01/09/2026), s/IVA + 10,5%
+const COMOFRA_ATF17500_DUALES = { codigo:"19905153", label:"Diferencia con ruedas duales (cód. 19905153) – solo llantas", precio:1960000 };
+
 const CUBIERTAS_COMOFRA = {
   autodesc_1eje:[
     {desc:"23:1x30 BKT 16T TA-17,5/21,5",precio:2285073,cant:2},

@@ -710,9 +710,30 @@ function mostrarOpcionalesPanel(itemId) {
     h += "</select><div class=\"opc-preview\" id=\"prev-cub-"+itemId+"\"></div>";
     h += "<button class=\"btn-add-opc\" id=\"btn-cub-"+itemId+"\" onclick=\"addOpc("+itemId+",true)\" disabled>+ Agregar cubiertas</button></div>";
   }
-  if (!bals.length && !cubs.length) h += "<div style=\"font-size:0.82rem;color:#888;\">Sin opcionales.</div>";
+  const esATF175 = /ATF 17500/.test(item.modelo) && typeof COMOFRA_ATF17500_DUALES !== "undefined";
+  if (esATF175) {
+    const d = COMOFRA_ATF17500_DUALES;
+    h += "<div class=\"opc-section\"><div class=\"opc-section-title\">Rodado duales (s/IVA + 10,5%)</div>";
+    h += "<div class=\"opc-preview\">"+d.label+": s/IVA $"+Math.round(d.precio).toLocaleString("es-AR")+" - c/IVA 10,5%: $"+Math.round(d.precio*1.105).toLocaleString("es-AR")+"<br>Con duales lleva 8 cubiertas: elegir las x8 en Cubiertas.</div>";
+    h += "<button class=\"btn-add-opc\" onclick=\"addDualesATF("+itemId+")\">+ Agregar duales</button></div>";
+  }
+  if (!bals.length && !cubs.length && !esATF175) h += "<div style=\"font-size:0.82rem;color:#888;\">Sin opcionales.</div>";
   panel.innerHTML = h;
   card.after(panel);
+}
+
+function addDualesATF(itemId) {
+  itemId = Number(itemId);
+  const item = presupuesto.find(function(x){return x.id===itemId;});
+  if (!item) return;
+  if (presupuesto.some(function(x){ return x.esDualesATF && x.parentId===itemId; })) { alert("Los duales ya están agregados a esta tolva."); return; }
+  const d = COMOFRA_ATF17500_DUALES;
+  presupuesto.push({marca:"COMOFRA",lista:item.lista,vigencia:item.vigencia,moneda:"Pesos",conIVA:false,
+    modelo:d.label,desc:"Opcional p/"+item.modelo,precio:d.precio,qty:item.qty||1,
+    esOpcional:true,ivaOpcional:0.105,esDualesATF:true,parentId:itemId,id:Date.now()});
+  const p = document.getElementById("opc-panel-"+itemId);
+  if (p) p.remove();
+  renderPresupuesto();
 }
 
 function prevOpc(sel, itemId, esCubierta) {
