@@ -1290,6 +1290,7 @@ const FLETES = {
   "BAIMA":     { costo: 1100, moneda: "USD" },
   "DOLBI":     { costo: 1430, moneda: "USD" },
   "SODE_900": { costo: 1035, moneda: "USD" },
+  "GROSSPAL_RCV1500": { costo: 1200, moneda: "USD" }, // rolo pata de cabra RCV 1500x1500, por unidad, + IVA, al TC oficial
   // COMOFRA: por modelo, ver FLETES_COMOFRA (camión completo Monte Buey ≈ USD 2.310 ÷ equipos por camión)
   "COMOFRA_AUTDESCARGABLE": { costo: 1155, moneda: "USD" },
   "COMOFRA_EMBOLSADORA":    { costo: 550,  moneda: "USD" },
