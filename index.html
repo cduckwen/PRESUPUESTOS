@@ -1818,6 +1818,7 @@ function renderPresupuesto() {
         ${item.marca === 'RICHIGER' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='RICHIGER'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesRICHIGER(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
         ${item.marca === 'ROGRIV' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='ROGRIV'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesROGRIV(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
         ${item.marca === 'S y L' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='S y L'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesSYL(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
+        ${item.marca === 'LE-CLER' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='LE-CLER'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; const nd=parseInt((item.modelo.match(/(\d+) discos/)||[])[1])||0; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalLecler(${item.id},${k})">⚙️ + ${o.label} (USD ${(o.porDisco?o.precio*nd:o.precio).toLocaleString('es-AR',{maximumFractionDigits:2})}${o.porDisco?' – '+nd+' discos':''}${o.porUnidad?' c/u':''} + IVA)</button>`).join('') + (!presupuesto.some(x=>x.parentId===item.id&&x.opcId==='lc_cub') ? `<div style="margin-top:6px;padding:8px;background:#f5f9f5;border:1px solid #cfe3cf;border-radius:6px;font-size:0.82rem;">🛞 La rastra sale sin cubiertas (al TC oficial):<br>Cant. <input type="number" id="lcCubQ-${item.id}" value="4" min="1" max="16" style="width:50px;"> · USD c/u + IVA <input type="text" inputmode="decimal" id="lcCubP-${item.id}" placeholder="ej. 250" style="width:70px;"> · IVA <select id="lcCubI-${item.id}"><option value="0.105">10,5%</option><option value="0.21">21%</option></select> <button class="btn-opcionales" style="margin-top:4px;" onclick="agregarCubiertasLecler(${item.id})">+ Agregar cubiertas</button></div>` : ''); })() : ''}
         ${item.marca === 'ACEPLA' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='ACEPLA'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalAcepla(${item.id},${k})">⚙️ + ${o.label} ($ ${o.precio.toLocaleString('es-AR')}${o.porMetro?' por metro':''}${o.porTimon?' por timón':''} + IVA)</button>`).join(''); })() : ''}
         ${item.marca === 'DOLBI' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='DOLBI'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; const tc=getTipoCambio(); return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalDolbi(${item.id},${k})">⚙️ + ${o.label} ($ ${o.precioARS.toLocaleString('es-AR')} + IVA ${Math.round(o.iva*1000)/10}%${tc?' ≈ USD '+Math.round(o.precioARS/tc).toLocaleString('es-AR'):''})</button>`).join(''); })() : ''}
         ${item.marca === 'GROSSPAL' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='GROSSPAL'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalGrosspal(${item.id},${k})">⚙️ + ${o.label.split(' – ')[0]} (USD ${o.precio.toLocaleString('es-AR')} + IVA ${Math.round((o.iva||0.105)*1000)/10}%)</button>`).join('') + (presupuesto.some(x=>x.parentId===item.id&&x.opcId==='gp_kit_pc') && !presupuesto.some(x=>x.parentId===item.id&&x.opcId==='gp_cub_kit') ? `<div style="margin-top:6px;padding:8px;background:#f5f9f5;border:1px solid #cfe3cf;border-radius:6px;font-size:0.82rem;">🛞 Cubiertas para el kit de transporte (al TC oficial):<br>Cant. <input type="number" id="gpCubQ-${item.id}" value="2" min="1" max="12" style="width:50px;"> · USD c/u + IVA <input type="text" inputmode="decimal" id="gpCubP-${item.id}" placeholder="ej. 360" style="width:70px;"> · IVA <select id="gpCubI-${item.id}"><option value="0.105">10,5%</option><option value="0.21">21%</option></select> <button class="btn-opcionales" style="margin-top:4px;" onclick="agregarCubiertasKitGrosspal(${item.id})">+ Agregar cubiertas</button></div>` : ''); })() : ''}
@@ -3297,6 +3298,31 @@ function _gerNetoUnit(item){
   return conIva ? (item.precio - fl)*(100/110.5) : item.precio - fl;
 }
 // Opcionales Grosspal (lista USD, al TC de fábrica como el equipo)
+function agregarOpcionalLecler(itemId, k){
+  const item = presupuesto.find(function(x){return x.id===Number(itemId);}); if (!item) return;
+  const fab = PRODUCTOS.find(function(p){return p.marca==='LE-CLER';});
+  const d = fab.items.find(function(i){return i.modelo===item.modelo;}); const o = d && d.opcionales && d.opcionales[k]; if (!o) return;
+  if (presupuesto.some(function(x){return x.parentId===item.id && x.opcId===o.id;})) { alert("Ese opcional ya está agregado."); return; }
+  let mult = 1, label = o.label;
+  if (o.porDisco) { mult = parseInt((item.modelo.match(/(\d+) discos/)||[])[1])||1; label = o.label+' ('+mult+' discos)'; }
+  if (o.porUnidad) { const q = parseInt(prompt("¿Cuántas unidades? ("+o.label+")","1")||''); if (!(q>0)) return; mult = q; label = o.label+' x'+q; }
+  presupuesto.push({ marca:'LE-CLER', lista:item.lista, vigencia:item.vigencia, moneda:'USD', conIVA:false,
+    modelo:label, desc:'Opcional p/'+item.modelo, precio:Math.round(o.precio*mult*100)/100, qty:item.qty||1,
+    esOpcional:true, ivaOpcional:o.iva||0.105, parentId:item.id, opcId:o.id, id:Date.now() });
+  renderPresupuesto();
+}
+function agregarCubiertasLecler(itemId){
+  const item = presupuesto.find(function(x){return x.id===Number(itemId);}); if (!item) return;
+  const q = parseInt(document.getElementById('lcCubQ-'+itemId).value)||0;
+  const pu = parseFloat(String(document.getElementById('lcCubP-'+itemId).value).replace(/\./g,'').replace(',','.'))||0;
+  const iva = parseFloat(document.getElementById('lcCubI-'+itemId).value)||0.105;
+  if (q<=0 || pu<=0) { alert("Cargá cantidad y precio en USD por cubierta."); return; }
+  const med = /P-01F/.test(item.modelo) ? '750x16' : '1000x16';
+  presupuesto.push({ marca:'LE-CLER', lista:item.lista, vigencia:item.vigencia, moneda:'USD', conIVA:false,
+    modelo:q+' Cubiertas '+med, desc:'Opcional p/'+item.modelo, precio:q*pu, qty:item.qty||1,
+    esOpcional:true, ivaOpcional:iva, parentId:item.id, opcId:'lc_cub', id:Date.now() });
+  renderPresupuesto();
+}
 function agregarOpcionalAcepla(itemId, k){
   const item = presupuesto.find(function(x){return x.id===Number(itemId);}); if (!item) return;
   const fab = PRODUCTOS.find(function(p){return p.marca==='ACEPLA';});

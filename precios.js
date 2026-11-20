@@ -181,6 +181,128 @@ const PRODUCTOS = [
     ]
   },
 
+  // ─── LE-CLER ──────────────────────────────────────────────
+  // Lista N°11 (sep-2025) en USD sin IVA, dólar BNA. Uso interno: descuento concesionario −15% sobre lista.
+  { marca:"LE-CLER", lista:"N°11", vigencia:"septiembre 2025", moneda:"USD", conIVA:false,
+    condiciones:"Transferencia: -20%. Credito bancario: -15%. 5 cheques (0-30-60-90-120): -15%. 10 cheques (0 a 270 dias): Neto. Rastras sin cubiertas. Flete incluido en el precio.",
+    items:[
+      { modelo:"P-01F Rastra fija 28 discos lisos – disco 24\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.380 kg) – sugerido 100-110 HP – llantas 750x16, sin balancín – sin cubiertas", precio:18896.8 },
+      { modelo:"P-01F Rastra fija 28 discos dentados y lisos – disco 24\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.380 kg) – sugerido 100-110 HP – llantas 750x16, sin balancín – sin cubiertas", precio:19179.06 },
+      { modelo:"P-01F Rastra fija 28 discos dentados – disco 24\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.380 kg) – sugerido 100-110 HP – llantas 750x16, sin balancín – sin cubiertas", precio:19403.9 },
+      { modelo:"P-01F Rastra fija 32 discos lisos – disco 24\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.720 kg) – sugerido 110-130 HP – llantas 750x16, sin balancín – sin cubiertas", precio:20064.1 },
+      { modelo:"P-01F Rastra fija 32 discos dentados y lisos – disco 24\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.720 kg) – sugerido 110-130 HP – llantas 750x16, sin balancín – sin cubiertas", precio:20341.57 },
+      { modelo:"P-01F Rastra fija 32 discos dentados – disco 24\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.720 kg) – sugerido 110-130 HP – llantas 750x16, sin balancín – sin cubiertas", precio:20604.69 },
+      { modelo:"P-01F Rastra fija 36 discos lisos – disco 24\"", desc:"Doble acción – 10 bancadas – 85 kg/disco (~3.060 kg) – sugerido 125-145 HP – llantas 750x16, sin balancín – sin cubiertas", precio:21413.18 },
+      { modelo:"P-01F Rastra fija 36 discos dentados y lisos – disco 24\"", desc:"Doble acción – 10 bancadas – 85 kg/disco (~3.060 kg) – sugerido 125-145 HP – llantas 750x16, sin balancín – sin cubiertas", precio:21714.58 },
+      { modelo:"P-01F Rastra fija 36 discos dentados – disco 24\"", desc:"Doble acción – 10 bancadas – 85 kg/disco (~3.060 kg) – sugerido 125-145 HP – llantas 750x16, sin balancín – sin cubiertas", precio:22015.97 },
+      { modelo:"P-01F Rastra fija 40 discos lisos – disco 24\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.400 kg) – sugerido 140-160 HP – llantas 750x16, sin balancín – sin cubiertas", precio:22800.54 },
+      { modelo:"P-01F Rastra fija 40 discos dentados y lisos – disco 24\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.400 kg) – sugerido 140-160 HP – llantas 750x16, sin balancín – sin cubiertas", precio:23111.5 },
+      { modelo:"P-01F Rastra fija 40 discos dentados – disco 24\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.400 kg) – sugerido 140-160 HP – llantas 750x16, sin balancín – sin cubiertas", precio:23446.38 },
+      { modelo:"P-01F Rastra fija 44 discos lisos – disco 24\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.740 kg) – sugerido 155-175 HP – llantas 750x16, sin balancín – sin cubiertas", precio:24288.37 },
+      { modelo:"P-01F Rastra fija 44 discos dentados y lisos – disco 24\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.740 kg) – sugerido 155-175 HP – llantas 750x16, sin balancín – sin cubiertas", precio:24608.9 },
+      { modelo:"P-01F Rastra fija 44 discos dentados – disco 24\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.740 kg) – sugerido 155-175 HP – llantas 750x16, sin balancín – sin cubiertas", precio:24962.91 },
+      { modelo:"P-01F Rastra fija 28 discos lisos – disco 26\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.380 kg) – sugerido 100-110 HP – llantas 750x16, sin balancín – sin cubiertas", precio:19048.6 },
+      { modelo:"P-01F Rastra fija 28 discos dentados y lisos – disco 26\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.380 kg) – sugerido 100-110 HP – llantas 750x16, sin balancín – sin cubiertas", precio:19315.4 },
+      { modelo:"P-01F Rastra fija 28 discos dentados – disco 26\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.380 kg) – sugerido 100-110 HP – llantas 750x16, sin balancín – sin cubiertas", precio:19536.2 },
+      { modelo:"P-01F Rastra fija 32 discos lisos – disco 26\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.720 kg) – sugerido 110-130 HP – llantas 750x16, sin balancín – sin cubiertas", precio:20295.2 },
+      { modelo:"P-01F Rastra fija 32 discos dentados y lisos – disco 26\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.720 kg) – sugerido 110-130 HP – llantas 750x16, sin balancín – sin cubiertas", precio:20566.6 },
+      { modelo:"P-01F Rastra fija 32 discos dentados – disco 26\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.720 kg) – sugerido 110-130 HP – llantas 750x16, sin balancín – sin cubiertas", precio:20815.0 },
+      { modelo:"P-01F Rastra fija 36 discos lisos – disco 26\"", desc:"Doble acción – 10 bancadas – 85 kg/disco (~3.060 kg) – sugerido 125-145 HP – llantas 750x16, sin balancín – sin cubiertas", precio:21721.2 },
+      { modelo:"P-01F Rastra fija 36 discos dentados y lisos – disco 26\"", desc:"Doble acción – 10 bancadas – 85 kg/disco (~3.060 kg) – sugerido 125-145 HP – llantas 750x16, sin balancín – sin cubiertas", precio:22020.2 },
+      { modelo:"P-01F Rastra fija 36 discos dentados – disco 26\"", desc:"Doble acción – 10 bancadas – 85 kg/disco (~3.060 kg) – sugerido 125-145 HP – llantas 750x16, sin balancín – sin cubiertas", precio:22305.4 },
+      { modelo:"P-01F Rastra fija 40 discos lisos – disco 26\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.400 kg) – sugerido 140-160 HP – llantas 750x16, sin balancín – sin cubiertas", precio:23174.8 },
+      { modelo:"P-01F Rastra fija 40 discos dentados y lisos – disco 26\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.400 kg) – sugerido 140-160 HP – llantas 750x16, sin balancín – sin cubiertas", precio:23492.2 },
+      { modelo:"P-01F Rastra fija 40 discos dentados – disco 26\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.400 kg) – sugerido 140-160 HP – llantas 750x16, sin balancín – sin cubiertas", precio:23795.8 },
+      { modelo:"P-01F Rastra fija 44 discos lisos – disco 26\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.740 kg) – sugerido 155-175 HP – llantas 750x16, sin balancín – sin cubiertas", precio:23998.2 },
+      { modelo:"P-01F Rastra fija 44 discos dentados y lisos – disco 26\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.740 kg) – sugerido 155-175 HP – llantas 750x16, sin balancín – sin cubiertas", precio:24403.0 },
+      { modelo:"P-01F Rastra fija 44 discos dentados – disco 26\"", desc:"Doble acción – 12 bancadas – 85 kg/disco (~3.740 kg) – sugerido 155-175 HP – llantas 750x16, sin balancín – sin cubiertas", precio:24752.6 },
+      { modelo:"P-01AR Rastra alas rebatibles 44 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.520 kg) – sugerido 155-175 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:27414.39 },
+      { modelo:"P-01AR Rastra alas rebatibles 44 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.520 kg) – sugerido 155-175 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:27622.43 },
+      { modelo:"P-01AR Rastra alas rebatibles 44 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.520 kg) – sugerido 155-175 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:27983.02 },
+      { modelo:"P-01AR Rastra alas rebatibles 48 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.840 kg) – sugerido 170-190 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:28528.53 },
+      { modelo:"P-01AR Rastra alas rebatibles 48 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.840 kg) – sugerido 170-190 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:28731.95 },
+      { modelo:"P-01AR Rastra alas rebatibles 48 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.840 kg) – sugerido 170-190 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:29092.54 },
+      { modelo:"P-01AR Rastra alas rebatibles 52 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.160 kg) – sugerido 180-210 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:29642.68 },
+      { modelo:"P-01AR Rastra alas rebatibles 52 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.160 kg) – sugerido 180-210 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:30021.76 },
+      { modelo:"P-01AR Rastra alas rebatibles 52 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.160 kg) – sugerido 180-210 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:30428.59 },
+      { modelo:"P-01AR Rastra alas rebatibles 56 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.480 kg) – sugerido 195-225 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:30890.89 },
+      { modelo:"P-01AR Rastra alas rebatibles 56 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.480 kg) – sugerido 195-225 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:31311.58 },
+      { modelo:"P-01AR Rastra alas rebatibles 56 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.480 kg) – sugerido 195-225 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:31741.52 },
+      { modelo:"P-01AR Rastra alas rebatibles 60 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.800 kg) – sugerido 210-240 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:32139.1 },
+      { modelo:"P-01AR Rastra alas rebatibles 60 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.800 kg) – sugerido 210-240 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:32601.4 },
+      { modelo:"P-01AR Rastra alas rebatibles 60 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.800 kg) – sugerido 210-240 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:33054.45 },
+      { modelo:"P-01AR Rastra alas rebatibles 44 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.520 kg) – sugerido 155-175 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:27746.47 },
+      { modelo:"P-01AR Rastra alas rebatibles 44 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.520 kg) – sugerido 155-175 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:27947.31 },
+      { modelo:"P-01AR Rastra alas rebatibles 44 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.520 kg) – sugerido 155-175 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:28295.42 },
+      { modelo:"P-01AR Rastra alas rebatibles 48 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.840 kg) – sugerido 170-190 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:28942.56 },
+      { modelo:"P-01AR Rastra alas rebatibles 48 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.840 kg) – sugerido 170-190 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:29134.46 },
+      { modelo:"P-01AR Rastra alas rebatibles 48 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~3.840 kg) – sugerido 170-190 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:29495.97 },
+      { modelo:"P-01AR Rastra alas rebatibles 52 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.160 kg) – sugerido 180-210 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:30138.64 },
+      { modelo:"P-01AR Rastra alas rebatibles 52 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.160 kg) – sugerido 180-210 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:30509.07 },
+      { modelo:"P-01AR Rastra alas rebatibles 52 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.160 kg) – sugerido 180-210 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:30891.99 },
+      { modelo:"P-01AR Rastra alas rebatibles 56 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.480 kg) – sugerido 195-225 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:31464.15 },
+      { modelo:"P-01AR Rastra alas rebatibles 56 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.480 kg) – sugerido 195-225 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:31865.82 },
+      { modelo:"P-01AR Rastra alas rebatibles 56 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.480 kg) – sugerido 195-225 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:32285.34 },
+      { modelo:"P-01AR Rastra alas rebatibles 60 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.800 kg) – sugerido 210-240 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:32789.66 },
+      { modelo:"P-01AR Rastra alas rebatibles 60 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.800 kg) – sugerido 210-240 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:33222.57 },
+      { modelo:"P-01AR Rastra alas rebatibles 60 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 80 kg/disco (~4.800 kg) – sugerido 210-240 HP – llantas 1000x16, sin balancín – sin cubiertas", precio:33678.69 },
+      { modelo:"P-01ART Rastra articulada 48 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.560 kg) – sugerido 170-190 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:42908.8 },
+      { modelo:"P-01ART Rastra articulada 48 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.560 kg) – sugerido 170-190 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:43829.72 },
+      { modelo:"P-01ART Rastra articulada 48 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.560 kg) – sugerido 170-190 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:44487.52 },
+      { modelo:"P-01ART Rastra articulada 52 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.940 kg) – sugerido 180-210 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:44730.4 },
+      { modelo:"P-01ART Rastra articulada 52 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.940 kg) – sugerido 180-210 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:45079.54 },
+      { modelo:"P-01ART Rastra articulada 52 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.940 kg) – sugerido 180-210 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:45545.06 },
+      { modelo:"P-01ART Rastra articulada 56 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.320 kg) – sugerido 195-225 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:45783.89 },
+      { modelo:"P-01ART Rastra articulada 56 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.320 kg) – sugerido 195-225 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:46390.08 },
+      { modelo:"P-01ART Rastra articulada 56 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.320 kg) – sugerido 195-225 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:46860.66 },
+      { modelo:"P-01ART Rastra articulada 60 discos lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.700 kg) – sugerido 210-240 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:47224.98 },
+      { modelo:"P-01ART Rastra articulada 60 discos dentados y lisos – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.700 kg) – sugerido 210-240 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:48034.58 },
+      { modelo:"P-01ART Rastra articulada 60 discos dentados – disco 24\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.700 kg) – sugerido 210-240 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:48247.1 },
+      { modelo:"P-01ART Rastra articulada 64 discos lisos – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.080 kg) – sugerido 225-255 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:50483.62 },
+      { modelo:"P-01ART Rastra articulada 64 discos dentados y lisos – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.080 kg) – sugerido 225-255 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:51227.44 },
+      { modelo:"P-01ART Rastra articulada 64 discos dentados – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.080 kg) – sugerido 225-255 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:51765.82 },
+      { modelo:"P-01ART Rastra articulada 68 discos lisos – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.460 kg) – sugerido 240-270 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:53423.48 },
+      { modelo:"P-01ART Rastra articulada 68 discos dentados y lisos – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.460 kg) – sugerido 240-270 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:54106.58 },
+      { modelo:"P-01ART Rastra articulada 68 discos dentados – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.460 kg) – sugerido 240-270 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:54683.42 },
+      { modelo:"P-01ART Rastra articulada 72 discos lisos – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.840 kg) – sugerido 250-290 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:56914.88 },
+      { modelo:"P-01ART Rastra articulada 72 discos dentados y lisos – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.840 kg) – sugerido 250-290 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:57547.38 },
+      { modelo:"P-01ART Rastra articulada 72 discos dentados – disco 24\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.840 kg) – sugerido 250-290 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:58164.7 },
+      { modelo:"P-01ART Rastra articulada 76 discos lisos – disco 24\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.220 kg) – sugerido 265-305 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:62997.0 },
+      { modelo:"P-01ART Rastra articulada 76 discos dentados y lisos – disco 24\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.220 kg) – sugerido 265-305 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:63619.38 },
+      { modelo:"P-01ART Rastra articulada 76 discos dentados – disco 24\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.220 kg) – sugerido 265-305 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:64317.66 },
+      { modelo:"P-01ART Rastra articulada 80 discos lisos – disco 24\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.600 kg) – sugerido 280-320 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:64919.8 },
+      { modelo:"P-01ART Rastra articulada 80 discos dentados y lisos – disco 24\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.600 kg) – sugerido 280-320 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:65537.12 },
+      { modelo:"P-01ART Rastra articulada 80 discos dentados – disco 24\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.600 kg) – sugerido 280-320 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:66220.22 },
+      { modelo:"P-01ART Rastra articulada 48 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.560 kg) – sugerido 170-190 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:43535.78 },
+      { modelo:"P-01ART Rastra articulada 48 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.560 kg) – sugerido 170-190 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:44415.99 },
+      { modelo:"P-01ART Rastra articulada 48 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.560 kg) – sugerido 170-190 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:44821.48 },
+      { modelo:"P-01ART Rastra articulada 52 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.940 kg) – sugerido 180-210 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:45063.79 },
+      { modelo:"P-01ART Rastra articulada 52 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.940 kg) – sugerido 180-210 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:45800.59 },
+      { modelo:"P-01ART Rastra articulada 52 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~4.940 kg) – sugerido 180-210 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:46250.59 },
+      { modelo:"P-01ART Rastra articulada 56 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.320 kg) – sugerido 195-225 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:46601.68 },
+      { modelo:"P-01ART Rastra articulada 56 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.320 kg) – sugerido 195-225 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:47195.08 },
+      { modelo:"P-01ART Rastra articulada 56 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.320 kg) – sugerido 195-225 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:47585.74 },
+      { modelo:"P-01ART Rastra articulada 60 discos lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.700 kg) – sugerido 210-240 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:48139.58 },
+      { modelo:"P-01ART Rastra articulada 60 discos dentados y lisos – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.700 kg) – sugerido 210-240 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:48629.13 },
+      { modelo:"P-01ART Rastra articulada 60 discos dentados – disco 26\"", desc:"Doble acción – 18 bancadas – 95 kg/disco (~5.700 kg) – sugerido 210-240 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:49128.58 },
+      { modelo:"P-01ART Rastra articulada 64 discos lisos – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.080 kg) – sugerido 225-255 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:51467.56 },
+      { modelo:"P-01ART Rastra articulada 64 discos dentados y lisos – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.080 kg) – sugerido 225-255 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:52189.53 },
+      { modelo:"P-01ART Rastra articulada 64 discos dentados – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.080 kg) – sugerido 225-255 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:52723.59 },
+      { modelo:"P-01ART Rastra articulada 68 discos lisos – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.460 kg) – sugerido 240-270 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:54469.18 },
+      { modelo:"P-01ART Rastra articulada 68 discos dentados y lisos – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.460 kg) – sugerido 240-270 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:55136.75 },
+      { modelo:"P-01ART Rastra articulada 68 discos dentados – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.460 kg) – sugerido 240-270 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:55700.48 },
+      { modelo:"P-01ART Rastra articulada 72 discos lisos – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.840 kg) – sugerido 250-290 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:58039.47 },
+      { modelo:"P-01ART Rastra articulada 72 discos dentados y lisos – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.840 kg) – sugerido 250-290 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:58657.59 },
+      { modelo:"P-01ART Rastra articulada 72 discos dentados – disco 26\"", desc:"Doble acción – 22 bancadas – 95 kg/disco (~6.840 kg) – sugerido 250-290 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:59250.99 },
+      { modelo:"P-01ART Rastra articulada 76 discos lisos – disco 26\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.220 kg) – sugerido 265-305 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:64245.44 },
+      { modelo:"P-01ART Rastra articulada 76 discos dentados y lisos – disco 26\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.220 kg) – sugerido 265-305 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:64868.51 },
+      { modelo:"P-01ART Rastra articulada 76 discos dentados – disco 26\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.220 kg) – sugerido 265-305 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:65536.09 },
+      { modelo:"P-01ART Rastra articulada 80 discos lisos – disco 26\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.600 kg) – sugerido 280-320 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:66109.71 },
+      { modelo:"P-01ART Rastra articulada 80 discos dentados y lisos – disco 26\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.600 kg) – sugerido 280-320 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:66722.89 },
+      { modelo:"P-01ART Rastra articulada 80 discos dentados – disco 26\"", desc:"Doble acción – 24 bancadas – 95 kg/disco (~7.600 kg) – sugerido 280-320 HP – llantas 1000x16, balancín incluido – sin cubiertas", precio:67400.35 },
+    ]
+  },
+
   // ─── ACEPLA ───────────────────────────────────────────────
   { marca:"ACEPLA", lista:"N°109", vigencia:"desde 14/10/2026", moneda:"Pesos", conIVA:false,
     condiciones:"Descuento 10% valores 0/30/60/90 dias.",
@@ -1293,6 +1415,7 @@ const FLETES = {
   "S y L":     { costo: 990,  moneda: "USD" },
   "BAIMA":     { costo: 1100, moneda: "USD" },
   "DOLBI":     { costo: 1430, moneda: "USD" },
+  "LE-CLER":   { costo: 1170, moneda: "USD" }, // por rastra, + IVA 10,5% (acordado 20/11/2026)
   "SODE_900": { costo: 1035, moneda: "USD" },
   "GROSSPAL_RCV1500": { costo: 1200, moneda: "USD" }, // rolo pata de cabra RCV 1500x1500, por unidad, + IVA, al TC oficial
   // COMOFRA: por modelo, ver FLETES_COMOFRA (camión completo Monte Buey ≈ USD 2.310 ÷ equipos por camión)
@@ -1727,5 +1850,22 @@ const FLETES_COMOFRA = [
   ];
   f.items.forEach(function(it){
     R.forEach(function(r){ if (r[0].test(it.modelo)) it.opcionales = (it.opcionales||[]).concat(r[1].map(function(o){ return Object.assign({iva:0.105}, o); })); });
+  });
+})();
+
+// ─── LE-CLER: accesorios (USD + IVA) como opcionales de cada rastra ───
+(function(){
+  const f = PRODUCTOS.find(function(p){ return p.marca === "LE-CLER"; }); if (!f) return;
+  f.items.forEach(function(it){
+    const art = /P-01ART/.test(it.modelo);
+    const o = [];
+    if (!art) o.push({id:"lc_bal79", label:"Juego balancín con mazas 7-9", precio:1843.07});
+    else o.push({id:"lc_bal911", label:"Juego balancín con mazas 9-11", precio:2321.34});
+    o.push({id:"lc_acople", label:"Acople hidráulico trasero", precio:933.20});
+    o.push({id:"lc_enganche", label:"Enganche trasero 1 metro", precio:729.06});
+    o.push({id:"lc_bancada", label:"Bancada (30211) con pata completa", precio:705.73, porUnidad:true});
+    o.push({id:"lc_disco6", label:"Diferencia por disco 6mm", precio:40.83, porDisco:true});
+    o.push({id:"lc_limpia", label:"Limpia disco", precio:29.16, porDisco:true});
+    it.opcionales = o.map(function(x){ return Object.assign({iva:0.105}, x); });
   });
 })();
