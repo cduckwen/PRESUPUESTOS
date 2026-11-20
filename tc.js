@@ -1,3 +1,3 @@
 // tc.js — tipo de cambio del día para el presupuestador. Lo actualiza una tarea diaria.
 // Fuente: Banco Nación, dólar billete, VENDEDOR. El vendedor lo puede cambiar a mano en la pantalla.
-const TC_DIA = { valor: 1580, fecha: "19/11/2026", fuente: "BNA billete vendedor" };
+const TC_DIA = { valor: 1585, fecha: "20/11/2026", fuente: "BNA billete vendedor" };
