@@ -1868,9 +1868,9 @@ const FLETES_COMOFRA = [
     o.push({id:"lc_limpia", label:"Limpia disco", precio:29.16, porDisco:true});
     // Cubiertas (salen sin cubiertas). Cantidad según Leandro (26/02/2026): fija y rebatible 4, articulada 6 (1000x16 10T 4 guías).
     // Precio: Martolio 04/06/2026 Galaxy/Alliance 1000-16 10T USD 174,55 s/IVA → 180; 750-16 BKT TF8181 14T 02/07/2026 USD 107,67 → 110. IVA 21%.
-    if (/P-01F /.test(it.modelo)) o.push({id:"lc_cub", label:"4 Cubiertas 750x16 (USD 110 c/u)", precio:440, iva:0.21});
-    else if (art) o.push({id:"lc_cub", label:"6 Cubiertas 1000x16 10 telas (USD 180 c/u)", precio:1080, iva:0.21});
-    else o.push({id:"lc_cub", label:"4 Cubiertas 1000x16 10 telas (USD 180 c/u)", precio:720, iva:0.21});
+    if (/P-01F /.test(it.modelo)) o.push({id:"lc_cub", label:"4 Cubiertas 750x16", unit:110, precio:440, iva:0.21});
+    else if (art) o.push({id:"lc_cub", label:"6 Cubiertas 1000x16 10 telas", unit:180, precio:1080, iva:0.21});
+    else o.push({id:"lc_cub", label:"4 Cubiertas 1000x16 10 telas", unit:180, precio:720, iva:0.21});
     it.opcionales = o.map(function(x){ return Object.assign({iva:0.105}, x); });
   });
 })();
