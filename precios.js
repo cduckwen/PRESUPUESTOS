@@ -182,7 +182,7 @@ const PRODUCTOS = [
   },
 
   // ─── LE-CLER ──────────────────────────────────────────────
-  // Lista N°11 (sep-2025) en USD sin IVA, dólar BNA. Uso interno: descuento concesionario −15% sobre lista.
+  // Lista N°11 (sep-2025, vigente confirmada por Leandro 02/11/2026) en USD sin IVA, dólar BNA. Uso interno: concesionario −15% sobre lista; en 5 cheques 0-120 la fábrica da −5% extra que queda para el concesionario (no se pasa al cliente).
   { marca:"LE-CLER", lista:"N°11", vigencia:"septiembre 2025", moneda:"USD", conIVA:false,
     condiciones:"Transferencia: -20%. 5 cheques (0-30-60-90-120): -15%. 10 cheques (0 a 270 dias): Neto. Flete incluido en el precio.",
     items:[
