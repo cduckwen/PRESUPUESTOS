@@ -184,7 +184,7 @@ const PRODUCTOS = [
   // ─── LE-CLER ──────────────────────────────────────────────
   // Lista N°11 (sep-2025) en USD sin IVA, dólar BNA. Uso interno: descuento concesionario −15% sobre lista.
   { marca:"LE-CLER", lista:"N°11", vigencia:"septiembre 2025", moneda:"USD", conIVA:false,
-    condiciones:"Transferencia: -20%. Credito bancario: -15%. 5 cheques (0-30-60-90-120): -15%. 10 cheques (0 a 270 dias): Neto. Flete incluido en el precio.",
+    condiciones:"Transferencia: -20%. 5 cheques (0-30-60-90-120): -15%. 10 cheques (0 a 270 dias): Neto. Flete incluido en el precio.",
     items:[
       { modelo:"P-01F Rastra fija 28 discos lisos – disco 24\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.380 kg) – sugerido 100-110 HP – llantas 750x16, sin balancín – sin cubiertas", precio:18896.8 },
       { modelo:"P-01F Rastra fija 28 discos dentados y lisos – disco 24\"", desc:"Doble acción – 8 bancadas – 85 kg/disco (~2.380 kg) – sugerido 100-110 HP – llantas 750x16, sin balancín – sin cubiertas", precio:19179.06 },
