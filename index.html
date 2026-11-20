@@ -1818,7 +1818,7 @@ function renderPresupuesto() {
         ${item.marca === 'RICHIGER' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='RICHIGER'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesRICHIGER(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
         ${item.marca === 'ROGRIV' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='ROGRIV'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesROGRIV(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
         ${item.marca === 'S y L' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='S y L'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesSYL(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
-        ${item.marca === 'GROSSPAL' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='GROSSPAL'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalGrosspal(${item.id},${k})">⚙️ + ${o.label.split(' – ')[0]} (USD ${o.precio.toLocaleString('es-AR')} + IVA ${Math.round((o.iva||0.105)*1000)/10}%)</button>`).join(''); })() : ''}
+        ${item.marca === 'GROSSPAL' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='GROSSPAL'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalGrosspal(${item.id},${k})">⚙️ + ${o.label.split(' – ')[0]} (USD ${o.precio.toLocaleString('es-AR')} + IVA ${Math.round((o.iva||0.105)*1000)/10}%)</button>`).join('') + (presupuesto.some(x=>x.parentId===item.id&&x.opcId==='gp_kit_pc') && !presupuesto.some(x=>x.parentId===item.id&&x.opcId==='gp_cub_kit') ? `<div style="margin-top:6px;padding:8px;background:#f5f9f5;border:1px solid #cfe3cf;border-radius:6px;font-size:0.82rem;">🛞 Cubiertas para el kit de transporte (al TC oficial):<br>Cant. <input type="number" id="gpCubQ-${item.id}" value="2" min="1" max="12" style="width:50px;"> · USD c/u + IVA <input type="text" inputmode="decimal" id="gpCubP-${item.id}" placeholder="ej. 360" style="width:70px;"> · IVA <select id="gpCubI-${item.id}"><option value="0.105">10,5%</option><option value="0.21">21%</option></select> <button class="btn-opcionales" style="margin-top:4px;" onclick="agregarCubiertasKitGrosspal(${item.id})">+ Agregar cubiertas</button></div>` : ''); })() : ''}
         ${item.marca === 'MAIZCO' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='MAIZCO'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesMAIZCO(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
       </div>
       <button class="btn-remove" onclick="quitarItem(${item.id})" title="Quitar">✕</button>
@@ -3304,6 +3304,18 @@ function agregarOpcionalGrosspal(itemId, k){
   presupuesto.push({ marca:'GROSSPAL', lista:item.lista, vigencia:item.vigencia, moneda:'Pesos', conIVA:false,
     modelo:o.label, desc:'Opcional p/'+item.modelo, precio:o.precio*tcf, qty:item.qty||1,
     esOpcional:true, ivaOpcional:o.iva||0.105, _tcFab: fab.tcFabrica||undefined, parentId:item.id, opcId:o.id, id:Date.now() });
+  renderPresupuesto();
+}
+function agregarCubiertasKitGrosspal(itemId){
+  const item = presupuesto.find(function(x){return x.id===Number(itemId);}); if (!item) return;
+  const q = parseInt(document.getElementById('gpCubQ-'+itemId).value)||0;
+  const pu = parseFloat(String(document.getElementById('gpCubP-'+itemId).value).replace(/\./g,'').replace(',','.'))||0;
+  const iva = parseFloat(document.getElementById('gpCubI-'+itemId).value)||0.105;
+  if (q<=0 || pu<=0) { alert("Cargá cantidad y precio en USD por cubierta."); return; }
+  // Las cubiertas no las pone la fábrica: van en USD y se pasan a pesos al TC oficial del día
+  presupuesto.push({ marca:'GROSSPAL', lista:item.lista, vigencia:item.vigencia, moneda:'USD', conIVA:false,
+    modelo:q+' Cubiertas 8.25x22.5 p/kit transporte', desc:'Opcional p/'+item.modelo, precio:q*pu, qty:item.qty||1,
+    esOpcional:true, ivaOpcional:iva, parentId:item.id, opcId:'gp_cub_kit', id:Date.now() });
   renderPresupuesto();
 }
 function setPrecioFinalPct(v){
