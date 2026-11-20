@@ -285,7 +285,7 @@
           <div class="total-row"><span>Subtotal s/IVA</span><span id="subtotalSinIva">—</span></div>
           <div class="total-row"><span>IVA (10,5%)</span><span id="montoIva">—</span></div>
           <div class="total-row final"><span>TOTAL c/IVA</span><span id="totalConIva">—</span></div>
-          <div class="total-row" id="precioFinalRow" style="align-items:center;"><span>Precio final (editable)</span><span style="display:flex;gap:4px;align-items:center;"><input type="text" id="precioFinalInput" inputmode="decimal" placeholder="—" onchange="setPrecioFinal(this.value)" style="width:130px;padding:4px 6px;border:1.5px solid #bbb;border-radius:6px;text-align:right;font-weight:600;"><button type="button" onclick="setPrecioFinal('')" title="Volver al total de lista" style="background:none;border:1px solid #bbb;border-radius:6px;cursor:pointer;padding:3px 7px;">↺</button></span></div>
+          <div class="total-row" id="precioFinalRow" style="align-items:center;"><span>Precio final (editable)</span><span style="display:flex;gap:4px;align-items:center;"><input type="text" id="precioFinalInput" inputmode="decimal" placeholder="—" onchange="setPrecioFinal(this.value)" style="width:130px;padding:4px 6px;border:1.5px solid #bbb;border-radius:6px;text-align:right;font-weight:600;"><input type="text" id="precioFinalPct" inputmode="decimal" placeholder="%" title="Ajuste en % sobre el total de lista (ej: -5 o 3)" onchange="setPrecioFinalPct(this.value)" style="width:58px;padding:4px 6px;border:1.5px solid #bbb;border-radius:6px;text-align:right;font-weight:600;"><button type="button" onclick="setPrecioFinal('')" title="Volver al total de lista" style="background:none;border:1px solid #bbb;border-radius:6px;cursor:pointer;padding:3px 7px;">↺</button></span></div>
           <div class="total-row" id="totalUSDRow" style="display:none;border-top:1px solid #ddd;margin-top:6px;padding-top:6px;"><span>Equiv. USD</span><span id="totalUSD">—</span></div>
         </div>
 
@@ -1818,6 +1818,7 @@ function renderPresupuesto() {
         ${item.marca === 'RICHIGER' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='RICHIGER'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesRICHIGER(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
         ${item.marca === 'ROGRIV' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='ROGRIV'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesROGRIV(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
         ${item.marca === 'S y L' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='S y L'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesSYL(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
+        ${item.marca === 'GROSSPAL' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='GROSSPAL'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalGrosspal(${item.id},${k})">⚙️ + ${o.label.split(' – ')[0]} (USD ${o.precio.toLocaleString('es-AR')} + IVA ${Math.round((o.iva||0.105)*1000)/10}%)</button>`).join(''); })() : ''}
         ${item.marca === 'MAIZCO' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='MAIZCO'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesMAIZCO(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
       </div>
       <button class="btn-remove" onclick="quitarItem(${item.id})" title="Quitar">✕</button>
@@ -1837,6 +1838,8 @@ function renderPresupuesto() {
     if (_precioFinalActivo()) totalSinIva = _precioFinalManual;
     const _pi = document.getElementById("precioFinalInput");
     if (_pi) { _pi.placeholder = todosPesos ? Math.round(_lista).toLocaleString("es-AR") : _lista.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2}); _pi.value = _precioFinalActivo() ? (todosPesos ? Math.round(_precioFinalManual).toLocaleString("es-AR") : _precioFinalManual.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2})) : ""; }
+    const _pp = document.getElementById("precioFinalPct");
+    if (_pp) _pp.value = _precioFinalActivo() && _lista ? ((_precioFinalManual/_lista-1)*100).toFixed(2).replace('.',',').replace(/,00$/,'') : "";
     document.getElementById("subtotalSinIva").textContent = "—";
     document.getElementById("montoIva").textContent = "—";
     document.getElementById("totalConIva").textContent = todosPesos
@@ -3290,6 +3293,24 @@ function _gerNetoUnit(item){
   let fl = f.costo || 0;
   if (f.moneda === 'USD' && item.moneda !== 'USD') fl = tc ? fl*tc : 0;
   return conIva ? (item.precio - fl)*(100/110.5) : item.precio - fl;
+}
+// Opcionales Grosspal (lista USD, al TC de fábrica como el equipo)
+function agregarOpcionalGrosspal(itemId, k){
+  const item = presupuesto.find(function(x){return x.id===Number(itemId);}); if (!item) return;
+  const fab = PRODUCTOS.find(function(p){return p.marca==='GROSSPAL';});
+  const d = fab.items.find(function(i){return i.modelo===item.modelo;}); const o = d && d.opcionales && d.opcionales[k]; if (!o) return;
+  if (presupuesto.some(function(x){return x.parentId===item.id && x.opcId===o.id;})) { alert("Ese opcional ya está agregado."); return; }
+  const tcf = fab.tcFabrica || getTipoCambio(); if (!tcf) { alert("Cargá el tipo de cambio."); return; }
+  presupuesto.push({ marca:'GROSSPAL', lista:item.lista, vigencia:item.vigencia, moneda:'Pesos', conIVA:false,
+    modelo:o.label, desc:'Opcional p/'+item.modelo, precio:o.precio*tcf, qty:item.qty||1,
+    esOpcional:true, ivaOpcional:o.iva||0.105, _tcFab: fab.tcFabrica||undefined, parentId:item.id, opcId:o.id, id:Date.now() });
+  renderPresupuesto();
+}
+function setPrecioFinalPct(v){
+  const pc = parseFloat(String(v).replace(',','.'));
+  const L = _listaTotalDisp();
+  if (!L || isNaN(pc) || pc === 0) { setPrecioFinal(''); return; }
+  setPrecioFinal(String(Math.round(L.tot*(1+pc/100)*100)/100).replace('.',','));
 }
 var _precioFinalManual = 0, _precioFinalBase = 0;
 function _listaTotalDisp(){
