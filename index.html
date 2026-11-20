@@ -1751,6 +1751,10 @@ function _normalizarTCFabrica(){
 
 function renderPresupuesto() {
   _normalizarTCFabrica();
+  // LE-CLER: si se agregaron cubiertas, la descripción deja de decir "sin cubiertas"
+  presupuesto.forEach(function(i){ if (i.marca!=='LE-CLER' || i.esOpcional) return; if (i._descOrig===undefined) i._descOrig=i.desc;
+    const conCub = presupuesto.some(function(x){ return x.parentId===i.id && x.opcId==='lc_cub'; });
+    i.desc = conCub ? String(i._descOrig).replace(/ – sin cubiertas/,'') : i._descOrig; });
   const list = document.getElementById('itemsList');
   const empty = document.getElementById('emptyState');
   const totalBox = document.getElementById('totalBox');
