@@ -1818,6 +1818,7 @@ function renderPresupuesto() {
         ${item.marca === 'RICHIGER' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='RICHIGER'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesRICHIGER(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
         ${item.marca === 'ROGRIV' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='ROGRIV'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesROGRIV(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
         ${item.marca === 'S y L' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='S y L'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesSYL(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
+        ${item.marca === 'DOLBI' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='DOLBI'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; const tc=getTipoCambio(); return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalDolbi(${item.id},${k})">⚙️ + ${o.label} ($ ${o.precioARS.toLocaleString('es-AR')} + IVA ${Math.round(o.iva*1000)/10}%${tc?' ≈ USD '+Math.round(o.precioARS/tc).toLocaleString('es-AR'):''})</button>`).join(''); })() : ''}
         ${item.marca === 'GROSSPAL' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='GROSSPAL'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalGrosspal(${item.id},${k})">⚙️ + ${o.label.split(' – ')[0]} (USD ${o.precio.toLocaleString('es-AR')} + IVA ${Math.round((o.iva||0.105)*1000)/10}%)</button>`).join('') + (presupuesto.some(x=>x.parentId===item.id&&x.opcId==='gp_kit_pc') && !presupuesto.some(x=>x.parentId===item.id&&x.opcId==='gp_cub_kit') ? `<div style="margin-top:6px;padding:8px;background:#f5f9f5;border:1px solid #cfe3cf;border-radius:6px;font-size:0.82rem;">🛞 Cubiertas para el kit de transporte (al TC oficial):<br>Cant. <input type="number" id="gpCubQ-${item.id}" value="2" min="1" max="12" style="width:50px;"> · USD c/u + IVA <input type="text" inputmode="decimal" id="gpCubP-${item.id}" placeholder="ej. 360" style="width:70px;"> · IVA <select id="gpCubI-${item.id}"><option value="0.105">10,5%</option><option value="0.21">21%</option></select> <button class="btn-opcionales" style="margin-top:4px;" onclick="agregarCubiertasKitGrosspal(${item.id})">+ Agregar cubiertas</button></div>` : ''); })() : ''}
         ${item.marca === 'MAIZCO' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='MAIZCO'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesMAIZCO(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
       </div>
@@ -3295,6 +3296,18 @@ function _gerNetoUnit(item){
   return conIva ? (item.precio - fl)*(100/110.5) : item.precio - fl;
 }
 // Opcionales Grosspal (lista USD, al TC de fábrica como el equipo)
+function agregarOpcionalDolbi(itemId, k){
+  const item = presupuesto.find(function(x){return x.id===Number(itemId);}); if (!item) return;
+  const fab = PRODUCTOS.find(function(p){return p.marca==='DOLBI';});
+  const d = fab.items.find(function(i){return i.modelo===item.modelo;}); const o = d && d.opcionales && d.opcionales[k]; if (!o) return;
+  if (presupuesto.some(function(x){return x.parentId===item.id && x.opcId===o.id;})) { alert("Ese opcional ya está agregado."); return; }
+  const tc = getTipoCambio(); if (!tc) { alert("Cargá el tipo de cambio."); return; }
+  // Precio en pesos pasado a USD al TC oficial BNA del día; sigue las condiciones de pago de Dolbi
+  presupuesto.push({ marca:'DOLBI', lista:item.lista, vigencia:item.vigencia, moneda:'USD', conIVA:false,
+    modelo:o.label, desc:'Opcional p/'+item.modelo, precio:Math.round(o.precioARS/tc*100)/100, qty:item.qty||1,
+    esOpcional:true, ivaOpcional:o.iva||0.105, parentId:item.id, opcId:o.id, id:Date.now() });
+  renderPresupuesto();
+}
 function agregarOpcionalGrosspal(itemId, k){
   const item = presupuesto.find(function(x){return x.id===Number(itemId);}); if (!item) return;
   const fab = PRODUCTOS.find(function(p){return p.marca==='GROSSPAL';});

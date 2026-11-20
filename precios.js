@@ -400,7 +400,9 @@ const PRODUCTOS = [
       { modelo:"RG 5250",  desc:"Rolo Triturador 90cm – 3 rolos – 5,25m ancho", precio:26334 },
       { modelo:"RG 7500",  desc:"Rolo Triturador 90cm – 5 rolos – 7,50m ancho", precio:34072 },
       { modelo:"RG 9000",  desc:"Rolo Triturador 90cm – 5 rolos – 9,00m ancho", precio:40903 },
-      { modelo:"RS 6750",  desc:"Rolo Triturador 70cm – 3 rolos – 6,75m ancho", precio:27389 },
+      { modelo:"RS 6750",  desc:"Rolo Triturador 70cm – 3 rolos – 6,75m ancho", precio:27389,
+        // Duam: costo $10.900.000 + IVA ÷ 0,85 (15% margen s/venta). Se pasa a USD al BNA del día.
+        opcionales:[ { id:"dolbi_duam", label:"Tolva sembradora Duam SN 500-EP – 500 L con monitor", precioARS:12823529, iva:0.105 } ] },
       { modelo:"RD 6750",  desc:"Rolo Deshidratador – 3 rolos – 6,75m ancho", precio:24026 },
       { modelo:"PD 600 Paratill",  desc:"600 timones curvos", precio:16055 },
       { modelo:"PD 800 Paratill",  desc:"800 timones curvos", precio:19801 },
