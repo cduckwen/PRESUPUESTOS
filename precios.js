@@ -1698,3 +1698,34 @@ const FLETES_COMOFRA = [
   [/Embolsadora|E-09/i,         550], // embolsadora
   [/ATAM|ACIS/,                 770], // acoplado rural y tanques: 3 por camión
 ];
+
+// ─── ACEPLA: accesorios de la lista N°109 (pesos + IVA) como opcionales de cada producto ───
+// porMetro: pide la cantidad de metros al agregarlo. porTimon: se multiplica por la cantidad de timones.
+(function(){
+  const f = PRODUCTOS.find(function(p){ return p.marca === "ACEPLA"; }); if (!f) return;
+  const R = [
+    [/^Acoplado Taller (3|4)x/, [ {id:"ac_duales", label:"Diferencia por llantas duales", precio:623834} ]],
+    [/^Acoplado Jaula/,         [ {id:"ac_cargador", label:"Cargador para hacienda", precio:682016.5},
+                                  {id:"ac_lanza", label:"Lanza regulable con resortes", precio:394061} ]],
+    [/^Rolo Culminacion/,       [ {id:"ac_peine", label:"Hilera de peine adicional", precio:178155, porMetro:true} ]],
+    [/^Rastra Rotativa/,        [ {id:"ac_estr", label:"Estrellas sin maza (c/u)", precio:162549},
+                                  {id:"ac_estrm", label:"Estrellas con mazas armadas (c/u)", precio:259199},
+                                  {id:"ac_mazaa", label:"Mazas armadas (c/u)", precio:109588},
+                                  {id:"ac_mazas", label:"Mazas sin armar (c/u)", precio:41786},
+                                  {id:"ac_res", label:"Resortes (c/u)", precio:21430} ]],
+    [/^Tanque Chapa/,           [ {id:"ac_duales", label:"Diferencia por llantas duales", precio:549599},
+                                  {id:"ac_cajon", label:"Cajón lateral", precio:239574} ]],
+    [/^Acoplado Rural Playo/,   [ {id:"ac_duales", label:"Diferencia por llantas duales", precio:514023},
+                                  {id:"ac_balancin", label:"Ejes en balancín (sin costo)", precio:0} ]],
+    [/^Trailer A-/,             [ {id:"ac_alargue", label:"Alargue de plataforma", precio:1339070, porMetro:true},
+                                  {id:"ac_vantdes", label:"Vantren desmontable", precio:252100},
+                                  {id:"ac_elast", label:"Kit de elásticos en ambos ejes", precio:2580394},
+                                  {id:"ac_guarda", label:"Guardabarros (ambos ejes)", precio:550000} ]],
+    [/^Tolva (Semillas|Silera)/,[ {id:"ac_lona", label:"Lona cobertora de atar con arcos", precio:500085},
+                                  {id:"ac_cobertor", label:"Cobertor rápido con lona enrollable", precio:1051619} ]],
+    [/^Descompactador/,         [ {id:"ac_safe", label:"Diferencia cuchilla con safe a resorte", precio:311725, porTimon:true} ]],
+  ];
+  f.items.forEach(function(it){
+    R.forEach(function(r){ if (r[0].test(it.modelo)) it.opcionales = (it.opcionales||[]).concat(r[1].map(function(o){ return Object.assign({iva:0.105}, o); })); });
+  });
+})();
