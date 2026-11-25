@@ -1738,7 +1738,7 @@ function _ejecutarAgregarProducto(marca, idx, qty, tipoDescargaATF) {
 }
 
 function quitarItem(id) {
-  presupuesto = presupuesto.filter(i => i.id !== id);
+  presupuesto = presupuesto.filter(i => i.id !== id && i.parentId !== id);
   renderPresupuesto();
   calcularDiferencia();
 }
@@ -1841,6 +1841,7 @@ function renderPresupuesto() {
         ${item.marca === 'ACEPLA' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='ACEPLA'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalAcepla(${item.id},${k})">⚙️ + ${o.label} ($ ${o.precio.toLocaleString('es-AR')}${o.porMetro?' por metro':''}${o.porTimon?' por timón':''} + IVA)</button>`).join(''); })() : ''}
         ${item.marca === 'DOLBI' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='DOLBI'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; const tc=getTipoCambio(); return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalDolbi(${item.id},${k})">⚙️ + ${o.label} ($ ${o.precioARS.toLocaleString('es-AR')} + IVA ${Math.round(o.iva*1000)/10}%${tc?' ≈ USD '+Math.round(o.precioARS/tc).toLocaleString('es-AR'):''})</button>`).join(''); })() : ''}
         ${item.marca === 'GROSSPAL' && !item.esOpcional ? (() => { const f=PRODUCTOS.find(p=>p.marca==='GROSSPAL'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return (d&&d.opcionales||[]).map((o,k)=>`<button class="btn-opcionales" onclick="agregarOpcionalGrosspal(${item.id},${k})">⚙️ + ${o.label.split(' – ')[0]} (USD ${o.precio.toLocaleString('es-AR')} + IVA ${Math.round((o.iva||0.105)*1000)/10}%)</button>`).join('') + (presupuesto.some(x=>x.parentId===item.id&&x.opcId==='gp_kit_pc') && !presupuesto.some(x=>x.parentId===item.id&&x.opcId==='gp_cub_kit') ? `<div style="margin-top:6px;padding:8px;background:#f5f9f5;border:1px solid #cfe3cf;border-radius:6px;font-size:0.82rem;">🛞 Cubiertas para el kit de transporte (al TC oficial):<br>Cant. <input type="number" id="gpCubQ-${item.id}" value="2" min="1" max="12" style="width:50px;"> · USD c/u + IVA <input type="text" inputmode="decimal" id="gpCubP-${item.id}" placeholder="ej. 360" style="width:70px;"> · IVA <select id="gpCubI-${item.id}"><option value="0.105">10,5%</option><option value="0.21">21%</option></select> <button class="btn-opcionales" style="margin-top:4px;" onclick="agregarCubiertasKitGrosspal(${item.id})">+ Agregar cubiertas</button></div>` : ''); })() : ''}
+        ${item.marca === 'MAIZCO' && !item.esOpcional && /^(SGT|SGS|Girasol)/.test(item.modelo) ? `<div style="margin:6px 0;font-size:0.85rem;">🌾 Cosechadora del cliente: <select onchange="setCosechadoraMaizco(${item.id}, this.value)">${MZ_COSECH.map(c=>`<option value="${c.k}" ${(item.cosechadora||'')===c.k?'selected':''}>${c.l}</option>`).join('')}</select>${item.cosechNota?`<div style="color:#c60;font-size:0.78rem;margin-top:3px;">⚠️ ${item.cosechNota}</div>`:''}</div>` : ''}
         ${item.marca === 'MAIZCO' && !item.esOpcional && (() => { const f=PRODUCTOS.find(p=>p.marca==='MAIZCO'); const d=f?f.items.find(i=>i.modelo===item.modelo):null; return d&&d.opcionales&&d.opcionales.length>0; })() ? `<button class="btn-opcionales" onclick="mostrarOpcionalesMAIZCO(${item.id})">⚙️ + Agregar opcionales</button>` : ''}
       </div>
       <button class="btn-remove" onclick="quitarItem(${item.id})" title="Quitar">✕</button>
@@ -3367,6 +3368,58 @@ function agregarOpcionalAcepla(itemId, k){
   presupuesto.push({ marca:'ACEPLA', lista:item.lista, vigencia:item.vigencia, moneda:'Pesos', conIVA:false,
     modelo:label, desc:'Opcional p/'+item.modelo, precio:o.precio*mult, qty:item.qty||1,
     esOpcional:true, ivaOpcional:o.iva||0.105, parentId:item.id, opcId:o.id, id:Date.now() });
+  renderPresupuesto();
+}
+// ── MAIZCO: extra según cosechadora del cliente (LP 110 – 01/09/2026). Case/NH/Vassalli: incluido. ──
+const MZ_COSECH = [
+  {k:'', l:'— elegir —'}, {k:'case', l:'Case / New Holland / Vassalli'}, {k:'jd', l:'John Deere'},
+  {k:'mf', l:'MF / AGCO'}, {k:'claas', l:'Claas'}, {k:'tc57', l:'NH TC 57 / TC 59'}, {k:'tc5070', l:'NH TC 5070 / 5090'}
+];
+function _mzExtraCosech(modelo, k){
+  const esGira = /^Girasol/.test(modelo), esSGS = /^SGS/.test(modelo), esHid = /HID/.test(modelo);
+  const surcos = parseInt((modelo.match(/(\d+)s/)||[])[1])||0;
+  const r = {label:'', usd:0, ars:0, nota:''};
+  const cil = (!esGira && surcos>=12 && ['case','jd','mf','tc57','tc5070'].indexOf(k)>-1) ? 'Maicero de 12 surcos o más: verificar con Maizco si lleva cilindro adicional (precio no está en la LP).' : '';
+  if (k==='case') { r.nota = cil; return r; }
+  if (k==='claas') {
+    if (esGira) { r.label='Adicional p/cosechadora Claas'; r.ars=2630000; }
+    else if (esSGS) { r.label='Adicional p/cosechadora Claas'; r.ars=2100000; }
+    else { r.label='Chapa cubrerolo hidráulica c/placa Claas'; r.usd=1100; }
+    return r;
+  }
+  if (esGira) {
+    if (k==='mf' && esHid) r.nota='Girasolero hidráulico para AGCO: la LP dice "consultar". Confirmar con Maizco.';
+    else r.nota='La LP no indica extra para girasolero en esta cosechadora. Confirmar con Maizco.';
+    return r;
+  }
+  if (k==='jd') { r.label='Chapa cubrerolo hidráulica c/placa JD'; r.usd=600; }
+  if (k==='mf') { r.label='Chapa cubrerolo hidráulica c/placa MF/AGCO'; r.usd=800; }
+  if (k==='tc57') { r.label='Mando especial p/NH TC 57 / TC 59'; r.ars=1604550.08; }
+  if (k==='tc5070') { r.label='Eje mando adicional p/NH TC 5070 / 5090'; r.ars=331638.97; }
+  r.nota = cil;
+  return r;
+}
+function setCosechadoraMaizco(itemId, k){
+  const item = presupuesto.find(function(x){ return x.id===Number(itemId); }); if (!item) return;
+  for (let i=presupuesto.length-1;i>=0;i--) if (presupuesto[i].parentId===item.id && presupuesto[i].opcId==='mz_cosech') presupuesto.splice(i,1);
+  if (item._descOrig===undefined) item._descOrig = item.desc;
+  item.cosechadora = k; item.cosechNota = '';
+  const c = MZ_COSECH.find(function(x){ return x.k===k; });
+  item.desc = k ? item._descOrig + ' – p/cosechadora ' + c.l : item._descOrig;
+  if (!k) { renderPresupuesto(); return; }
+  const e = _mzExtraCosech(item.modelo, k);
+  item.cosechNota = e.nota;
+  if (e.usd || e.ars) {
+    let precio = e.ars, moneda = 'Pesos', dx = '';
+    if (e.usd) {
+      if (item.moneda === 'USD') { precio = e.usd; moneda = 'USD'; }
+      else { const tc = getTipoCambio(); if (!tc) { alert('Cargá el Tipo de Cambio.'); item.cosechadora=''; item.desc=item._descOrig; renderPresupuesto(); return; }
+        precio = Math.round(e.usd*tc); dx = ' – USD ' + e.usd.toLocaleString('es-AR') + ' al TC del día'; }
+    }
+    presupuesto.push({ marca:'MAIZCO', lista:item.lista, vigencia:item.vigencia, moneda:moneda, conIVA:false,
+      modelo:e.label, desc:'Opcional p/' + item.modelo + dx, precio:precio, qty:item.qty||1,
+      esOpcional:true, ivaOpcional:0.105, parentId:item.id, opcId:'mz_cosech', id:Date.now()+Math.random() });
+  }
   renderPresupuesto();
 }
 function agregarOpcionalDolbi(itemId, k){
