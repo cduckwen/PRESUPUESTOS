@@ -460,6 +460,7 @@
                 <option value="contado">💵 Pago contado</option>
                 <option value="estacional90">🌾 Estacional 90</option>
                 <option value="estacional120">🌾 Estacional 120</option>
+                <option value="cheques">🧾 Cheques a medida</option>
                 <option value="sololista">🏷️ Precio Lista Solo</option>
               </select>
             </div>
@@ -495,6 +496,20 @@
                   <option value="10">10 cuotas</option>
                   <option value="12">12 cuotas</option>
                 </select>
+              </div>
+            </div>
+
+            <!-- Campos plan en cheques a medida (usados / sin lista) -->
+            <div id="camposChequesMedida" style="display:none;">
+              <div class="stock-row">
+                <label>1° cheque a:</label>
+                <input type="number" id="chqMedD0" value="30" min="0" max="720" step="1" style="max-width:70px;" oninput="calcularCuotas()" />
+                <span style="font-size:0.78rem;color:#888;">días (0 = al contado)</span>
+              </div>
+              <div class="stock-row">
+                <label>Cant. cheques:</label>
+                <input type="number" id="chqMedN" value="10" min="1" max="36" step="1" style="max-width:70px;" oninput="calcularCuotas()" />
+                <span style="font-size:0.78rem;color:#888;">mensuales (cada 30 días)</span>
               </div>
             </div>
 
@@ -2146,15 +2161,21 @@ function copiarWhatsApp() {
           txt += "📊 *Saldo a financiar (" + (100-pct) + "%): " + fmt2(saldoUSD) + "*\n";
         }
         txt += sep;
-        txt += "🌾 *" + sd.planNombre + "* — TNA " + sd.tna + "% | " + sd.nCuotas + " cuotas\n";
+        if (sd.esChqMedida) txt += "🧾 *Plan en cheques* — " + sd.nCuotas + " cheques mensuales, 1° a " + sd.d0 + " días" + (sd.tna > 0 ? " | TNA " + sd.tna + "%" : "") + "\n";
+        else txt += "🌾 *" + sd.planNombre + "* — TNA " + sd.tna + "% | " + sd.nCuotas + " cuotas\n";
         if (sd.cuotasFechas) {
           sd.cuotasFechas.forEach(function(c) {
             txt += "   *" + c.etiqueta + ":* " + fmt2(sd.cuotaUSD) + "\n";
           });
         }
+        if (sd.esChqMedida) {
+          txt += "   *Total en cheques: " + fmt2(sd.totalConInteres) + "*\n";
+          txt += "_Cheques pesificados al dólar BNA vendedor del día anterior al cobro._\n";
+        } else {
         txt += "   *Suma de cuotas: " + fmt2(sd.totalUSD + (sd.tna > 0 ? sd.totalDisplay - sd.totalDisplay : 0)) + "*\n";
         txt += "_Cada cuota conlleva documento en USD con cheque a cuenta._\n";
         txt += "_Ventana prohibida: 1° nov – 30 ene. Cuotas corridas al 31 de enero._\n";
+        }
       } else {
 
       // ── MODO CUOTAS ────────────────────────────────────────
@@ -3796,7 +3817,8 @@ function actualizarPeriodos() {
   const plazoVal    = plazoEl.value;
   const esContado   = plazoVal === "contado";
   const esSoloLista = plazoVal === "sololista";
-  const esEstacional = plazoVal === "estacional90" || plazoVal === "estacional120";
+  const esChqMed = plazoVal === "cheques";
+  const esEstacional = plazoVal === "estacional90" || plazoVal === "estacional120" || esChqMed;
   const camposCuotas  = document.getElementById("camposCuotas");
   const camposContado = document.getElementById("camposContado");
   const camposEntrega = document.getElementById("camposEntrega");
@@ -3846,7 +3868,10 @@ function actualizarPeriodos() {
   }
 
   const camposEst = document.getElementById("camposEstacional");
-  if (camposEst) camposEst.style.display = esEstacional ? "block" : "none";
+  if (camposEst) camposEst.style.display = (esEstacional && !esChqMed) ? "block" : "none";
+  const camposChqM = document.getElementById("camposChequesMedida");
+  if (camposChqM) camposChqM.style.display = esChqMed ? "block" : "none";
+  { const mr = document.getElementById("stockMonedaCuotas"); const row = mr ? mr.closest(".stock-row") : null; if (row) row.style.display = esChqMed ? "none" : ""; }
 
   if (!esContado && !esEstacional) {
     const plazo = parseInt(plazoVal);
@@ -3910,6 +3935,45 @@ function calcularCuotas() {
   const fmtP = function(v){ return "$ " + Math.round(v).toLocaleString("es-AR"); };
   const fmt  = esPesos && tc ? function(v){ return fmtP(v); } : fmt2;
   const toDisplay = function(usd){ return esPesos && tc ? usd * tc : usd; };
+
+  // ── MODO CHEQUES A MEDIDA (usados / sin lista): 1° cheque a X días + N mensuales, pesificados ──
+  if (plazoVal === "cheques") {
+    const d0 = Math.max(0, parseInt(document.getElementById("chqMedD0") ? document.getElementById("chqMedD0").value : "30") || 0);
+    const nC = Math.max(1, Math.min(36, parseInt(document.getElementById("chqMedN") ? document.getElementById("chqMedN").value : "10") || 1));
+    const tnaC = parseFloat(document.getElementById("stockTNA") ? document.getElementById("stockTNA").value : "0") || 0;
+    const pmC = window._pmData;
+    const saldoC = window._totalFinanciarUSD || 0;
+    if (!saldoC || saldoC <= 0) { res.style.display="none"; window._stockData=null; verificarBotonWA(); return; }
+    const hoyC = new Date();
+    const diasC = [], fechasC = [];
+    for (let i=0;i<nC;i++){ const dd=d0+i*30; diasC.push(dd); const f=new Date(hoyC); f.setDate(f.getDate()+dd); fechasC.push(f); }
+    let intC = 0;
+    if (tnaC > 0) diasC.forEach(function(dd){ intC += (saldoC/nC) * (Math.pow(1+tnaC/100, dd/365) - 1); });
+    const totC = saldoC + intC, cuotaC = totC / nC;
+    const fU = function(v){ return "USD " + v.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2}); };
+    const tcC = getTipoCambio();
+    let html = "<div class=\"cr-titulo\">🧾 Plan en cheques — " + nC + " cheques mensuales, 1° a " + d0 + " días" + (tnaC>0 ? " | TNA " + tnaC + "%" : " | sin interés") + "</div>";
+    if (pmC && pmC.conEntrega) {
+      html += "<div class=\"cr-fila\" style=\"font-weight:700;color:#2040a0;\"><span>✔ Entrega contado (" + pmC.pct + "%)</span><span>" + fU(pmC.entregaUSD) + "</span></div>";
+      html += "<div class=\"cr-fila\"><span>Saldo a financiar (" + (100-pmC.pct) + "%)</span><span>" + fU(pmC.saldoUSD || saldoC) + "</span></div>";
+    }
+    if (intC > 0) html += "<div class=\"cr-fila\"><span>Interés total</span><span>" + fU(intC) + "</span></div>";
+    html += "<div class=\"cr-fila\" style=\"font-weight:700;margin-top:4px;border-top:1px solid #cce;padding-top:4px;\"><span>" + nC + " cheques de</span><span>" + fU(cuotaC) + (tcC ? " (≈ $ " + Math.round(cuotaC*tcC).toLocaleString("es-AR") + " hoy)" : "") + "</span></div>";
+    fechasC.forEach(function(f,i){ html += "<div class=\"cr-fila\"><span>Cheque " + (i+1) + " — " + diasC[i] + " días (" + f.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"}) + ")</span><span>" + fU(cuotaC) + "</span></div>"; });
+    html += "<div class=\"cr-total\">Total en cheques: " + fU(totC) + "</div>";
+    html += "<div style=\"font-size:0.75rem;color:#666;margin-top:4px;\">Cheques pesificados: se pagan en pesos al dólar BNA vendedor del día anterior al cobro.</div>";
+    res.style.display = "block"; res.innerHTML = html;
+    window._stockData = {
+      esContado:false, esEstacional:true, esChqMedida:true, planNombre:"Plan en cheques",
+      detalle: pmC ? pmC.detalle : "", totalUSD: saldoC, nCuotas:nC, d0:d0,
+      esPesos:false, tna:tnaC, cuotaUSD:cuotaC, cuotaDisplay:cuotaC, totalDisplay:totC, totalConInteres:totC,
+      cuotasFechas: fechasC.map(function(f,i){ return { etiqueta: "Cheque " + (i+1) + " (" + diasC[i] + " días)" }; }),
+      periodoNombre:"mensuales", periodoLabel:"mens.", esMensual:false, esModoEntrega: !!(pmC && pmC.conEntrega),
+      monedaCuotas:"USD", pmData: pmC || null
+    };
+    verificarBotonWA();
+    return;
+  }
 
   // ── MODO ESTACIONAL ────────────────────────────────────────
   if (plazoVal === "estacional90" || plazoVal === "estacional120") {
