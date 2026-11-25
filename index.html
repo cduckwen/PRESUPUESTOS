@@ -2100,7 +2100,8 @@ function copiarWhatsApp() {
   if (modosWA.stock && pmWA && pmWA.detalle) {
     txt += sep;
     txt += "🚜 *" + pmWA.detalle + "*\n";
-    txt += "   *Precio c/IVA: " + fmt2(pmWA.precioManual) + "*\n";
+    if (pmWA.monedaManual === "Pesos") txt += "   *Precio c/IVA: " + fmtP(pmWA.precioManual) + "*" + (tcWA ? " (" + fmt2(pmWA.precioManual / tcWA) + ")" : "") + "\n";
+    else txt += "   *Precio c/IVA: " + fmt2(pmWA.precioManual) + "*\n";
   }
 
   // ── DESGLOSE IVA TOTAL VENDIDO (LP + stock, excepto 1 solo producto sin stock) ──
@@ -2165,12 +2166,18 @@ function copiarWhatsApp() {
         else txt += "🌾 *" + sd.planNombre + "* — TNA " + sd.tna + "% | " + sd.nCuotas + " cuotas\n";
         if (sd.cuotasFechas) {
           sd.cuotasFechas.forEach(function(c) {
-            txt += "   *" + c.etiqueta + ":* " + fmt2(sd.cuotaUSD) + "\n";
+            if (sd.esChqMedida && tcWA) txt += "   *" + c.etiqueta + ":* " + fmtP(sd.cuotaUSD * tcWA) + "\n";
+            else txt += "   *" + c.etiqueta + ":* " + fmt2(sd.cuotaUSD) + "\n";
           });
         }
         if (sd.esChqMedida) {
-          txt += "   *Total en cheques: " + fmt2(sd.totalConInteres) + "*\n";
-          txt += "_Cheques pesificados al dólar BNA vendedor del día anterior al cobro._\n";
+          if (tcWA) {
+            txt += "   *Total en cheques: " + fmtP(sd.totalConInteres * tcWA) + "* (" + fmt2(sd.totalConInteres) + ")\n";
+            txt += "_Importes en pesos al TC de hoy ($" + Math.round(tcWA).toLocaleString("es-AR") + "). Cada cheque se ajusta al dólar BNA vendedor del día anterior al cobro._\n";
+          } else {
+            txt += "   *Total en cheques: " + fmt2(sd.totalConInteres) + "*\n";
+            txt += "_Cheques pesificados al dólar BNA vendedor del día anterior al cobro._\n";
+          }
         } else {
         txt += "   *Suma de cuotas: " + fmt2(sd.totalUSD + (sd.tna > 0 ? sd.totalDisplay - sd.totalDisplay : 0)) + "*\n";
         txt += "_Cada cuota conlleva documento en USD con cheque a cuenta._\n";
@@ -3959,8 +3966,9 @@ function calcularCuotas() {
     }
     if (intC > 0) html += "<div class=\"cr-fila\"><span>Interés total</span><span>" + fU(intC) + "</span></div>";
     html += "<div class=\"cr-fila\" style=\"font-weight:700;margin-top:4px;border-top:1px solid #cce;padding-top:4px;\"><span>" + nC + " cheques de</span><span>" + fU(cuotaC) + (tcC ? " (≈ $ " + Math.round(cuotaC*tcC).toLocaleString("es-AR") + " hoy)" : "") + "</span></div>";
-    fechasC.forEach(function(f,i){ html += "<div class=\"cr-fila\"><span>Cheque " + (i+1) + " — " + diasC[i] + " días (" + f.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"}) + ")</span><span>" + fU(cuotaC) + "</span></div>"; });
-    html += "<div class=\"cr-total\">Total en cheques: " + fU(totC) + "</div>";
+    const fPC = function(u){ return tcC ? "$ " + Math.round(u*tcC).toLocaleString("es-AR") : fU(u); };
+    fechasC.forEach(function(f,i){ html += "<div class=\"cr-fila\"><span>Cheque " + (i+1) + " — " + diasC[i] + " días (" + f.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"}) + ")</span><span>" + fPC(cuotaC) + "</span></div>"; });
+    html += "<div class=\"cr-total\">Total en cheques: " + fPC(totC) + (tcC ? " (" + fU(totC) + ")" : "") + "</div>";
     html += "<div style=\"font-size:0.75rem;color:#666;margin-top:4px;\">Cheques pesificados: se pagan en pesos al dólar BNA vendedor del día anterior al cobro.</div>";
     res.style.display = "block"; res.innerHTML = html;
     window._stockData = {
