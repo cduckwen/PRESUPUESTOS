@@ -2980,13 +2980,15 @@ function _mzFecha(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.ge
 function _mzEtiquetaADate(et){
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   if (/^cdo$/i.test(et)) return hoy;
-  const m = /^(\d{1,2})?(Ene|Jul)(\d{2})$/i.exec(et);   // "Ene27" = 31/01/27 · "30Ene27" = 30/01/27
+  const m = /^(\d{1,2})?(Ene|Mar|Jun|Jul)(\d{2})$/i.exec(et);   // "Ene27" = 31/01/27 · "30Ene27" = 30/01/27 · "30Jun27" = 30/06/27
   if (!m) return null;
-  return new Date(2000+parseInt(m[3],10), m[2].toLowerCase()==='ene' ? 0 : 6, m[1] ? parseInt(m[1],10) : 31);
+  const mes = {ene:0, mar:2, jun:5, jul:6}[m[2].toLowerCase()];
+  const ult = new Date(2000+parseInt(m[3],10), mes+1, 0).getDate();
+  return new Date(2000+parseInt(m[3],10), mes, m[1] ? parseInt(m[1],10) : ult);
 }
 function _mzEtiquetaAFecha(et){ const d=_mzEtiquetaADate(et); return d ? _mzFecha(d) : et; }
 // "30Ene27" → "30/01/27" para mostrar
-function _mzFechasTxt(t){ return String(t).replace(/\b(\d{1,2})(Ene|Jul)(\d{2})\b/gi, function(a,d,m,y){ return d+'/'+(m.toLowerCase()==='ene'?'01':'07')+'/'+y; }); }
+function _mzFechasTxt(t){ return String(t).replace(/\b(\d{1,2})(Ene|Mar|Jun|Jul)(\d{2})\b/gi, function(a,d,m,y){ return d+'/'+({ene:'01',mar:'03',jun:'06',jul:'07'}[m.toLowerCase()])+'/'+y; }).replace(/\bCdo\b/g,'Entrega'); }
 // Parsea los planes desde el texto "cond" del item MAIZCO
 function parsearPlanesMaizco(cond){
   const planes = [];

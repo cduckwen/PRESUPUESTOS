@@ -1874,3 +1874,34 @@ const FLETES_COMOFRA = [
     it.opcionales = o.map(function(x){ return Object.assign({iva:0.105}, x); });
   });
 })();
+
+// ═══ MAIZCO · PLANES DICIEMBRE 2026 ═══
+// Vigentes desde que se publican (27/11/2026) hasta el 31/12/2026 inclusive.
+// El 01/01/2027 a las 00:00 se dejan de aplicar solos y vuelven las condiciones "cond" estándar de cada ítem.
+(function(){
+  const HASTA = new Date(2027, 0, 1, 0, 0, 0);   // 01/01/2027 00:00 (hora local)
+  if (new Date() >= HASTA) return;
+  const PLAN = {
+    maicero: "Pesos:\n* Contado -10%\n* 0-30-60 dias -7%\n* 12 cheques (0 a 330 dias) precio lista\n" +
+             "USD lista: 25% Cdo, 25% 30Jun27, 25% 30Ene28, 25% 30Jun28.\n" +
+             "USD lista +3%: 20% Cdo, 20% 30Jun27, 20% 30Ene28, 20% 30Jun28, 20% 30Ene29.\n" +
+             "USD lista +6%: 25% Cdo, 25% 30Jun27, 25% 30Jun28, 25% 30Jun29.",
+    draper:  "Pesos:\n* Contado -10%\n* 0-30-60 dias -7%\n* 8 cheques (0 a 210 dias) precio lista\n" +
+             "USD lista: 25% Cdo, 25% 30Jun27, 25% 30Ene28, 25% 30Jun28.\n" +
+             "USD lista +3%: 20% Cdo, 20% 30Jun27, 20% 30Ene28, 20% 30Jun28, 20% 30Ene29.\n" +
+             "USD lista +7%: 20% Cdo, 20% 30Jun27, 5% 30Ene28, 25% 30Jun28, 5% 30Ene29, 20% 30Jul29, 5% 30Ene30.",
+    girasol: "Pesos:\n* Contado -10%\n* 0-30-60 dias -7%\n* 8 cheques (30 a 240 dias) precio lista\n" +
+             "USD lista: 20% Cdo, 20% 30Mar27, 25% 30Jul27, 15% 30Mar28, 20% 30Jul28.\n" +
+             "USD lista +2%: 15% Cdo, 20% 30Mar27, 20% 30Jul27, 15% 30Mar28, 20% 30Jul28, 10% 30Mar29."
+  };
+  const mz = PRODUCTOS.find(function(p){ return p.marca === "MAIZCO"; });
+  if (!mz) return;
+  mz.items.forEach(function(it){
+    if (!it.cond) return;
+    let tipo = null;
+    if (/^SG[TS]\b/.test(it.modelo)) tipo = "maicero";
+    else if (/^DM200\b/.test(it.modelo)) tipo = "draper";
+    else if (/^Girasol\b/.test(it.modelo)) tipo = "girasol";
+    if (tipo) { it.condEstandar = it.cond; it.cond = PLAN[tipo]; it.planMaizco = "Plan Diciembre 2026"; }
+  });
+})();
